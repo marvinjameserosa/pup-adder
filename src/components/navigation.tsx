@@ -10,14 +10,18 @@ export default function Navigation() {
           <Link href="/" className="font-bold text-2xl mr-auto">Logo</Link>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-4 mr-80">
-              <Button variant="ghost" size="sm">
-                <Compass className="h-5 w-5 mr-2" />
-                Discover
-              </Button>
-              <Button variant="ghost" size="sm">
-                <Calendar className="h-5 w-5 mr-2" />
-                Events
-              </Button>
+              <Link href="/createEvent">
+                <Button variant="ghost" size="sm">
+                  <Compass className="h-5 w-5 mr-2" />
+                  Discover
+                </Button>
+              </Link>
+              <Link href="/eventsPage">
+                <Button variant="ghost" size="sm">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Events
+                </Button>
+              </Link>
             </div>
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
@@ -27,10 +31,12 @@ export default function Navigation() {
               <Bell className="h-5 w-5" />
               <span className="sr-only">Notifications</span>
             </Button>
-            <Button>
-              <PlusCircle className="h-5 w-5 mr-2" />
-              Create Event
-            </Button>
+            <Link href="/createEvent">
+              <Button>
+                <PlusCircle className="h-5 w-5 mr-2" />
+                Create Event
+              </Button>
+            </Link>
             <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
               <img src="/placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
             </div>
