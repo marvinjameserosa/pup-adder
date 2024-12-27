@@ -1,8 +1,6 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-import { LoginForm } from "@/components/login-form"
-import { Button } from "@/components/ui/button"
-import Link from 'next/link'
+import { LoginForm } from "@/components/login-form";
+import { Button } from "@/components/ui/button";
+import Link from 'next/link';
 
 export default function Page() {
   return (
@@ -15,7 +13,7 @@ export default function Page() {
         </Button>
         
         <Button variant="outline">
-           <Link href="/#">Events</Link>
+           <Link href="/eventsPage">Events</Link>
         </Button>
       </div>
     </div>
