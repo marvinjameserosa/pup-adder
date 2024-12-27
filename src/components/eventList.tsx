@@ -16,12 +16,12 @@ const events = [
     isCreator: true,
     availableSlots: 150,
     totalSlots: 500,
-    isGoing: true
+    isGoing: false,
   },
   {
     id: 2,
-    name: "Tech Conference 2023",
-    date: "2023-08-22",
+    name: "Tech Conference 2025",
+    date: "2025-01-22",
     time: "09:00",
     host: "TechCorp",
     location: "Convention Center",
@@ -29,20 +29,20 @@ const events = [
     isCreator: true,
     availableSlots: 50,
     totalSlots: 200,
-    isGoing: false
+    isGoing: false,
   },
   {
     id: 3,
     name: "Food & Wine Expo",
-    date: "2023-09-10",
+    date: "2025-02-10",
     time: "11:00",
     host: "Gourmet Association",
     location: "Exhibition Hall",
     imageUrl: "/placeholder.svg?height=193&width=193",
-    isCreator: false,
+    isCreator: true,
     availableSlots: 75,
     totalSlots: 300,
-    isGoing: true
+    isGoing: false,
   },
   {
     id: 4,
@@ -55,7 +55,7 @@ const events = [
     isCreator: true,
     availableSlots: 25,
     totalSlots: 100,
-    isGoing: false
+    isGoing: false,
   },
   {
     id: 5,
@@ -65,10 +65,10 @@ const events = [
     host: "City Sports Association",
     location: "City Streets",
     imageUrl: "/placeholder.svg?height=193&width=193",
-    isCreator: false,
+    isCreator: true,
     availableSlots: 1000,
     totalSlots: 5000,
-    isGoing: true
+    isGoing: false,
   },
 ]
 
@@ -102,7 +102,7 @@ export default function EventsList() {
 
   return (
     <div className="w-full max-w-[616px] space-y-6">
-      <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+      <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
         {filteredEvents.slice(0, visibleEvents).map((event) => (
           <EventCard key={event.id} {...event} />
         ))}
@@ -115,4 +115,3 @@ export default function EventsList() {
     </div>
   )
 }
-

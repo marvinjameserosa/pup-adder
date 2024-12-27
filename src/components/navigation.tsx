@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 export default function Navigation() {
   return (
-    <nav className="w-full bg-background border-b">
+    <nav className="w-full bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] to-50%">
       <div className="max-w-[1360px] mx-auto px-4">
         <div className="flex items-center h-16">
           <Link href="/" className="font-bold text-2xl mr-auto">Logo</Link>

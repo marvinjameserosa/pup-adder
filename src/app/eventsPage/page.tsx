@@ -5,7 +5,7 @@ import { Suspense } from 'react'
 
 export default function EventsPage() {
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center">
+    <div className="min-h-screen bg-background flex flex-col items-center bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] to-50%">
       <Navigation />
       <main className="w-full max-w-[1360px] px-4 py-8 flex flex-col items-center">
         <div className="w-full max-w-[616px] mb-8">
