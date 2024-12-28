@@ -10,7 +10,7 @@ export default function EventsPage() {
       <main className="w-full max-w-[1360px] px-4 py-8 flex flex-col items-center">
         <div className="w-full max-w-[616px] mb-8">
           <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-bold">Events</h1>
+            <h1 className="text-3xl font-bold">Events</h1>
             <FilterToggle />
           </div>
         </div>

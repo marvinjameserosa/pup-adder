@@ -11,13 +11,13 @@ export default function Navigation() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-4 mr-80">
               <Link href="/createEvent">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="default">
                   <Compass className="h-5 w-5 mr-2" />
                   Discover
                 </Button>
               </Link>
               <Link href="/eventsPage">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="default">
                   <Calendar className="h-5 w-5 mr-2" />
                   Events
                 </Button>
