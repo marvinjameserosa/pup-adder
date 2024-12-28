@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { useEffect, useMemo, useState } from 'react'
 import EmptyEventsList from './emptyEventsList'
 import EventCard from './eventCard'
+import EventDrawer from './eventDrawer'
 
 const events = [
   {
@@ -76,6 +77,8 @@ const events = [
 export default function EventsList() {
   const [visibleEvents, setVisibleEvents] = useState(3)
   const [filter, setFilter] = useState<'upcoming' | 'past'>('upcoming')
+  const [selectedEvent, setSelectedEvent] = useState<typeof events[0] | null>(null)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   const currentDate = new Date()
 
@@ -101,6 +104,15 @@ export default function EventsList() {
     setVisibleEvents(prevVisible => Math.min(prevVisible + 3, filteredEvents.length))
   }
 
+  const handleEventClick = (event: typeof events[0]) => {
+    setSelectedEvent(event)
+    setIsDrawerOpen(true)
+  }
+
+  const closeDrawer = () => {
+    setIsDrawerOpen(false)
+  }
+
   if (filteredEvents.length === 0 && filter === 'upcoming') {
     return <EmptyEventsList />
   }
@@ -109,7 +121,7 @@ export default function EventsList() {
     <div className="w-full max-w-[616px] space-y-6">
       <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
         {filteredEvents.slice(0, visibleEvents).map((event) => (
-          <EventCard key={event.id} {...event} />
+          <EventCard key={event.id} {...event} onClick={() => handleEventClick(event)} />
         ))}
       </div>
       {visibleEvents < filteredEvents.length && (
@@ -117,6 +129,7 @@ export default function EventsList() {
           <Button onClick={loadMore}>Load More</Button>
         </div>
       )}
+      <EventDrawer event={selectedEvent} isOpen={isDrawerOpen} onClose={closeDrawer} />
     </div>
   )
 }

@@ -14,6 +14,7 @@ interface EventCardProps {
   availableSlots: number
   totalSlots: number
   isGoing: boolean
+  onClick: () => void
 }
 
 export default function EventCard({ 
@@ -26,14 +27,15 @@ export default function EventCard({
   isCreator, 
   availableSlots, 
   totalSlots,
-  isGoing
+  isGoing, 
+  onClick
 }: EventCardProps) {
   const eventDate = new Date(date)
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
   const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
   return (
-    <Card className="overflow-hidden w-full max-w-[616px] h-[200px] flex">
+    <Card className="overflow-hidden w-full max-w-[616px] h-[200px] flex cursor-pointer hover:shadow-lg transition-shadow" onClick={onClick}>
       <div className="w-[100px] flex-shrink-0 flex flex-col items-center justify-center border-r">
         <div className="text-xl font-bold">{monthNames[eventDate.getMonth()]} {eventDate.getDate()}</div>
         <div className="text-sm text-muted-foreground">{dayNames[eventDate.getDay()]}</div>
@@ -61,7 +63,7 @@ export default function EventCard({
             </div>
           </CardContent>
         </div>
-        <CardFooter className="p-0 mt-auto pt-2 flex justify-between items-center">
+        <CardFooter className="p-0 mt-auto pt-2 flex justify-between items-center" onClick={(e) => e.stopPropagation()}>
           {isCreator ? (
             <div className="flex space-x-2">
               <Button size="sm" variant="outline" className="h-7 px-2 text-xs">Check In</Button>
