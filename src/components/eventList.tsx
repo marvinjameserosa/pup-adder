@@ -2,13 +2,14 @@
 
 import { Button } from "@/components/ui/button"
 import { useEffect, useMemo, useState } from 'react'
+import EmptyEventsList from './emptyEventsList'
 import EventCard from './eventCard'
 
 const events = [
   {
     id: 1,
     name: "Summer Music Festival",
-    date: "2024-12-29",
+    date: "2023-12-29",
     time: "14:00",
     host: "City Cultural Center",
     location: "Central Park",
@@ -34,7 +35,7 @@ const events = [
   {
     id: 3,
     name: "Food & Wine Expo",
-    date: "2025-02-10",
+    date: "2024-02-10",
     time: "11:00",
     host: "Gourmet Association",
     location: "Exhibition Hall",
@@ -47,7 +48,7 @@ const events = [
   {
     id: 4,
     name: "Art Gallery Opening",
-    date: "2025-01-05",
+    date: "2024-01-05",
     time: "18:00",
     host: "Metropolitan Museum",
     location: "Downtown Art District",
@@ -100,6 +101,10 @@ export default function EventsList() {
     setVisibleEvents(prevVisible => Math.min(prevVisible + 3, filteredEvents.length))
   }
 
+  if (filteredEvents.length === 0 && filter === 'upcoming') {
+    return <EmptyEventsList />
+  }
+
   return (
     <div className="w-full max-w-[616px] space-y-6">
       <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
@@ -115,5 +120,7 @@ export default function EventsList() {
     </div>
   )
 }
+
+
 
 
