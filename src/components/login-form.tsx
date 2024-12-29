@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/app/firebase/config"
 import Link from 'next/link'
+
 export function LoginForm({
   className,
   ...props
@@ -24,17 +25,13 @@ export function LoginForm({
     const formData = new FormData(event.currentTarget); 
     const email = formData.get("email") as string; 
     const password = formData.get("password") as string;
-    console.log(email)
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      console.log("Logged in:", user);
-     
     } catch (error: any) {
       console.error("Login error:", error.message || error.code);
     }
   }
-
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

@@ -1,4 +1,6 @@
-;import { Button } from "@/components/ui/button";
+"use client"
+
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,9 +11,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from 'next/link'
-
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/app/firebase/config";
 
 export default function Page(){
+
+  async function signUpEmailPassword(event: React.FormEvent<HTMLFormElement>){
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    try{
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user
+    } catch(error: any){
+      console.error("Login error:", error.message || error.code);
+    }
+  }
   return (
     <div className="flex flex-col gap-6 items-center"> 
       <Card className="w-full max-w-md">
@@ -22,7 +38,7 @@ export default function Page(){
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={signUpEmailPassword}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
