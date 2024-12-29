@@ -15,10 +15,10 @@ const events = [
     host: "City Cultural Center",
     location: "Central Park",
     imageUrl: "/placeholder.svg?height=193&width=193",
-    isCreator: true,
+    isCreator: false,
     availableSlots: 150,
     totalSlots: 500,
-    isGoing: false,
+    isGoing: true,
   },
   {
     id: 2,
