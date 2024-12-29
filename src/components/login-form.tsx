@@ -14,23 +14,29 @@ import { Label } from "@/components/ui/label";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/app/firebase/config"
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
 
+  const router = useRouter();
+
   async function loginEmailPassword(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); 
+    
     const formData = new FormData(event.currentTarget); 
     const email = formData.get("email") as string; 
     const password = formData.get("password") as string;
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      //const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      //const user = userCredential.user;
+      router.push('/discover');
     } catch (error: any) {
       console.error("Login error:", error.message || error.code);
     }
+    
   }
 
   return (
