@@ -1,19 +1,41 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+"use client"
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/app/firebase/config"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+
+  async function loginEmailPassword(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault(); 
+    const formData = new FormData(event.currentTarget); 
+    const email = formData.get("email") as string; 
+    const password = formData.get("password") as string;
+    console.log(email)
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log("Logged in:", user);
+     
+    } catch (error: any) {
+      console.error("Login error:", error.message || error.code);
+    }
+  }
+
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -24,14 +46,15 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={loginEmailPassword}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="person@example.com"
                   required
                 />
               </div>
@@ -45,7 +68,7 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" name="password" type="password" required />
               </div>
               <Button type="submit" className="w-full">
                 Login
@@ -61,5 +84,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
