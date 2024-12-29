@@ -1,39 +1,48 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { Button } from "@/components/ui/button"
+import { Bell, Calendar, Compass, PlusCircle, Search } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Header() {
   return (
-    <header className={styles.header}>
-      {/* Logo */}
-      <div className={styles.logo}>
-        <Image src="/favicon.ico" alt="PUP Gather" width={30} height={30}/>
+    <nav className="w-full bg-white">
+      <div className="max-w-[1360px] mx-auto px-4">
+        <div className="flex items-center h-16">
+          <Link href="/discover" className="font-bold text-2xl mr-auto">Logo</Link>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 mr-80">
+              <Link href="/discover">
+                <Button variant="ghost" size="default">
+                  <Compass className="h-5 w-5 mr-2" />
+                  Discover
+                </Button>
+              </Link>
+              <Link href="/events">
+                <Button variant="ghost" size="default">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Events
+                </Button>
+              </Link>
+            </div>
+            <Button variant="ghost" size="icon">
+              <Search className="h-5 w-5" />
+              <span className="sr-only">Search</span>
+            </Button>
+            <Button variant="ghost" size="icon">
+              <Bell className="h-5 w-5" />
+              <span className="sr-only">Notifications</span>
+            </Button>
+            <Link href="/createEvent">
+              <Button>
+                <PlusCircle className="h-5 w-5 mr-2" />
+                Create Event
+              </Button>
+            </Link>
+            <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
+              <img src="/placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
+            </div>
+          </div>
+        </div>
       </div>
-
-      {/* Navigation Buttons */}
-      <nav className={styles.nav}>
-        <button className={styles.navButton}>
-          <Image src="/icons/discover.png" alt="Discover" width={20} height={20} />
-          Discover
-        </button>
-        <button className={styles.navButton}>
-          <Image src="/icons/events.png" alt="Events" width={20} height={20} />
-          Events
-        </button>
-      </nav>
-
-      {/* Utility Buttons (Search and Notifications next to each other) */}
-      <div className={styles.utilityButtons}>
-        <button className={styles.iconButton}>
-          <Image src="/icons/notification.png" alt="Notifications" width={20} height={20} />
-        </button>
-        <button className={styles.iconButton}>
-          <Image src="/icons/search.png" alt="Search" width={20} height={20} />
-        </button>
-        <button className={styles.createEventButton}>Create Event</button>
-        <button className={styles.profileButton}>
-          <Image src="/icons/profile.png" alt="Profile" width={40} height={40} className={styles.profileImage} layout="Intrinsic" />
-        </button>
-      </div>
-    </header>
-  );
+    </nav>
+  )
 }

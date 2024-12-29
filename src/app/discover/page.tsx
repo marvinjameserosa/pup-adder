@@ -1,6 +1,5 @@
 "use client"
 import Image from "next/image";
-import styles from "./page.module.css";
 import * as React from "react"
 import Link from "next/link";
 import Header from "@/components/header/header";
