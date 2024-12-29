@@ -30,8 +30,9 @@ export function LoginForm({
     const email = formData.get("email") as string; 
     const password = formData.get("password") as string;
     try {
-      //const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      //const user = userCredential.user;
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log("User:", user);
       router.push('/discover');
     } catch (error: any) {
       console.error("Login error:", error.message || error.code);

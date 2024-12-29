@@ -1,5 +1,6 @@
 "use client"
 import Image from "next/image";
+import styles from "./page.module.css";
 import * as React from "react"
 import Link from "next/link";
 import Header from "@/components/header/header";
@@ -43,7 +44,7 @@ import {
 
 
 
-export default function page() {
+export default function Discover() {
   const [isSheetOpen, setIsSheetOpen] = useState(false); // Manage sheet visibility
 
   const handleSheetOpen = () => {
