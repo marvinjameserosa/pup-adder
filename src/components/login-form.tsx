@@ -39,7 +39,6 @@ export function LoginForm({
     } catch (error: any) {
       console.error("Login error:", error.message || error.code);
     }
-    
   }
 
   return (
@@ -88,7 +87,7 @@ export function LoginForm({
                   required 
                   className="bg-white text-black placeholder-gray-400"/>
               </div>
-              <Button type="submit" className="w-full bg-yellow-700 hover:bg-yellow-800 text-black">
+              <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-800 text-black">
                 Login
               </Button>
             </div>
