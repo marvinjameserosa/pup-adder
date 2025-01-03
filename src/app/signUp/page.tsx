@@ -25,7 +25,6 @@ export default function SignUpForm(){
   };
 
   return (
-    <div>
       <div>
         {showSignUpForm1 ? (
           <SignUpForm1 onSubmit={signUpEmailPassword} />
@@ -33,6 +32,6 @@ export default function SignUpForm(){
           <SignUpForm2 />
         )}
       </div>
-    </div>
+    
   );
 }
