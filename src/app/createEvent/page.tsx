@@ -120,7 +120,7 @@ export default function CreateEvent() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center space-x-4" style={{ width: '440px' }}>
-                  <span className="font-semibold w-12">Start</span>
+                  <span className="text-sm font-semibold w-12">Start</span>
                   <div className="flex-1 relative">
                     <Input 
                       type="date" 
@@ -139,7 +139,7 @@ export default function CreateEvent() {
                   </Select>
                 </div>
                 <div className="flex items-center space-x-4" style={{ width: '440px' }}>
-                  <span className="font-semibold w-12">End</span>
+                  <span className="text-sm font-semibold w-12">End</span>
                   <div className="flex-1 relative">
                     <Input 
                       type="date" 
@@ -234,7 +234,7 @@ export default function CreateEvent() {
                 </Dialog>
               </div>
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Event Options</h3>
+                <h3 className="text-sm font-semibold">Event Options</h3>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <UserCheck className="h-5 w-5 text-gray-500" />
