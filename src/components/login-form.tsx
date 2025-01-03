@@ -15,6 +15,8 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/app/firebase/config"
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Door } from "./door";
+
 
 export function LoginForm({
   className,
@@ -41,15 +43,20 @@ export function LoginForm({
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+    <div className={cn("flex flex-col gap-4", className)} {...props}>
+      <Card className="shadow-xl rounded-[24px] bg-[#2E2E2E]/60 backdrop-blur-sm flex flex-col border border-[#302F30]">
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
+        <div className="flex items-center gap-4">
+        <div className="w-18 h-20">
+          <Door/>
+        </div>
+      </div>
+          <CardTitle className="text-2xl text-white">Welcome to PUP Gather!</CardTitle>
+          <CardDescription className="text-white">
             Enter your email below to login to your account.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="text-white">
           <form onSubmit={loginEmailPassword}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
@@ -60,6 +67,7 @@ export function LoginForm({
                   type="email"
                   placeholder="person@example.com"
                   required
+                  className="bg-white text-black placeholder-gray-400"
                 />
               </div>
               <div className="grid gap-2">
@@ -72,9 +80,15 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" name="password" type="password" required />
+                <Input 
+                  id="password" 
+                  name="password" 
+                  type="password" 
+                  placeholder="password"
+                  required 
+                  className="bg-white text-black placeholder-gray-400"/>
               </div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full bg-yellow-700 hover:bg-yellow-800 text-black">
                 Login
               </Button>
             </div>

@@ -6,6 +6,10 @@ export default function Home(){
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
+<>
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] to-50% p-4">
+    <div className="absolute inset-0 bg-black/80 mix-blend-multiply" />
+      <div className="relative z-10 w-[360px]">
         <LoginForm />
         <Button variant="outline">
            <Link href="/createEvent">Create Event</Link>
