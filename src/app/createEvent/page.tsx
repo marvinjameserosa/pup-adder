@@ -15,6 +15,11 @@ import { useState } from 'react'
 
 export default function CreateEvent() {
   const { toast } = useToast()
+  const [eventName, setEventName] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [startTime, setStartTime] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [endTime, setEndTime] = useState('')
   const [isVirtual, setIsVirtual] = useState(false)
   const [description, setDescription] = useState('')
   const [location, setLocation] = useState('')
@@ -51,14 +56,35 @@ export default function CreateEvent() {
     setIsCapacityDialogOpen(false)
   }
 
+  const validateForm = () => {
+    const missingFields = []
+    if (!eventName) missingFields.push('Event Name')
+    if (!startDate) missingFields.push('Start Date')
+    if (!startTime) missingFields.push('Start Time')
+    if (!endDate) missingFields.push('End Date')
+    if (!endTime) missingFields.push('End Time')
+    if (!location) missingFields.push('Location')
+    if (!description) missingFields.push('Description')
+    return missingFields
+  }
+
   const handleCreateEvent = () => {
-    const eventName = (document.getElementById('event-name') as HTMLInputElement).value;
-    const creationDate = new Date().toLocaleString();
+    const missingFields = validateForm()
+    if (missingFields.length > 0) {
+      toast({
+        title: "Missing Information",
+        description: `Please fill in the following fields: ${missingFields.join(', ')}`,
+        variant: "destructive",
+      })
+      return
+    }
+
+    const creationDate = new Date().toLocaleString()
     toast({
       title: `${eventName} is created`,
       description: `Created on ${creationDate}`,
-    });
-  };
+    })
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] to-50% pt-20 flex items-center justify-center">
@@ -78,15 +104,26 @@ export default function CreateEvent() {
           <div className="flex-1 space-y-4">
             <div>
               <Label htmlFor="event-name">Name of Event</Label>
-              <Input id="event-name" className="w-full h-[45px]" placeholder="Enter event name" />
+              <Input 
+                id="event-name" 
+                className="w-full h-[45px]" 
+                placeholder="Enter event name" 
+                value={eventName}
+                onChange={(e) => setEventName(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <div className="flex items-center space-x-4" style={{ width: '440px' }}>
-                <span className="text-sm font-semibold w-12">Start</span>
+                <span className="font-semibold w-12">Start</span>
                 <div className="flex-1 relative">
-                  <Input type="date" className="w-full h-[45px] pr-10" />
+                  <Input 
+                    type="date" 
+                    className="w-full h-[45px] pr-10" 
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                  />
                 </div>
-                <Select>
+                <Select value={startTime} onValueChange={setStartTime}>
                   <SelectTrigger className="flex-1 h-[45px]">
                     <SelectValue placeholder="Select time" />
                   </SelectTrigger>
@@ -96,11 +133,16 @@ export default function CreateEvent() {
                 </Select>
               </div>
               <div className="flex items-center space-x-4" style={{ width: '440px' }}>
-                <span className="text-sm font-semibold w-12">End</span>
+                <span className="font-semibold w-12">End</span>
                 <div className="flex-1 relative">
-                  <Input type="date" className="w-full h-[45px] pr-10" />
+                  <Input 
+                    type="date" 
+                    className="w-full h-[45px] pr-10" 
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
                 </div>
-                <Select>
+                <Select value={endTime} onValueChange={setEndTime}>
                   <SelectTrigger className="flex-1 h-[45px]">
                     <SelectValue placeholder="Select time" />
                   </SelectTrigger>
@@ -186,7 +228,7 @@ export default function CreateEvent() {
               </Dialog>
             </div>
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold">Event Options</h3>
+              <h3 className="text-lg font-semibold">Event Options</h3>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <UserCheck className="h-5 w-5 text-gray-500" />
@@ -244,7 +286,13 @@ export default function CreateEvent() {
                 </div>
               </div>
             </div>
-            <Button className="w-full" onClick={handleCreateEvent}>Create Event</Button>
+            <Button 
+              className="w-full" 
+              onClick={handleCreateEvent}
+              disabled={validateForm().length > 0}
+            >
+              Create Event
+            </Button>
           </div>
         </div>
       </Card>
@@ -252,4 +300,3 @@ export default function CreateEvent() {
     </div>
   )
 }
-
