@@ -56,11 +56,13 @@ export default function Discover() {
 
   return (
     // Page Header Section
-       <div >
+       <div className="relative min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] to-50% p-4">
+       <div className="absolute inset-0 bg-black/80 mix-blend-multiply" />
+       <div className="relative z-10">
         <Header />
           <div className="mx-72 p-2">
-            <h1 className = "justify-center  text-[20px] text-red-800"><b>Discover Events</b></h1>
-            <p className="text-sm">Explore popular events in the university, browse by category or check out what exciting events are coming for you...</p>
+            <h1 className = "justify-center  text-[20px] text-white"><b>Discover Events</b></h1>
+            <p className="text-sm text-white">Explore popular events in the university, browse by category or check out what exciting events are coming for you...</p>
           </div>
 
           {/*-------------------------------------------POPULAR EVENT SECTION ---------------------------------------------*/}
@@ -69,7 +71,7 @@ export default function Discover() {
            
             <div className="mx-80">
             
-            <Separator className="my-3" />
+            <Separator className="my-4" />
             
             </div>
             {/* ---------------------EXPLORE PUP BRANCH EVENTS--------------------------------*/}
@@ -243,7 +245,7 @@ export default function Discover() {
             </div>
           </div>
           </div>
-
+          </div>
   
        
   );

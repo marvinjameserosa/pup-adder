@@ -56,19 +56,19 @@ export function EventSheet() {
   }
 
   return (
-    <div className="mx-80 p-2">
+    <div className="mx-80 p-4">
       <div>
         <Carousel className="w-full min-w-min">
-          <h2 className="text-red-800">
+          <h2 className="text-white">
             <b>Popular Events</b>
           </h2>
-          <p className="text-gray-500">PUP Main</p>
+          <p className="text-gray-400">PUP Main</p>
           <CarouselContent>
             {/*--------------EVENT 1----------------------*/}
             <CarouselItem className="md:basis-1/1 lg:basis-1/2">
               <div className="p-1" onClick={handleSheetOpen}>
                 {/* Open the sheet when clicked */}
-                <Card className="inline-flex items-center p-2 space-x-2 border-none">
+                <Card className="bg-white bg-opacity-0 inline-flex items-center p-2 space-x-2 border-none">
                   <div className="w-1/2">
                     <Image
                       src="/discover-images/event1.png"

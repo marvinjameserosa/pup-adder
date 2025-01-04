@@ -3,8 +3,8 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import * as React from "react"
 import Link from "next/link";
-import Header from "@/components/ui/header/header";
-import { EventSheet } from "@/components/ui/eventSheet/eventSheet";
+{/*import Header from "@/components/ui/header/header";
+import { EventSheet } from "@/components/ui/eventSheet/eventSheet";*/}
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
 import { useState } from "react";
@@ -60,12 +60,12 @@ export default function PupBranches() {
            
 
             {/*-------------------------------------------EXPLORE PUP BRANCH EVENT SECTION---------------------------------- */}
-            <div className="p-1">
+            <div className="p-0">
               <Tabs defaultValue="account" className="w-full"> 
-                <h3 className="text-red-800"><b>Explore PUP Branch Events</b></h3>
+                <h3 className="text-white pb-4"><b>Explore PUP Branch Events</b></h3>
 
                 {/*------------------PUP BRANCHES------------- */}
-                  <TabsList>
+                  <TabsList className="bg-white bg-opacity-0 text-white">
                     <TabsTrigger value="metromanila">Metro Manila</TabsTrigger>
                     <TabsTrigger value="centralluzon">Central Luzon</TabsTrigger>
                     <TabsTrigger value="southluzon">South Luzon</TabsTrigger>
