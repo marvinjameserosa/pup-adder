@@ -1,45 +1,22 @@
 "use client"
 import Image from "next/image";
-import styles from "./page.module.css";
 import * as React from "react"
 import Link from "next/link";
 {/*import Header from "@/components/ui/header/header";
 import { EventSheet } from "@/components/ui/eventSheet/eventSheet";*/}
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
 import { useState } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
-
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+
 
 
 

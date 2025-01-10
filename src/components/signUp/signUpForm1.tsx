@@ -10,11 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from 'next/link'
 
-type SignUpForm1Props = {
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-};
 
-export default function SignUpForm1({onSubmit}: SignUpForm1Props){
+export default function SignUpForm1(){
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] to-50% p-4"> 
       <div className="absolute inset-0 bg-black/80 mix-blend-multiply" />
@@ -26,7 +23,7 @@ export default function SignUpForm1({onSubmit}: SignUpForm1Props){
           </CardDescription>
         </CardHeader>
         <CardContent className="text-white">
-          <form onSubmit={onSubmit}>
+          <form>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>

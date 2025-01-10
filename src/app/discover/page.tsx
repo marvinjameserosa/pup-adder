@@ -5,54 +5,16 @@ import Link from "next/link";
 import Header from "@/components/header/header";
 import PupBranches from "@/components/pupBranches/pupBranches";
 import { EventSheet } from "@/components/eventSheet/eventSheet";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
-import { useState } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
 
 
 
 export default function Discover() {
-  const [isSheetOpen, setIsSheetOpen] = useState(false); // Manage sheet visibility
-
-  const handleSheetOpen = () => {
-    setIsSheetOpen(true); // Open the sheet when a card is clicked
-  };
-
-  const handleSheetClose = () => {
-    setIsSheetOpen(false); // Close the sheet
-  };
 
   return (
     // Page Header Section
