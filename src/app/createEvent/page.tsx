@@ -91,7 +91,9 @@ export default function CreateEvent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] to-50%">
+    <div className="relative min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] to-50% p-4">
+      <div className="absolute inset-0 bg-black/80 mix-blend-multiply"/>
+      <div className="relative z-10">
       <Header />
       <div className="pt-8 pb-20 flex items-center justify-center">
         <Card className="w-full max-w-[824px] p-6">
@@ -304,6 +306,7 @@ export default function CreateEvent() {
         </Card>
       </div>
       <Toaster />
+      </div>
     </div>
   )
 }

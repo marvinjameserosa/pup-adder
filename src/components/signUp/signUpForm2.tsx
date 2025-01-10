@@ -53,7 +53,7 @@ export default function SignUpForm2() {
               </TabsTrigger>
             </TabsList>
 
-            <form>
+            <form action="/discover">
               <TabsContent value="student">
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
@@ -180,11 +180,8 @@ export default function SignUpForm2() {
                 </div>
               </TabsContent>
 
-              <Button
-                type="submit"
-                className="w-full mt-6 bg-yellow-500 hover:bg-yellow-800 text-black"
-              >
-                Sign up
+              <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-800 text-black my-4">
+                  Finish your account
               </Button>
             </form>
           </Tabs>
