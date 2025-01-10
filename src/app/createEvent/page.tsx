@@ -216,7 +216,7 @@ export default function CreateEvent() {
                     <DialogHeader>
                       <DialogTitle>Event Description</DialogTitle>
                       <DialogDescription>
-                        Write a description for your event. Click save when you're done.
+                        Write a description for your event. Click save when you&apos;re done.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-2 py-4">
