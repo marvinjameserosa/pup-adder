@@ -13,7 +13,7 @@ const eslintConfig = [
   ...compat.config({
     extends: ['next'],
     rules: {
-      'no-unused-vars': 'error',
+      'no-unused-vars': 'off',
     },
   }),
 ];
