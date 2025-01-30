@@ -1,614 +1,80 @@
 "use client"
-import Image from "next/image";
-import styles from "./page.module.css";
-import * as React from "react"
-import Link from "next/link";
-import Header from "@/components/ui/header/header";
-import { EventSheet } from "@/components/ui/eventSheet/eventSheet";
-import { Button } from "@/components/ui/button";
+
+import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Image from "next/image"
+import Link from "next/link"
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
-
-
+const branches = {
+  metromanila: [
+    { name: "Parañaque City", events: 10, image: "/discover-images/pupparanaque.jpg" },
+    { name: "Quezon City", events: 10, image: "/discover-images/pupquezoncity.png" },
+    { name: "San Juan City", events: 10, image: "/discover-images/pupsanjuan.jpg" },
+    { name: "Taguig City", events: 10, image: "/discover-images/puptaguig.png" },
+  ],
+  centralluzon: [
+    { name: "Bataan", events: 10, image: "/discover-images/pupparanaque.jpg" },
+    { name: "Sta. Maria Bulacan", events: 10, image: "/discover-images/pupquezoncity.png" },
+    { name: "Pulilan, Bulacan", events: 25, image: "/discover-images/pupsanjuan.jpg" },
+    { name: "Cabiao, Nueva Ecija", events: 10, image: "/discover-images/puptaguig.png" },
+  ],
+  southluzon: [
+    { name: "Lopez, Quezon", events: 10, image: "/discover-images/pupparanaque.jpg" },
+    { name: "Mulanay, Quezon", events: 10, image: "/discover-images/pupquezoncity.png" },
+    { name: "Unisan, Quezon", events: 25, image: "/discover-images/pupsanjuan.jpg" },
+    { name: "Ragay, Camarines Sur", events: 10, image: "/discover-images/pupparanaque.jpg" },
+    { name: "Sto. Tomas, Batangas", events: 10, image: "/discover-images/pupquezoncity.png" },
+    { name: "Maragondon, Cavite", events: 25, image: "/discover-images/pupsanjuan.jpg" },
+    { name: "Bansud, Oriental Mindoro", events: 10, image: "/discover-images/pupparanaque.jpg" },
+    { name: "Sablayan, Occidental Mindoro", events: 10, image: "/discover-images/pupquezoncity.png" },
+    { name: "Binan, Laguna", events: 25, image: "/discover-images/pupsanjuan.jpg" },
+    { name: "San Pedro, Laguna", events: 10, image: "/discover-images/pupparanaque.jpg" },
+    { name: "Sta. Rosa, Laguna", events: 10, image: "/discover-images/pupquezoncity.png" },
+    { name: "Calauan, Laguna", events: 25, image: "/discover-images/pupsanjuan.jpg" },
+  ],
+}
 
 export default function PupBranches() {
-  const [isSheetOpen, setIsSheetOpen] = useState(false); // Manage sheet visibility
-
-  const handleSheetOpen = () => {
-    setIsSheetOpen(true); // Open the sheet when a card is clicked
-  };
-
-  const handleSheetClose = () => {
-    setIsSheetOpen(false); // Close the sheet
-  };
-
   return (
+    <div className="w-full max-w-4xl mx-auto p-4">
+      <Tabs defaultValue="metromanila" className="w-full">
+        <h3 className="text-2xl font-bold text-red-800 mb-4">Explore PUP Branch Events</h3>
 
-       <div className="mx-80 p-2">
-           
+        <TabsList className="bg-white mb-4">
+          <TabsTrigger value="metromanila">Metro Manila</TabsTrigger>
+          <TabsTrigger value="centralluzon">Central Luzon</TabsTrigger>
+          <TabsTrigger value="southluzon">South Luzon</TabsTrigger>
+        </TabsList>
 
-            {/*-------------------------------------------EXPLORE PUP BRANCH EVENT SECTION---------------------------------- */}
-            <div className="p-1">
-              <Tabs defaultValue="account" className="w-full"> 
-                <h3 className="text-red-800"><b>Explore PUP Branch Events</b></h3>
-
-                {/*------------------PUP BRANCHES------------- */}
-                  <TabsList>
-                    <TabsTrigger value="metromanila">Metro Manila</TabsTrigger>
-                    <TabsTrigger value="centralluzon">Central Luzon</TabsTrigger>
-                    <TabsTrigger value="southluzon">South Luzon</TabsTrigger>
-                  </TabsList>
-
-                  {/*------------------PUP BRANCH CONTENTS------------- */}
-                  {/*------Metro Manila---------- */}
-                  <TabsContent value="metromanila" className="p-2 ">
-                    <div className="grid grid-cols-3 grid-rows-2 gap-x-4 gap-y-4 w-full">
-                      {/* Parañaque City */}
-                      <div >
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupparanaque.jpg"
-                                alt="Parañaque City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Parañaque City</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-
-                      {/* Quezon City */}
-                      <div>
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupquezoncity.png"
-                                alt="Quezon City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Quezon City</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-
-                      {/* San Juan City */}
-                      <div>
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupsanjuan.jpg"
-                                alt="San Juan City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">San Juan City</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
+        {Object.entries(branches).map(([region, campuses]) => (
+          <TabsContent key={region} value={region}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {campuses.map((campus, index) => (
+                <Link href="/samplePage" key={index}>
+                  <Card className="flex items-center p-2 space-x-2 hover:bg-gray-100 transition-colors">
+                    <div className="w-12 h-12 flex-shrink-0">
+                      <Image
+                        src={campus.image || "/placeholder.svg"}
+                        alt={campus.name}
+                        className="rounded-md object-cover"
+                        width={48}
+                        height={48}
+                      />
                     </div>
-
-                    {/* Taguig City */}
-                    <div className="-mt-[50px]">
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 w-1/3 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/puptaguig.png"
-                                alt="San Juan City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Taguig City</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-                  </TabsContent>
-
-                  {/*-----------Central Luzon---------- */}
-                  <TabsContent value="centralluzon">
-                  <div className="grid grid-cols-3 grid-rows-2 gap-x-4 gap-y-0 w-full">
-                      {/* Bataan */}
-                      <div >
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupparanaque.jpg"
-                                alt="Parañaque City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Bataan</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-
-                      {/* Sta. Maria Bulacan */}
-                      <div>
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupquezoncity.png"
-                                alt="Quezon City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Sta. Maria Bulacan</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-
-                      {/* Pulilan, Bulacan */}
-                      <div>
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupsanjuan.jpg"
-                                alt="San Juan City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Pulilan, Bulacan</p>
-                                <p className="text-red-800 text-sm text-opacity-75">25 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-                    </div>
-
-                    {/* Cabiao, Nueva Ecija */}
-                    <div className="-mt-[50px]">
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 w-1/3 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/puptaguig.png"
-                                alt="San Juan City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Cabiao, Nueva Ecija</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-                    
-                  </TabsContent>
-
-                  {/*--------------South Luzon---------- */}
-                  <TabsContent value="southluzon">
-                  <div className="flex flex-col gap-y-6">
-                     {/* First Row */}
-                  <div className="grid grid-cols-3 gap-4 w-full">
-                      {/* Lopez, Quezon */}
-                      <div >
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupparanaque.jpg"
-                                alt="Parañaque City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Lopez, Quezon</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-
-                      {/* Mulanay, Quezon */}
-                      <div>
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupquezoncity.png"
-                                alt="Quezon City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Mulanay, Quezon</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-
-                      {/* Unisan, Quezon */}
-                      <div>
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupsanjuan.jpg"
-                                alt="San Juan City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Unisan, Quezon </p>
-                                <p className="text-red-800 text-sm text-opacity-75">25 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-                    </div>
-
-                    {/* Second Row */}
-                    <div className="grid grid-cols-3 gap-4 w-full">
-                      {/* Ragay, Camarines Sur */}
-                      <div >
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupparanaque.jpg"
-                                alt="Parañaque City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Ragay, Camarines Sur</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-
-                      {/* Sto. Tomas, Batangas */}
-                      <div>
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupquezoncity.png"
-                                alt="Quezon City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Sto. Tomas, Batangas</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-
-                      {/* Maragondon, Cavite */}
-                      <div>
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupsanjuan.jpg"
-                                alt="San Juan City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Maragondon, Cavite</p>
-                                <p className="text-red-800 text-sm text-opacity-75">25 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-                    </div>
-
-                  {/* Third Row */}
-                  <div className="grid grid-cols-3 gap-4 w-full">
-                      {/* Bansud, Oriental Mindoro */}
-                      <div >
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupparanaque.jpg"
-                                alt="Parañaque City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Bansud, Oriental Mindoro</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-
-                      {/* Sablayan, Occidental Mindoro */}
-                      <div>
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupquezoncity.png"
-                                alt="Quezon City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Sablayan, Occidental Mindoro</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-
-                      {/* Binan, Laguna */}
-                      <div>
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupsanjuan.jpg"
-                                alt="San Juan City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Binan, Laguna</p>
-                                <p className="text-red-800 text-sm text-opacity-75">25 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-                    </div>
-
-                   {/* Fourth Row */}
-                  <div className="grid grid-cols-3 gap-4 w-full">
-                      {/* San Pedro, Laguna */}
-                      <div >
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupparanaque.jpg"
-                                alt="Parañaque City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">San Pedro, Laguna</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-
-                      {/* Sta. Rosa, Laguna */}
-                      <div>
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupquezoncity.png"
-                                alt="Quezon City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Sta. Rosa, Laguna</p>
-                                <p className="text-red-800 text-sm text-opacity-75">10 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-
-                      {/* Calauan, Laguna */}
-                      <div>
-                        <Link href="/samplePage">
-                          <Card className="flex items-center p-2 space-x-2 border-none">
-                            {/* Image Section */}
-                            <div className="w-12 h-12">
-                              <Image
-                                src="/discover-images/pupsanjuan.jpg"
-                                alt="San Juan City"
-                                className="rounded-md object-cover"
-                                width={50}
-                                height={50}
-                              />
-                            </div>
-                            {/* Text Section */}
-                            <div className="w-auto">
-                              <CardContent className="p-0">
-                                <p className="text-red-800 font-bold">Calauan, Laguna</p>
-                                <p className="text-red-800 text-sm text-opacity-75">25 Events</p>
-                              </CardContent>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-                    </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
+                    <CardContent className="p-2">
+                      <p className="text-red-800 font-bold">{campus.name}</p>
+                      <p className="text-red-800 text-sm opacity-75">{campus.events} Events</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
             </div>
-
-            <div>
-            <Separator className="my-3" />
-            </div>
-            
-            
-        </div>
-  
-       
-  );
+          </TabsContent>
+        ))}
+      </Tabs>
+      <Separator className="my-8" />
+    </div>
+  )
 }
+
