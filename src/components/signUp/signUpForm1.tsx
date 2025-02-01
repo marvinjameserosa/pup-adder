@@ -51,7 +51,7 @@ export default function SignUpForm1({onSubmit}: SignUpForm1Props){
                   required 
                   className="bg-white text-black placeholder-gray-400"/>
               </div>
-              <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-800 text-black my-4">
+              <Button type="submit" className="w-full bg-yellow-700 hover:bg-yellow-800 text-black">
                   Sign up
               </Button>
             </div>

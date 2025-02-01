@@ -15,7 +15,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/app/firebase/config"
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Door } from "@/assests/door";
+import { Door } from "./door";
 
 
 export function LoginForm({
