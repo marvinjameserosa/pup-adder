@@ -55,7 +55,7 @@ export function PopularEvents() {
   const [name, setName] = useState("")
   const [username, setUsername] = useState("")
 
-  const handleEventClick = (event) => {
+  const handleEventClick = (event: any) => { 
     setSelectedEvent(event)
     setIsSheetOpen(true)
   }
