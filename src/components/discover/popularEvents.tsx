@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import EventCard from "../eventCard"
 import {
   Sheet,
   SheetClose,
@@ -23,28 +24,28 @@ const events = [
     title: "CPE FAIR 2025: Grand Prix",
     time: "Today, 8:00 am",
     location: "NDC Court",
-    image: "/discover-images/event1.png",
+    image: "/discover-images/popularEvents/grandprix.jpg",
   },
   {
     id: 2,
-    title: "CPE FAIR 2025: Grand Prix",
-    time: "Today, 8:00 am",
-    location: "NDC Court",
-    image: "/discover-images/event1.png",
+    title: "PUP Job Fair 2025",
+    time: "April 17, 2025, 8:00 am",
+    location: "PUP Gym",
+    image: "/discover-images/popularEvents/jobfair.png",
   },
   {
     id: 3,
     title: "CPE FAIR 2025: Grand Prix",
     time: "Today, 8:00 am",
     location: "NDC Court",
-    image: "/discover-images/event1.png",
+    image: "/discover-images/popularEvents/grandprix.jpg",
   },
   {
     id: 4,
     title: "CPE FAIR 2025: Grand Prix",
     time: "Today, 8:00 am",
     location: "NDC Court",
-    image: "/discover-images/event1.png",
+    image: "/discover-images/popularEvents/grandprix.jpg",
   },
   // Add more events here...
 ]
@@ -96,9 +97,9 @@ export function PopularEvents() {
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent className="sm:max-w-[425px] bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B]">
           <SheetHeader>
-            <SheetTitle className="text-white">Register to Event</SheetTitle>
+            <SheetTitle className="text-white">Events for you</SheetTitle>
             <SheetDescription className="text-gray-300">
-              This section is still for consultation. Click the register button to register.
+              Click the event to see full details
             </SheetDescription>
           </SheetHeader>
           <div className="py-4">
@@ -114,28 +115,9 @@ export function PopularEvents() {
             <p className="text-sm text-gray-300">{selectedEvent.location}</p>
           </div>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right text-white">
-                Name
-              </Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="col-span-3 bg-white/10 text-white"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right text-white">
-                Username
-              </Label>
-              <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="col-span-3 bg-white/10 text-white"
-              />
-            </div>
+            <div className="grid grid-cols-4 items-center gap-4 text-gray-200">
+              <p>Event Description: </p>
+              </div>
           </div>
           <SheetFooter>
             <SheetClose asChild>
@@ -144,7 +126,7 @@ export function PopularEvents() {
                 onClick={() => setIsSheetOpen(false)}
                 className="bg-white text-red-800 hover:bg-gray-200"
               >
-                Register
+                Go to Event
               </Button>
             </SheetClose>
           </SheetFooter>

@@ -39,7 +39,7 @@ export default function PupBranches() {
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
       <Tabs defaultValue="metromanila" className="w-full">
-        <h3 className="text-2xl font-bold text-red-800 mb-4">Explore PUP Branch Events</h3>
+        <h3 className="text-2xl font-bold text-white mb-4">Explore PUP Branch Events</h3>
 
         <TabsList className="bg-white mb-4">
           <TabsTrigger value="metromanila" className="px-4 py-2 rounded-lg transition-colors hover:bg-yellow-400 data-[state=active]:bg-yellow-500 data-[state=active]:text-white">Metro Manila</TabsTrigger>
@@ -52,7 +52,7 @@ export default function PupBranches() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {campuses.map((campus, index) => (
                 <Link href="/samplePage" key={index}>
-                  <Card className="flex items-center p-2 space-x-2 bg-transparent shadow-none hover:bg-gray-100/50 transition-colors">
+                  <Card className="flex items-center p-2 space-x-2 border-none hover:bg-white/10 transition-colors cursor-pointer bg-white/5">
                     <div className="w-12 h-12 flex-shrink-0">
                       <Image
                         src={campus.image || "/placeholder.svg"}
@@ -63,8 +63,8 @@ export default function PupBranches() {
                       />
                     </div>
                     <CardContent className="p-2">
-                      <p className="text-red-800 font-bold">{campus.name}</p>
-                      <p className="text-red-800 text-sm opacity-75">{campus.events} Events</p>
+                      <p className="text-white font-bold">{campus.name}</p>
+                      <p className="text-gray-300 text-sm">{campus.events} Events</p>
                     </CardContent>
                   </Card>
                 </Link>

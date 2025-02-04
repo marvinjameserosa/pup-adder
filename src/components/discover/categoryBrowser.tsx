@@ -3,12 +3,12 @@ import Image from "next/image"
 import Link from "next/link"
 
 const categories = [
-  { title: "Seminars", eventCount: 10, image: "/discover-images/category1.png" },
-  { title: "Job Fair", eventCount: 10, image: "/discover-images/category2.png" },
-  { title: "Tournaments", eventCount: 25, image: "/discover-images/category3.png" },
-  { title: "Bootcamps", eventCount: 10, image: "/discover-images/category4.png" },
-  { title: "Career Development", eventCount: 10, image: "/discover-images/category5.png" },
-  { title: "Trainings", eventCount: 25, image: "/discover-images/category6.png" },
+  { title: "Seminars", eventCount: 10, image: "/discover-images/categoryBrowser/category1.png" },
+  { title: "Job Fair", eventCount: 10, image: "/discover-images/categoryBrowser/category2.png" },
+  { title: "Tournaments", eventCount: 25, image: "/discover-images/categoryBrowser/category3.png" },
+  { title: "Bootcamps", eventCount: 10, image: "/discover-images/categoryBrowser/category4.png" },
+  { title: "Career Development", eventCount: 10, image: "/discover-images/categoryBrowser/category5.png" },
+  { title: "Trainings", eventCount: 25, image: "/discover-images/categoryBrowser/category6.png" },
 ]
 
 export default function CategoryBrowser() {
@@ -18,7 +18,7 @@ export default function CategoryBrowser() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {categories.map((category, index) => (
           <Link href={`/category/${category.title.toLowerCase().replace(/\s+/g, "-")}`} key={index}>
-            <Card className="flex items-center p-2 space-x-2 bg-transparent shadow-none hover:bg-gray-100/50 transition-colors">
+            <Card className="flex items-center p-2 space-x-2 border-none hover:bg-white/10 transition-colors cursor-pointer bg-white/5">
               <div className="w-12 h-12 flex-shrink-0">
                 <Image
                   src={category.image || "/placeholder.svg"}
@@ -29,8 +29,8 @@ export default function CategoryBrowser() {
                 />
               </div>
               <CardContent className="p-2">
-                <p className="text-red-800 font-bold">{category.title}</p>
-                <p className="text-red-800 text-sm opacity-75">{category.eventCount} Events</p>
+                <p className="text-white font-bold">{category.title}</p>
+                <p className="text-gray-300 text-sm">{category.eventCount} Events</p>
               </CardContent>
             </Card>
           </Link>
