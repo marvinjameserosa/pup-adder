@@ -17,8 +17,8 @@ export default function CategoryBrowser() {
       <h2 className="text-xl sm:text-2xl font-bold text-red-800 mb-4">Browse by category</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {categories.map((category, index) => (
-          <Link href={`/category/${category.title.toLowerCase().replace(" ", "-")}`} key={index}>
-            <Card className="flex items-center p-2 space-x-2 hover:bg-gray-100 transition-colors">
+          <Link href={`/category/${category.title.toLowerCase().replace(/\s+/g, "-")}`} key={index}>
+            <Card className="flex items-center p-2 space-x-2 bg-transparent shadow-none hover:bg-gray-100/50 transition-colors">
               <div className="w-12 h-12 flex-shrink-0">
                 <Image
                   src={category.image || "/placeholder.svg"}
@@ -39,4 +39,3 @@ export default function CategoryBrowser() {
     </section>
   )
 }
-
