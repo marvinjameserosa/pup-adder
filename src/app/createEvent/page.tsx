@@ -126,9 +126,9 @@ export default function CreateEvent() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] to-50%">
       <Header />
-      <div className="pt-8 pb-20 flex items-center justify-center">
-        <Card className="w-full max-w-[824px] p-6">
-          <div className="flex flex-col md:flex-row gap-6">
+      <div className="pt-4 pb-10 sm:pt-8 sm:pb-20 flex items-center justify-center">
+        <Card className="w-full max-w-[824px] p-4 sm:p-6 mx-4 sm:mx-auto">
+          <div className="flex flex-col md:flex-row gap-4 md:gap-6">
             <div className="w-full md:w-[325px] space-y-2">
               <div className="h-[325px] bg-gray-200 rounded-md flex items-center justify-center text-gray-500 relative overflow-hidden">
                 {eventPoster ? (
@@ -162,7 +162,7 @@ export default function CreateEvent() {
             </div>
             <div className="flex-1 space-y-4">
               <div>
-                <Label htmlFor="event-name w-12">Name of Event</Label>
+                <Label htmlFor="event-name">Name of Event</Label>
                 <Input
                   id="event-name"
                   className="w-full h-[45px]"
@@ -172,35 +172,35 @@ export default function CreateEvent() {
                 />
               </div>
               <div className="space-y-2">
-                <div className="flex items-center space-x-4" style={{ width: "440px" }}>
-                  <span className="w-12">Start</span>
-                  <div className="flex-1 relative">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                  <span className="w-12 font-semibold">Start</span>
+                  <div className="flex-1 w-full sm:w-auto">
                     <Input
                       type="date"
-                      className="w-full h-[45px] pr-10"
+                      className="w-full h-[45px]"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
                     />
                   </div>
                   <Select value={startTime} onValueChange={setStartTime}>
-                    <SelectTrigger className="flex-1 h-[45px]">
+                    <SelectTrigger className="w-full sm:w-auto h-[45px]">
                       <SelectValue placeholder="Select time" />
                     </SelectTrigger>
                     <SelectContent>{generateTimeOptions()}</SelectContent>
                   </Select>
                 </div>
-                <div className="flex items-center space-x-4" style={{ width: "440px" }}>
-                  <span className="w-12">End</span>
-                  <div className="flex-1 relative">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                  <span className="w-12 font-semibold">End</span>
+                  <div className="flex-1 w-full sm:w-auto">
                     <Input
                       type="date"
-                      className="w-full h-[45px] pr-10"
+                      className="w-full h-[45px]"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
                     />
                   </div>
                   <Select value={endTime} onValueChange={setEndTime}>
-                    <SelectTrigger className="flex-1 h-[45px]">
+                    <SelectTrigger className="w-full sm:w-auto h-[45px]">
                       <SelectValue placeholder="Select time" />
                     </SelectTrigger>
                     <SelectContent>{generateTimeOptions()}</SelectContent>
