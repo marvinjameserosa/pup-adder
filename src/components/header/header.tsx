@@ -5,7 +5,6 @@ import { Bell, Calendar, Compass, Menu, PlusCircle, Search, X } from "lucide-rea
 import Link from "next/link"
 import { useState } from "react"
 import ProfileSheet from "./profileSheet"
-import { PupLogo } from "@/assets/puplogo";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)

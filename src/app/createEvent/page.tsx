@@ -172,12 +172,12 @@ export default function CreateEvent() {
                 />
               </div>
               <div className="space-y-2">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                  <span className="w-12 font-semibold">Start</span>
-                  <div className="flex-1 w-full sm:w-auto">
+              <div className="flex items-center space-x-4" style={{ width: '440px' }}>
+                  <span className="text-sm w-12">Start</span>
+                  <div className="flex-1 relative">
                     <Input
                       type="date"
-                      className="w-full h-[45px]"
+                      className="w-full h-[45px] pr-10"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
                     />
@@ -189,12 +189,12 @@ export default function CreateEvent() {
                     <SelectContent>{generateTimeOptions()}</SelectContent>
                   </Select>
                 </div>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                  <span className="w-12 font-semibold">End</span>
-                  <div className="flex-1 w-full sm:w-auto">
+                <div className="flex items-center space-x-4" style={{ width: '440px' }}>
+                  <span className="text-sm w-12">End</span>
+                  <div className="flex-1 relative">
                     <Input
                       type="date"
-                      className="w-full h-[45px]"
+                      className="w-full h-[45px] pr-10"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
                     />
