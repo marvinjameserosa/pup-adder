@@ -1,10 +1,11 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
+import { Calendar } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import EmptyEventsList from './emptyEventsList'
 import EventCard from './eventCard'
 import EventDrawer from './eventDrawer'
+
 
 const events = [
   {
@@ -114,7 +115,16 @@ export default function EventsList() {
   }
 
   if (filteredEvents.length === 0 && filter === 'upcoming') {
-    return <EmptyEventsList />
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] text-center">
+      <Calendar className="w-16 h-16 mb-4 text-gray-400" />
+      <h3 className="text-2xl font-bold mb-2">No Upcoming Events</h3>
+      <p className="text-muted-foreground mb-6">You have no upcoming events. Why not host one?</p>
+      <Button>
+        Create Event
+      </Button>
+    </div>
+    )
   }
 
   return (
@@ -133,7 +143,3 @@ export default function EventsList() {
     </div>
   )
 }
-
-
-
-
