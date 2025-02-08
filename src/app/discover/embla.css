@@ -48,7 +48,7 @@
   .embla__slide__title {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #333;
+    color: #b0aeae;
     margin-bottom: 10px;
   }
   .embla__slide__description {
@@ -96,7 +96,7 @@
     -webkit-tap-highlight-color: rgba(var(--text-high-contrast-rgb-value), 0.5);
     -webkit-appearance: none;
     appearance: none;
-    background-color: transparent;
+    background-color: floralwhite;
     touch-action: manipulation;
     display: inline-flex;
     text-decoration: none;
