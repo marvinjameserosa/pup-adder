@@ -14,8 +14,7 @@ import { Label } from "@/components/ui/label";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/app/firebase/config"
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { Door } from "./door";
+import { useRouter } from 'next/navigation' 
 import { useState } from "react";
 
 
@@ -90,13 +89,10 @@ export function LoginForm({
       <Card className="shadow-xl rounded-[24px] bg-[#2E2E2E]/60 backdrop-blur-sm flex flex-col border border-[#302F30]">
         <CardHeader>
         <div className="flex items-center gap-4">
-        <div className="w-18 h-20">
-          <Door/>
-        </div>
       </div>
           <CardTitle className="text-2xl text-white">Welcome to PUP Gather!</CardTitle>
           <CardDescription className={`${error ? "text-red-500" : "text-white"}`}> 
-            {error ? error : "Enter your credentials below to login to your account."}
+            {error ? error : "Enter your credentials to login."}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-white">
