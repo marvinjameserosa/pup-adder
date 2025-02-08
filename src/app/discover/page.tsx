@@ -84,6 +84,34 @@ export default function DiscoverPage() {
       totalSlots: 500,
       isCreator: true,
     },
+    {
+      id: 5,
+      image: "/discover-images/popularEvents/grandprix.jpg",
+      title: "PUP Grand Prix 2025",
+      description: "Experience the thrill of competition in this year’s PUP Grand Prix.",
+      details: "Join the annual PUP Grand Prix, an event full of excitement, competition, and camaraderie among students and professionals alike.",
+      date: "2025-03-25",
+      time: "10:00 AM - 5:00 PM",
+      location: "PUP Main Campus, Manila",
+      host: "PUP University",
+      availableSlots: 50,
+      totalSlots: 100,
+      isCreator: false,
+    },
+    {
+      id: 6,
+      image: "/discover-images/popularEvents/jobfair.png",
+      title: "Job Fair: We Need You!",
+      description: "Discover career opportunities at our biggest job fair of the year.",
+      details: "Explore numerous job opportunities, network with industry leaders, and kickstart your career journey at our annual job fair.",
+      date: "2025-04-10",
+      time: "9:00 AM - 4:00 PM",
+      location: "SMX Convention Center",
+      host: "JobLink PH",
+      availableSlots: 200,
+      totalSlots: 500,
+      isCreator: true,
+    },
   ];
 
   // 🔍 Filter slides based on search query
@@ -100,14 +128,15 @@ export default function DiscoverPage() {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] bg-fixed">
-      <div className="absolute inset-0 bg-black/90 mix-blend-multiply" />
+      <div className="absolute inset-0 bg-black/80 mix-blend-multiply" />
       <div className="relative z-10">
         <Header />
         <div className="flex flex-col items-center">
           <main className="w-full max-w-[1360px] px-4 py-8 flex flex-col items-center">
             <div className="w-full max-w-[616px] mb-8">
               <h1 className="text-3xl sm:text-2xl md:text-3xl font-bold text-gray-200 p-1">Discover</h1>
-              <p className="text-sm text-gray-200">See what exciting events are waiting for you...</p>
+              <p className="text-sm text-gray-200">Find and explore events that match your passion. 
+                Stay updated, register easily, and never miss out on the experiences that matter most to you.</p>
             </div>
 
             {/* 🔍 Search Bar */}
