@@ -27,7 +27,7 @@ type Event = {
     total: number
     list: Array<{
       name: string
-      category: "Student" | "Alumni" | "Other"
+      category: "Student" | "Alumni" | "Faculty"
       registrationDate: string
     }>
   }
@@ -53,6 +53,16 @@ const events: Event[] = [
     attendees: {
       total: 350,
       list: [
+        { name: "John Doe", category: "Student", registrationDate: "2023-11-15" },
+        { name: "Jane Smith", category: "Alumni", registrationDate: "2023-11-16" },
+        { name: "John Doe", category: "Student", registrationDate: "2023-11-15" },
+        { name: "Jane Smith", category: "Alumni", registrationDate: "2023-11-16" },
+        { name: "John Doe", category: "Student", registrationDate: "2023-11-15" },
+        { name: "Jane Smith", category: "Alumni", registrationDate: "2023-11-16" },
+        { name: "John Doe", category: "Student", registrationDate: "2023-11-15" },
+        { name: "Jane Smith", category: "Alumni", registrationDate: "2023-11-16" },
+        { name: "John Doe", category: "Student", registrationDate: "2023-11-15" },
+        { name: "Jane Smith", category: "Alumni", registrationDate: "2023-11-16" },
         { name: "John Doe", category: "Student", registrationDate: "2023-11-15" },
         { name: "Jane Smith", category: "Alumni", registrationDate: "2023-11-16" },
         // Add more attendees as needed

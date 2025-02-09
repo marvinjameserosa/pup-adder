@@ -351,7 +351,7 @@ export default function CreateEvent() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <User className="h-5 w-5 text-gray-500" />
-                          <Label htmlFor="approve-others">Others</Label>
+                          <Label htmlFor="approve-others">Faculty</Label>
                         </div>
                         <Switch
                           id="approve-others"
