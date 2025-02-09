@@ -6,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 import {
   Sheet,
   SheetClose,
@@ -16,12 +15,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from "next/image"
-import Link from "next/link"
-import { useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
-// POPULAR EVENTS 
 const events = [
   {
     id: 1,
@@ -32,70 +28,134 @@ const events = [
   },
   {
     id: 2,
-    title: "CPE FAIR 2025: Grand Prix",
-    time: "Today, 8:00 am",
-    location: "NDC Court",
-    image: "/discover-images/event1.png",
+    title: "Tech Symposium 2025",
+    time: "Tomorrow, 10:00 am",
+    location: "Main Auditorium",
+    image: "/discover-images/event2.png",
   },
   {
     id: 3,
-    title: "CPE FAIR 2025: Grand Prix",
-    time: "Today, 8:00 am",
-    location: "NDC Court",
-    image: "/discover-images/event1.png",
+    title: "Robotics Workshop",
+    time: "Next Week, 2:00 pm",
+    location: "Engineering Building",
+    image: "/discover-images/event3.png",
   },
   {
     id: 4,
-    title: "CPE FAIR 2025: Grand Prix",
-    time: "Today, 8:00 am",
-    location: "NDC Court",
-    image: "/discover-images/event1.png",
+    title: "AI and Machine Learning Seminar",
+    time: "Next Month, 9:00 am",
+    location: "Computer Science Department",
+    image: "/discover-images/event4.png",
   },
-  // Add more events here...
+  {
+    id: 5,
+    title: "AI and Machine Learning Seminar",
+    time: "Next Month, 9:00 am",
+    location: "Computer Science Department",
+    image: "/discover-images/event4.png",
+  },
+  {
+    id: 6,
+    title: "AI and Machine Learning Seminar",
+    time: "Next Month, 9:00 am",
+    location: "Computer Science Department",
+    image: "/discover-images/event4.png",
+  },
 ]
 
-export function PopularEvents() {
+function PopularEvents() {
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(events[0])
   const [name, setName] = useState("")
   const [username, setUsername] = useState("")
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const carouselRef = useRef<HTMLDivElement>(null)
+  const autoScrollRef = useRef<NodeJS.Timeout | null>(null)
 
-  const handleEventClick = (event: any) => { 
+  const handleEventClick = useCallback((event: (typeof events)[0]) => {
     setSelectedEvent(event)
     setIsSheetOpen(true)
-  }
+  }, [])
+
+  const scrollToSlide = useCallback((index: number) => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollTo({
+        left: index * carouselRef.current.clientWidth,
+        behavior: "smooth",
+      })
+    }
+  }, [])
+
+  const startAutoScroll = useCallback(() => {
+    if (autoScrollRef.current) clearInterval(autoScrollRef.current)
+    autoScrollRef.current = setInterval(() => {
+      setCurrentSlide((prevSlide) => {
+        const nextSlide = (prevSlide + 1) % events.length
+        scrollToSlide(nextSlide)
+        return nextSlide
+      })
+    }, 5000)
+  }, [scrollToSlide])
+
+  const stopAutoScroll = useCallback(() => {
+    if (autoScrollRef.current) {
+      clearInterval(autoScrollRef.current)
+      autoScrollRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    startAutoScroll()
+    return () => stopAutoScroll()
+  }, [startAutoScroll, stopAutoScroll])
+
+  const handleManualNavigation = useCallback(
+    (direction: "prev" | "next") => {
+      stopAutoScroll()
+      setCurrentSlide((prevSlide) => {
+        const nextSlide =
+          direction === "prev" ? (prevSlide - 1 + events.length) % events.length : (prevSlide + 1) % events.length
+        scrollToSlide(nextSlide)
+        return nextSlide
+      })
+      startAutoScroll()
+    },
+    [startAutoScroll, stopAutoScroll, scrollToSlide],
+  )
 
   return (
     <section className="w-full max-w-6xl mx-auto p-4">
       <h2 className="text-2xl font-bold text-white mb-2">Popular Events</h2>
       <p className="text-gray-300 mb-4">PUP Main</p>
       <Carousel className="w-full">
-        <CarouselContent>
+        <CarouselContent ref={carouselRef}>
           {events.map((event) => (
             <CarouselItem key={event.id} className="md:basis-1/2 lg:basis-1/3">
-              <div className="p-1" onClick={() => handleEventClick(event)}>
-                <Card className="flex flex-col sm:flex-row items-center p-2 space-y-2 sm:space-y-0 sm:space-x-2 border-none hover:bg-white/10 transition-colors cursor-pointer bg-white/5">
-                  <div className="w-full sm:w-1/2">
+              <div className="p-1 h-full" onClick={() => handleEventClick(event)}>
+                <Card className="flex flex-col h-full border-none hover:bg-white/10 transition-colors cursor-pointer bg-white/5">
+                  <div className="w-full h-40">
                     <Image
                       src={event.image || "/placeholder.svg"}
                       alt={event.title}
-                      className="rounded-md object-cover w-full h-32 sm:h-24"
+                      className="rounded-t-md object-cover w-full h-full"
                       width={200}
                       height={150}
                     />
                   </div>
-                  <CardContent className="p-2 w-full sm:w-1/2">
-                    <p className="text-white font-bold">{event.title}</p>
-                    <p className="text-gray-300 text-sm">{event.time}</p>
-                    <p className="text-gray-300 text-sm">{event.location}</p>
+                  <CardContent className="p-4 flex-grow flex flex-col justify-between">
+                    <p className="text-white font-bold mb-2">{event.title}</p>
+                    <div>
+                      <p className="text-gray-300 text-sm">{event.time}</p>
+                      <p className="text-gray-300 text-sm">{event.location}</p>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <CarouselPrevious onClick={() => handleManualNavigation("prev")} />
+        <CarouselNext onClick={() => handleManualNavigation("next")} />
       </Carousel>
 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -159,117 +219,6 @@ export function PopularEvents() {
   )
 }
 
-// PUP BRANCHES 
-const branches = {
-  metromanila: [
-    { name: "Parañaque City", events: 10, image: "/discover-images/pupparanaque.jpg" },
-    { name: "Quezon City", events: 10, image: "/discover-images/pupquezoncity.png" },
-    { name: "San Juan City", events: 10, image: "/discover-images/pupsanjuan.jpg" },
-    { name: "Taguig City", events: 10, image: "/discover-images/puptaguig.png" },
-  ],
-  centralluzon: [
-    { name: "Bataan", events: 10, image: "/discover-images/pupparanaque.jpg" },
-    { name: "Sta. Maria Bulacan", events: 10, image: "/discover-images/pupquezoncity.png" },
-    { name: "Pulilan, Bulacan", events: 25, image: "/discover-images/pupsanjuan.jpg" },
-    { name: "Cabiao, Nueva Ecija", events: 10, image: "/discover-images/puptaguig.png" },
-  ],
-  southluzon: [
-    { name: "Lopez, Quezon", events: 10, image: "/discover-images/pupparanaque.jpg" },
-    { name: "Mulanay, Quezon", events: 10, image: "/discover-images/pupquezoncity.png" },
-    { name: "Unisan, Quezon", events: 25, image: "/discover-images/pupsanjuan.jpg" },
-    { name: "Ragay, Camarines Sur", events: 10, image: "/discover-images/pupparanaque.jpg" },
-    { name: "Sto. Tomas, Batangas", events: 10, image: "/discover-images/pupquezoncity.png" },
-    { name: "Maragondon, Cavite", events: 25, image: "/discover-images/pupsanjuan.jpg" },
-    { name: "Bansud, Oriental Mindoro", events: 10, image: "/discover-images/pupparanaque.jpg" },
-    { name: "Sablayan, Occidental Mindoro", events: 10, image: "/discover-images/pupquezoncity.png" },
-    { name: "Binan, Laguna", events: 25, image: "/discover-images/pupsanjuan.jpg" },
-    { name: "San Pedro, Laguna", events: 10, image: "/discover-images/pupparanaque.jpg" },
-    { name: "Sta. Rosa, Laguna", events: 10, image: "/discover-images/pupquezoncity.png" },
-    { name: "Calauan, Laguna", events: 25, image: "/discover-images/pupsanjuan.jpg" },
-  ],
-}
-
-function PupBranches() {
-  return (
-    <div className="w-full max-w-4xl mx-auto p-4">
-      <Tabs defaultValue="metromanila" className="w-full">
-        <h3 className="text-2xl font-bold text-white mb-4">Explore PUP Branch Events</h3>
-
-        <TabsList className="bg-white mb-4">
-          <TabsTrigger value="metromanila">Metro Manila</TabsTrigger>
-          <TabsTrigger value="centralluzon">Central Luzon</TabsTrigger>
-          <TabsTrigger value="southluzon">South Luzon</TabsTrigger>
-        </TabsList>
-
-        {Object.entries(branches).map(([region, campuses]) => (
-          <TabsContent key={region} value={region}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {campuses.map((campus, index) => (
-                <Link href="/samplePage" key={index}>
-                  <Card className="flex items-center p-2 space-x-2 hover:bg-white/10 transition-colors bg-white/5">
-                    <div className="w-12 h-12 flex-shrink-0">
-                      <Image
-                        src={campus.image || "/placeholder.svg"}
-                        alt={campus.name}
-                        className="rounded-md object-cover"
-                        width={48}
-                        height={48}
-                      />
-                    </div>
-                    <CardContent className="p-2">
-                      <p className="text-white font-bold">{campus.name}</p>
-                      <p className="text-gray-300 text-sm">{campus.events} Events</p>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </TabsContent>
-        ))}
-      </Tabs>
-    </div>
-  )
-}
-
-// EVENT CATEGORIES
-const categories = [
-  { title: "Seminars", eventCount: 10, image: "/discover-images/category1.png" },
-  { title: "Job Fair", eventCount: 10, image: "/discover-images/category2.png" },
-  { title: "Tournaments", eventCount: 25, image: "/discover-images/category3.png" },
-  { title: "Bootcamps", eventCount: 10, image: "/discover-images/category4.png" },
-  { title: "Career Development", eventCount: 10, image: "/discover-images/category5.png" },
-  { title: "Trainings", eventCount: 25, image: "/discover-images/category6.png" },
-]
-
-function CategoryBrowser() {
-  return (
-    <section className="w-full max-w-4xl mx-auto p-4">
-      <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Browse by category</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {categories.map((category, index) => (
-          <Link href={`/category/${category.title.toLowerCase().replace(" ", "-")}`} key={index}>
-            <Card className="flex items-center p-2 space-x-2 hover:bg-white/10 transition-colors bg-white/5">
-              <div className="w-12 h-12 flex-shrink-0">
-                <Image
-                  src={category.image || "/placeholder.svg"}
-                  alt={category.title}
-                  width={48}
-                  height={48}
-                  className="rounded-md object-cover"
-                />
-              </div>
-              <CardContent className="p-2">
-                <p className="text-white font-bold">{category.title}</p>
-                <p className="text-gray-300 text-sm">{category.eventCount} Events</p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
-    </section>
-  )
-}
-
 export default function DiscoverPage() {
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] bg-fixed">
@@ -286,14 +235,9 @@ export default function DiscoverPage() {
           </section>
 
           <PopularEvents />
-
-          <Separator className="my-8 bg-white/20" />
-
-          <PupBranches />
-
-          <CategoryBrowser />
         </main>
       </div>
     </div>
   )
 }
+

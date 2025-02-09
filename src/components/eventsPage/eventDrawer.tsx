@@ -25,7 +25,7 @@ interface Event {
     total: number
     list: Array<{
       name: string
-      category: "Student" | "Alumni" | "Other"
+      category: "Student" | "Alumni" | "Faculty"
       registrationDate: string
     }>
   }
@@ -42,9 +42,9 @@ export default function EventDrawer({ event, isOpen, onClose }: EventDrawerProps
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-[400px] sm:w-[540px] bg-white">
+      <SheetContent className="sm:max-w-[425px] bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] text-white">
         <SheetHeader>
-          <SheetTitle className="text-2xl font-bold">{event.name}</SheetTitle>
+          <SheetTitle className="text-2xl text-white font-bold">{event.name}</SheetTitle>
         </SheetHeader>
         <ScrollArea className="h-[calc(100vh-120px)] pr-4">
           <img
@@ -54,17 +54,17 @@ export default function EventDrawer({ event, isOpen, onClose }: EventDrawerProps
           />
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <CalendarDays className="h-5 w-5 text-gray-500" />
+              <CalendarDays className="h-5 w-5 text-white" />
               <span>
                 {event.date} • {event.time}
               </span>
             </div>
             <div className="flex items-center space-x-2">
-              <MapPin className="h-5 w-5 text-gray-500" />
+              <MapPin className="h-5 w-5 text-white" />
               <span>{event.location}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Users className="h-5 w-5 text-gray-500" />
+              <Users className="h-5 w-5 text-white" />
               <span>{event.attendees.total} attendees</span>
             </div>
             <div className="flex items-center space-x-2">
@@ -77,7 +77,7 @@ export default function EventDrawer({ event, isOpen, onClose }: EventDrawerProps
                 <p>{event.host.name}</p>
               </div>
             </div>
-            <SheetDescription>
+            <SheetDescription className="text-white">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
               dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
               ea commodo consequat.
