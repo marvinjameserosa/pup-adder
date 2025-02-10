@@ -7,6 +7,7 @@ import { PrevButton, NextButton, usePrevNextButtons } from "./emblaCarouselArrow
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
 
+
 type SlideType = {
   id: number;
   image: string;
@@ -53,10 +54,12 @@ const EmblaCarousel: React.FC<PropType> = ({ slides, options, onCardClick }) => 
               className="embla__slide cursor-pointer"
               onClick={() => onCardClick(slide)}
             >
-              <div className="embla__slide__content">
+              <div className="embla__slide">
                 <img src={slide.image} alt={slide.title} className="embla__slide__image" />
+              <div className="embla__slide__content">
                 <h2 className="embla__slide__title">{slide.title}</h2>
                 <p className="embla__slide__description">{slide.description}</p>
+              </div>
               </div>
             </div>
           ))}
