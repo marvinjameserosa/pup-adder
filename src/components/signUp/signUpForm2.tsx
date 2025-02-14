@@ -8,17 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type UserType = "student" | "alumni" | "faculty";
+type UserType = "Student" | "Alumni" | "Faculty";
 
-export default function SignUpForm2() {
+type SignUpForm2Props = {
+  userType: UserType;
+  setUserType: (type: UserType) => void; // 🔥 Add this prop
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  errorMsg?: string;
+};
+
+export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg }: SignUpForm2Props) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
-  const [tab, setTab] = useState<UserType>("student");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted");
-  };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] p-4">
@@ -29,91 +30,94 @@ export default function SignUpForm2() {
           <CardDescription className="text-white">Finish creating your account.</CardDescription>
         </CardHeader>
         <CardContent className="text-white">
-        <Tabs defaultValue="student" onValueChange={(value) => setTab(value as UserType)}>
-          <div className="flex flex-col gap-4">
-            <TabsList className="flex">
-              <TabsTrigger value="student" className={`flex-1 ${tab === "student" ? "bg-yellow-500" : "hover:bg-yellow-400"}`}>Student</TabsTrigger>
-              <TabsTrigger value="alumni" className={`flex-1 ${tab === "alumni" ? "bg-yellow-500" : "hover:bg-yellow-400"}`}>Alumni</TabsTrigger>
-              <TabsTrigger value="faculty" className={`flex-1 ${tab === "faculty" ? "bg-yellow-500" : "hover:bg-yellow-400"}`} aria-label="Faculty Registration">Faculty</TabsTrigger>
-            </TabsList>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <TabsContent value="student">
-                <div className="flex flex-col gap-3">
-                  <Label htmlFor="first-name">First Name</Label>
-                  <Input id="first-name" name="first-name" type="text" placeholder="Juan" required />
+          {/* 🔥 Remove local state and use userType from parent */}
+          <Tabs defaultValue={userType} onValueChange={(value) => setUserType(value as UserType)}>
+            <div className="flex flex-col gap-4">
+              <TabsList className="flex">
+                <TabsTrigger value="Student" className={`flex-1 ${userType === "Student" ? "bg-yellow-500" : "hover:bg-yellow-400"}`}>Student</TabsTrigger>
+                <TabsTrigger value="Alumni" className={`flex-1 ${userType === "Alumni" ? "bg-yellow-500" : "hover:bg-yellow-400"}`}>Alumni</TabsTrigger>
+                <TabsTrigger value="Faculty" className={`flex-1 ${userType === "Faculty" ? "bg-yellow-500" : "hover:bg-yellow-400"}`}>Faculty</TabsTrigger>
+              </TabsList>
 
-                  <Label htmlFor="last-name">Last Name</Label>
-                  <Input id="last-name" name="last-name" type="text" placeholder="Dela Cruz" required />
+              <form onSubmit={onSubmit}>
+                <TabsContent value="Student">
+                  <div className="flex flex-col gap-3">
+                    <Label htmlFor="first-name">First Name</Label>
+                    <Input id="first-name" name="first-name" type="text" placeholder="Juan" required />
 
-                  <Label htmlFor="student-number">Student Number</Label>
-                  <Input id="student-number" name="student-number" type="text" placeholder="2015-001..." required />
+                    <Label htmlFor="last-name">Last Name</Label>
+                    <Input id="last-name" name="last-name" type="text" placeholder="Dela Cruz" required />
 
-                  <Label htmlFor="program">Program</Label>
-                  <Select name="program">
-                    <SelectTrigger id="program">
-                      <SelectValue placeholder="Select your program" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="CPE">BS Computer Engineering</SelectItem>
-                      <SelectItem value="accountancy">BS Accountancy</SelectItem>
-                      <SelectItem value="management">BS Business Management</SelectItem>
-                      <SelectItem value="architecture">BS Architecture</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </TabsContent>
+                    <Label htmlFor="student-number">Student Number</Label>
+                    <Input id="student-number" name="student-number" type="text" placeholder="2015-001..." required />
 
-              <TabsContent value="alumni">
-                <div className="flex flex-col gap-3">
-                  <Label htmlFor="first-name">First Name</Label>
-                  <Input id="first-name" name="first-name" type="text" placeholder="Juan" required />
+                    <Label htmlFor="department">Department</Label>
+                    <Select name="department" required>
+                      <SelectTrigger id="department">
+                        <SelectValue placeholder="Select your department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="CPE">BS Computer Engineering</SelectItem>
+                        <SelectItem value="accountancy">BS Accountancy</SelectItem>
+                        <SelectItem value="management">BS Business Management</SelectItem>
+                        <SelectItem value="architecture">BS Architecture</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </TabsContent>
 
-                  <Label htmlFor="last-name">Last Name</Label>
-                  <Input id="last-name" name="last-name" type="text" placeholder="Dela Cruz" required />
+                <TabsContent value="Alumni">
+                  <div className="flex flex-col gap-3">
+                    <Label htmlFor="first-name">First Name</Label>
+                    <Input id="first-name" name="first-name" type="text" placeholder="Juan" required />
 
-                  <Label htmlFor="program-graduated">Program Graduated</Label>
-                  <Select name="program-graduated">
-                    <SelectTrigger id="program-graduated">
-                      <SelectValue placeholder="Select your program" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cpe">BS Computer Engineering</SelectItem>
-                      <SelectItem value="accountancy">BS Accountancy</SelectItem>
-                      <SelectItem value="management">BS Business Management</SelectItem>
-                      <SelectItem value="architecture">BS Architecture</SelectItem>
-                    </SelectContent>
-                  </Select>
-                
-                  <Label htmlFor="year-graduated">Year Graduated</Label>
-                  <Select name="year-graduated">
-                    <SelectTrigger id="year-graduated">
-                      <SelectValue placeholder="Select year" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {years.map((year) => (
-                        <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </TabsContent>
-              <TabsContent value="faculty">
-                <div className="flex flex-col gap-3">
-                  <Label htmlFor="first-name">First Name</Label>
-                  <Input id="first-name" name="first-name" type="text" placeholder="Juan" required />
+                    <Label htmlFor="last-name">Last Name</Label>
+                    <Input id="last-name" name="last-name" type="text" placeholder="Dela Cruz" required />
 
-                  <Label htmlFor="last-name">Last Name</Label>
-                  <Input id="last-name" name="last-name" type="text" placeholder="Dela Cruz" required />
+                    <Label htmlFor="department-graduated">Program Graduated</Label>
+                    <Select name="department" required>
+                      <SelectTrigger id="department-graduated">
+                        <SelectValue placeholder="Select your Department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cpe">BS Computer Engineering</SelectItem>
+                        <SelectItem value="accountancy">BS Accountancy</SelectItem>
+                        <SelectItem value="management">BS Business Management</SelectItem>
+                        <SelectItem value="architecture">BS Architecture</SelectItem>
+                      </SelectContent>
+                    </Select>
 
-                  <Label htmlFor="faculty-id">Faculty ID Number</Label>
-                  <Input id="faculty-id" name="faculty-id" type="text" placeholder="2010-000..." required />
-                </div>
-              </TabsContent>
-              
-              <Button type="submit" className="w-full mt-6 bg-yellow-500 hover:bg-yellow-800 text-black">Sign up</Button>
-            </form>
-          </div> 
-        </Tabs>     
+                    <Label htmlFor="year-graduated">Year Graduated</Label>
+                    <Select name="year-graduated" required>
+                      <SelectTrigger id="year-graduated">
+                        <SelectValue placeholder="Select year" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {years.map((year) => (
+                          <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="Faculty">
+                  <div className="flex flex-col gap-3">
+                    <Label htmlFor="first-name">First Name</Label>
+                    <Input id="first-name" name="first-name" type="text" placeholder="Juan" required />
+
+                    <Label htmlFor="last-name">Last Name</Label>
+                    <Input id="last-name" name="last-name" type="text" placeholder="Dela Cruz" required />
+
+                    <Label htmlFor="faculty-id">Faculty ID Number</Label>
+                    <Input id="faculty-id" name="faculty-number" type="text" placeholder="2010-000..." required />
+                  </div>
+                </TabsContent>
+
+                <Button type="submit" className="w-full mt-6 bg-yellow-500 hover:bg-yellow-800 text-black">Sign up</Button>
+              </form>
+            </div> 
+          </Tabs>     
         </CardContent>
       </Card>
     </div>
