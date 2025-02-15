@@ -4,10 +4,12 @@ import { useState } from "react";
 import SignUpForm1 from "@/components/signUp/signUpForm1";
 import SignUpForm2 from "@/components/signUp/signUpForm2";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/app/firebase/config"; // Ensure db is properly imported
+import { auth, db } from "@/app/firebase/config"; 
 import { doc, setDoc } from "firebase/firestore";
+import { useRouter } from 'next/navigation' 
 
 export default function SignUpForm() {
+  const router = useRouter();
   const [showSignUpForm1, setSignUpForm1] = useState(true);
   const [error, setError] = useState("");
   const [userType, setUserType] = useState<"Student" | "Alumni" | "Faculty">("Student");
@@ -40,17 +42,16 @@ export default function SignUpForm() {
       return;
     }
 
-    const userId = user.uid; // Use UID instead of email for Firestore document ID
+    const userId = user.uid; 
 
     const userData: any = {
       userId: userId,
       userType: selectedUserType,
       firstName: formData.get("first-name") as string,
       lastName: formData.get("last-name") as string,
-      email: user.email, // Ensure email comes from Firebase auth
+      email: user.email, 
     };
 
-    // Store additional fields based on user type
     if (selectedUserType === "Student") {
       userData.studentNumber = formData.get("student-number") as string;
       userData.department = formData.get("department") as string;
@@ -63,11 +64,11 @@ export default function SignUpForm() {
     }
 
     try {
-      await setDoc(doc(db, "users", userId), userData); // Store data under the user's UID
-      console.log("User data successfully saved to Firestore");
+      await setDoc(doc(db, "users", userId), userData); 
+      router.push('/discover');
     } catch (error) {
-      console.error("Error saving user data: ", error);
       setError("Failed to save user data. Please try again.");
+     
     }
   }
 

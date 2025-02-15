@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,7 +11,7 @@ type UserType = "Student" | "Alumni" | "Faculty";
 
 type SignUpForm2Props = {
   userType: UserType;
-  setUserType: (type: UserType) => void; // 🔥 Add this prop
+  setUserType: (type: UserType) => void; 
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   errorMsg?: string;
 };
@@ -30,7 +29,6 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
           <CardDescription className="text-white">Finish creating your account.</CardDescription>
         </CardHeader>
         <CardContent className="text-white">
-          {/* 🔥 Remove local state and use userType from parent */}
           <Tabs defaultValue={userType} onValueChange={(value) => setUserType(value as UserType)}>
             <div className="flex flex-col gap-4">
               <TabsList className="flex">
