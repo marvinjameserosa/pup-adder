@@ -111,6 +111,19 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
 
                     <Label htmlFor="faculty-id">Faculty ID Number</Label>
                     <Input id="faculty-id" name="faculty-number" type="text" placeholder="2010-000..." required />
+
+                    <Label htmlFor="department">Department</Label>
+                    <Select name="department" required>
+                      <SelectTrigger id="department">
+                        <SelectValue placeholder="Select your department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="CPE">BS Computer Engineering</SelectItem>
+                        <SelectItem value="accountancy">BS Accountancy</SelectItem>
+                        <SelectItem value="management">BS Business Management</SelectItem>
+                        <SelectItem value="architecture">BS Architecture</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </TabsContent>
 
