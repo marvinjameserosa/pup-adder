@@ -97,6 +97,15 @@ body {
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(to bottom, #5A1E1E 0%, #B62B2B 50%, #B62B2B 100%);
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */

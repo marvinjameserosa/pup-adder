@@ -31,7 +31,7 @@ export default function ProfileSheet() {
               <p className="text-sm text-muted-foreground">user@example.com</p>
             </div>
           </div>
-          <Link href="/discover" className="font-bold text-2xl">
+          <Link href="/dashboard" className="font-bold text-2xl">
             <Button variant="outline" className="px-4 py-2 rounded-lg transition-colors hover:bg-yellow-400 data-[state=active]:bg-yellow-500 data-[state=active]:text-white"onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Dashboard
