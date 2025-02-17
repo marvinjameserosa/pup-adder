@@ -122,13 +122,13 @@
 /* Left button on the left edge */
 .embla__button--prev {
     position: absolute;
-    left: -5rem; /* Adjust spacing from the carousel */
+    left: -2rem; /* Adjust spacing from the carousel */
 }
 
 /* Right button on the right edge */
 .embla__button--next {
     position: absolute;
-    right: -5rem; /* Adjust spacing from the carousel */
+    right: -2rem; /* Adjust spacing from the carousel */
 }
   .embla__button:disabled {
     color: var(--detail-high-contrast);

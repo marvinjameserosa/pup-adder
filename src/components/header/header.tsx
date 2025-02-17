@@ -73,6 +73,12 @@ export default function Header() {
                   Events
                 </Button>
               </Link>
+              <Link href="/dashboard">
+                <Button variant="ghost" size="default" className="text-white">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Dashboard
+                </Button>
+              </Link>
             </div>
             <Button onClick={startScan} variant="ghost" size="icon" className="text-white">
               <Camera className="h-5 w-5" />
@@ -109,6 +115,12 @@ export default function Header() {
                 <Button variant="ghost" size="sm" className="w-full justify-start text-white">
                   <Calendar className="h-5 w-5 mr-2" />
                   Events
+                </Button>
+              </Link>
+              <Link href="/dashboard">
+                <Button variant="ghost" size="sm" className="w-full justify-start text-white">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Dashboard
                 </Button>
               </Link>
               <Button variant="ghost" size="sm" className="w-full justify-start text-white" onClick={startScan}>

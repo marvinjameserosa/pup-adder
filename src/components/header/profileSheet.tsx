@@ -29,14 +29,10 @@ export default function ProfileSheet() {
             <div>
               <h3 className="font-medium">User Name</h3>
               <p className="text-sm text-muted-foreground">user@example.com</p>
+              <p className="text-sm text-muted-foreground">Student</p>
+              <p className="text-sm text-muted-foreground">BS Computer Engineering</p>
             </div>
           </div>
-          <Link href="/dashboard" className="font-bold text-2xl">
-            <Button variant="outline" className="px-4 py-2 rounded-lg transition-colors hover:bg-yellow-400 data-[state=active]:bg-yellow-500 data-[state=active]:text-white"onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Dashboard
-            </Button>
-          </Link>
           <Link href="/" className="font-bold text-2xl">
             <Button variant="outline" className="px-4 py-2 rounded-lg transition-colors hover:bg-yellow-400 data-[state=active]:bg-yellow-500 data-[state=active]:text-white" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />

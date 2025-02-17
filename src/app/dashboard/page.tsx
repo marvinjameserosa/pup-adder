@@ -16,8 +16,27 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Calendar, CalendarDays, MapPin, Ticket, Users } from "lucide-react"
 import { useMemo, useState } from "react"
 
+// Define types for event and participant
+interface Participant {
+  id: number
+  name: string
+  email: string
+  type: string
+  department: string
+  registrationDate: string
+}
+
+interface Event {
+  id: number
+  name: string
+  date: string
+  location: string
+  description: string
+  participants: Participant[]
+}
+
 // Updated mock data for events and participants
-const events = [
+const events: Event[] = [
   {
     id: 1,
     name: "Summer Music Festival",
@@ -148,9 +167,10 @@ const events = [
 export default function Dashboard() {
   const currentDate = new Date("2023-09-25") // For demonstration purposes
 
+  // Use the defined types for currentEvents and upcomingEvents
   const { currentEvents, upcomingEvents, totalRegistrations, totalEvents } = useMemo(() => {
-    const currentEvents = []
-    const upcomingEvents = []
+    const currentEvents: Event[] = []
+    const upcomingEvents: Event[] = []
     let totalRegistrations = 0
 
     events.forEach((event) => {
@@ -171,7 +191,7 @@ export default function Dashboard() {
     }
   }, [currentDate])
 
-  const [selectedEvent, setSelectedEvent] = useState(currentEvents[0])
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(currentEvents[0])
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] bg-fixed">
@@ -282,7 +302,7 @@ export default function Dashboard() {
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
-                                {selectedEvent.participants.map((participant) => (
+                                {selectedEvent.participants.map((participant: Participant) => (
                                   <TableRow key={participant.id} className="border-b border-white/20">
                                     <TableCell className="text-white">{participant.name}</TableCell>
                                     <TableCell className="text-white">{participant.email}</TableCell>
@@ -336,4 +356,3 @@ export default function Dashboard() {
     </div>
   )
 }
-

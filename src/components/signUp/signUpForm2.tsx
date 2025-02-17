@@ -56,9 +56,16 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="CPE">BS Computer Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Civil Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Electronics Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Industrial Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Mechanical Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Computer Science</SelectItem>
                         <SelectItem value="accountancy">BS Accountancy</SelectItem>
                         <SelectItem value="management">BS Business Management</SelectItem>
                         <SelectItem value="architecture">BS Architecture</SelectItem>
+                        <SelectItem value="architecture">BS Information Techonology</SelectItem>
+                        <SelectItem value="architecture">BS Management Accounting</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -78,10 +85,17 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         <SelectValue placeholder="Select your Department" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="cpe">BS Computer Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Computer Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Civil Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Electronics Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Industrial Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Mechanical Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Computer Science</SelectItem>
                         <SelectItem value="accountancy">BS Accountancy</SelectItem>
                         <SelectItem value="management">BS Business Management</SelectItem>
                         <SelectItem value="architecture">BS Architecture</SelectItem>
+                        <SelectItem value="architecture">BS Information Techonology</SelectItem>
+                        <SelectItem value="architecture">BS Management Accounting</SelectItem>
                       </SelectContent>
                     </Select>
 
@@ -116,10 +130,17 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         <SelectValue placeholder="Select your department" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="CPE">BS Computer Engineering</SelectItem>
+                      <SelectItem value="CPE">BS Computer Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Civil Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Electronics Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Industrial Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Mechanical Engineering</SelectItem>
+                        <SelectItem value="CPE">BS Computer Science</SelectItem>
                         <SelectItem value="accountancy">BS Accountancy</SelectItem>
                         <SelectItem value="management">BS Business Management</SelectItem>
                         <SelectItem value="architecture">BS Architecture</SelectItem>
+                        <SelectItem value="architecture">BS Information Techonology</SelectItem>
+                        <SelectItem value="architecture">BS Management Accounting</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
