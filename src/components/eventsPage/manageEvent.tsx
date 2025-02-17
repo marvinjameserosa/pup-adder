@@ -56,9 +56,9 @@ export default function ManageEventCard({
   const attendeesList = attendees?.list ?? []
 
   return (
-    <Card className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-[824px] max-h-[90vh] overflow-auto bg-background">
+    <Card className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] sm:w-[80%] md:w-[70%] lg:w-[824px] max-h-[90vh] overflow-auto bg-background">
       <CardHeader className="flex flex-row items-center justify-between sticky top-0 bg-background z-10">
-        <CardTitle className="text-2xl font-bold">{name}</CardTitle>
+        <CardTitle className="text-xl sm:text-2xl font-bold">{name}</CardTitle>
         <Button variant="ghost" size="icon" onClick={onClose}>
           <X className="h-4 w-4" />
         </Button>
@@ -71,40 +71,44 @@ export default function ManageEventCard({
           </TabsList>
           <TabsContent value="overview">
             <div className="space-y-4 mt-4">
-              <img src={imageUrl || "/placeholder.svg"} alt={name} className="w-full h-48 object-cover rounded-lg" />
+              <img
+                src={imageUrl || "/placeholder.svg"}
+                alt={name}
+                className="w-full h-32 sm:h-48 object-cover rounded-lg"
+              />
               <Card>
                 <CardContent className="p-4 space-y-2">
                   <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    <span>{formatDate(date)}</span>
+                    <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="text-sm sm:text-base">{formatDate(date)}</span>
                   </div>
                   <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-2" />
-                    <span>{time}</span>
+                    <Clock className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="text-sm sm:text-base">{time}</span>
                   </div>
                   <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    <span>{location}</span>
+                    <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="text-sm sm:text-base">{location}</span>
                   </div>
                   <div className="flex items-center">
-                    <Users className="h-4 w-4 mr-2" />
-                    <span>{attendeesTotal} guests attended</span>
+                    <Users className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="text-sm sm:text-base">{attendeesTotal} guests attended</span>
                   </div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold mb-2">Event Host</h3>
-                  <p>Name: {host.name}</p>
-                  <p>Email: {host.email}</p>
-                  <p>Phone: {host.phone}</p>
+                  <h3 className="font-semibold mb-2 text-sm sm:text-base">Event Host</h3>
+                  <p className="text-sm sm:text-base">Name: {host.name}</p>
+                  <p className="text-sm sm:text-base">Email: {host.email}</p>
+                  <p className="text-sm sm:text-base">Phone: {host.phone}</p>
                 </CardContent>
               </Card>
             </div>
           </TabsContent>
           <TabsContent value="guests">
-            <div className="mt-4">
-              <h3 className="font-semibold mb-2">Guests ({attendeesTotal})</h3>
+            <div className="mt-4 overflow-x-auto">
+              <h3 className="font-semibold mb-2 text-sm sm:text-base">Guests ({attendeesTotal})</h3>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -117,10 +121,12 @@ export default function ManageEventCard({
                 <TableBody>
                   {attendeesList.map((attendee, index) => (
                     <TableRow key={index}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{attendee.name}</TableCell>
-                      <TableCell>{attendee.category}</TableCell>
-                      <TableCell>{new Date(attendee.registrationDate).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-sm sm:text-base">{index + 1}</TableCell>
+                      <TableCell className="text-sm sm:text-base">{attendee.name}</TableCell>
+                      <TableCell className="text-sm sm:text-base">{attendee.category}</TableCell>
+                      <TableCell className="text-sm sm:text-base">
+                        {new Date(attendee.registrationDate).toLocaleDateString()}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -132,3 +138,4 @@ export default function ManageEventCard({
     </Card>
   )
 }
+
