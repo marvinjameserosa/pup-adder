@@ -1,111 +1,110 @@
-'use client'
+"use client"
 
 import { Button } from "@/components/ui/button"
-import { Calendar } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-import EventCard from './eventCard'
-import EventDrawer from './eventDrawer'
+import { Calendar, PlusCircle } from "lucide-react"
+import Link from "next/link"
+import { useEffect, useMemo, useState } from "react"
+import EventCard from "./eventCard"
+import EventDrawer from "./eventDrawer"
 
+type Event = {
+  id: number
+  name: string
+  date: string
+  time: string
+  host: {
+    name: string
+    email: string
+    phone: string
+  }
+  location: string
+  imageUrl: string
+  isCreator: boolean
+  availableSlots: number
+  totalSlots: number
+  isGoing: boolean
+  attendees: {
+    total: number
+    list: Array<{
+      name: string
+      category: "Student" | "Alumni" | "Faculty"
+      registrationDate: string
+    }>
+  }
+}
 
-const events = [
+const events: Event[] = [
   {
     id: 1,
     name: "Summer Music Festival",
     date: "2023-12-29",
     time: "14:00",
-    host: "City Cultural Center",
+    host: {
+      name: "City Cultural Center",
+      email: "contact@culturalcenter.com",
+      phone: "123-456-7890",
+    },
     location: "Central Park",
     imageUrl: "/placeholder.svg?height=193&width=193",
-    isCreator: false,
+    isCreator: true,
     availableSlots: 150,
     totalSlots: 500,
-    isGoing: true,
-  },
-  {
-    id: 2,
-    name: "Tech Conference 2025",
-    date: "2025-01-22",
-    time: "09:00",
-    host: "TechCorp",
-    location: "Convention Center",
-    imageUrl: "/placeholder.svg?height=193&width=193",
-    isCreator: true,
-    availableSlots: 50,
-    totalSlots: 200,
     isGoing: false,
+    attendees: {
+      total: 350,
+      list: [
+        { name: "John Doe", category: "Student", registrationDate: "2023-11-15" },
+        { name: "Jane Smith", category: "Alumni", registrationDate: "2023-11-16" },
+        { name: "John Doe", category: "Student", registrationDate: "2023-11-15" },
+        { name: "Jane Smith", category: "Alumni", registrationDate: "2023-11-16" },
+        { name: "John Doe", category: "Student", registrationDate: "2023-11-15" },
+        { name: "Jane Smith", category: "Alumni", registrationDate: "2023-11-16" },
+        { name: "John Doe", category: "Student", registrationDate: "2023-11-15" },
+        { name: "Jane Smith", category: "Alumni", registrationDate: "2023-11-16" },
+        { name: "John Doe", category: "Student", registrationDate: "2023-11-15" },
+        { name: "Jane Smith", category: "Alumni", registrationDate: "2023-11-16" },
+        { name: "John Doe", category: "Student", registrationDate: "2023-11-15" },
+        { name: "Jane Smith", category: "Alumni", registrationDate: "2023-11-16" },
+        // Add more attendees as needed
+      ],
+    },
   },
-  {
-    id: 3,
-    name: "Food & Wine Expo",
-    date: "2024-02-10",
-    time: "11:00",
-    host: "Gourmet Association",
-    location: "Exhibition Hall",
-    imageUrl: "/placeholder.svg?height=193&width=193",
-    isCreator: true,
-    availableSlots: 75,
-    totalSlots: 300,
-    isGoing: false,
-  },
-  {
-    id: 4,
-    name: "Art Gallery Opening",
-    date: "2024-01-05",
-    time: "18:00",
-    host: "Metropolitan Museum",
-    location: "Downtown Art District",
-    imageUrl: "/placeholder.svg?height=193&width=193",
-    isCreator: true,
-    availableSlots: 25,
-    totalSlots: 100,
-    isGoing: false,
-  },
-  {
-    id: 5,
-    name: "Marathon 2023",
-    date: "2023-11-12",
-    time: "07:00",
-    host: "City Sports Association",
-    location: "City Streets",
-    imageUrl: "/placeholder.svg?height=193&width=193",
-    isCreator: true,
-    availableSlots: 1000,
-    totalSlots: 5000,
-    isGoing: false,
-  },
+  // ... Add similar details for other events
 ]
 
 export default function EventsList() {
   const [visibleEvents, setVisibleEvents] = useState(3)
-  const [filter, setFilter] = useState<'upcoming' | 'past'>('upcoming')
-  const [selectedEvent, setSelectedEvent] = useState<typeof events[0] | null>(null)
+  const [filter, setFilter] = useState<"upcoming" | "past">("upcoming")
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   const currentDate = new Date()
 
   const filteredEvents = useMemo(() => {
-    return events.filter(event => {
-      const eventDate = new Date(event.date)
-      return filter === 'upcoming' ? eventDate >= currentDate : eventDate < currentDate
-    }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-  }, [filter])
+    return events
+      .filter((event) => {
+        const eventDate = new Date(event.date)
+        return filter === "upcoming" ? eventDate >= currentDate : eventDate < currentDate
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  }, [filter, currentDate]) // Added currentDate to dependencies
 
   useEffect(() => {
     const handleFilterChange = (event: CustomEvent) => {
       setFilter(event.detail.filter)
       setVisibleEvents(3) // Reset visible events when filter changes
     }
-    window.addEventListener('filterChange' as any, handleFilterChange)
+    window.addEventListener("filterChange" as any, handleFilterChange)
     return () => {
-      window.removeEventListener('filterChange' as any, handleFilterChange)
+      window.removeEventListener("filterChange" as any, handleFilterChange)
     }
   }, [])
 
   const loadMore = () => {
-    setVisibleEvents(prevVisible => Math.min(prevVisible + 3, filteredEvents.length))
+    setVisibleEvents((prevVisible) => Math.min(prevVisible + 3, filteredEvents.length))
   }
 
-  const handleEventClick = (event: typeof events[0]) => {
+  const handleEventClick = (event: Event) => {
     setSelectedEvent(event)
     setIsDrawerOpen(true)
   }
@@ -114,16 +113,19 @@ export default function EventsList() {
     setIsDrawerOpen(false)
   }
 
-  if (filteredEvents.length === 0 && filter === 'upcoming') {
+  if (filteredEvents.length === 0 && filter === "upcoming") {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] text-center">
-      <Calendar className="w-16 h-16 mb-4 text-gray-400" />
-      <h3 className="text-2xl font-bold mb-2 text-gray-300">No Upcoming Events</h3>
-      <p className="text-muted-foreground mb-6">You have no upcoming events. Why not host one?</p>
-      <Button>
-        Create Event
-      </Button>
-    </div>
+        <Calendar className="w-16 h-16 mb-4 text-gray-400" />
+        <h3 className="text-2xl text-muted-foreground font-bold mb-2">No Upcoming Events</h3>
+        <p className="text-muted-foreground mb-6">You have no upcoming events. Why not host one?</p>
+        <Link href="/createEvent">
+          <Button className="text-white">
+            <PlusCircle className="h-5 w-5 mr-2" />
+            Create Event
+          </Button>
+        </Link>
+      </div>
     )
   }
 
@@ -131,7 +133,22 @@ export default function EventsList() {
     <div className="w-full max-w-[616px] space-y-6">
       <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
         {filteredEvents.slice(0, visibleEvents).map((event) => (
-          <EventCard key={event.id} {...event} onClick={() => handleEventClick(event)} />
+          <EventCard
+            key={event.id}
+            id={event.id.toString()}
+            name={event.name}
+            date={event.date}
+            time={event.time}
+            host={event.host}
+            location={event.location}
+            imageUrl={event.imageUrl}
+            isCreator={event.isCreator}
+            availableSlots={event.availableSlots}
+            totalSlots={event.totalSlots}
+            isGoing={event.isGoing}
+            attendees={event.attendees}
+            onClick={() => handleEventClick(event)}
+          />
         ))}
       </div>
       {visibleEvents < filteredEvents.length && (
@@ -143,3 +160,4 @@ export default function EventsList() {
     </div>
   )
 }
+

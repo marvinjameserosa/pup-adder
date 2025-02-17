@@ -56,8 +56,8 @@ export default function ManageEventCard({
   const attendeesList = attendees?.list ?? []
 
   return (
-    <Card className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] sm:w-[80%] md:w-[70%] lg:w-[824px] max-h-[90vh] overflow-auto bg-background">
-      <CardHeader className="flex flex-row items-center justify-between sticky top-0 bg-background z-10">
+    <Card className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] sm:w-[80%] md:w-[70%] lg:w-[824px] max-h-[90vh] overflow-auto">
+      <CardHeader className="flex flex-row items-center justify-between sticky top-0 z-10">
         <CardTitle className="text-xl sm:text-2xl font-bold">{name}</CardTitle>
         <Button variant="ghost" size="icon" onClick={onClose}>
           <X className="h-4 w-4" />

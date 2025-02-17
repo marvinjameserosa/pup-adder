@@ -27,7 +27,7 @@ interface EventCardProps {
     total: number
     list: Array<{
       name: string
-      category: "Student" | "Alumni" | "Other"
+      category: "Student" | "Alumni" | "Faculty"
       registrationDate: string
     }>
   }
@@ -141,3 +141,4 @@ export default function EventCard({
     </>
   )
 }
+
