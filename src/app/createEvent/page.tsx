@@ -3,6 +3,7 @@
 import Header from "@/components/header/header"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import {
   Dialog,
@@ -19,10 +20,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
-import { FileText, Image, MapPin, UserCheck, Users } from "lucide-react"
+import { Building, ChevronDown, Circle, CircleIcon, FileText, GraduationCap, Image, MapPin, Ticket, User, UserCheck, Users } from "lucide-react"
 import { useState } from "react"
-import { auth, db } from "@/app/firebase/config"; 
-import { doc, setDoc } from "firebase/firestore";
 
 export default function CreateEvent() {
   const { toast } = useToast()
@@ -36,11 +35,16 @@ export default function CreateEvent() {
   const [location, setLocation] = useState("")
   const [isDescriptionDialogOpen, setIsDescriptionDialogOpen] = useState(false)
   const [isLocationDialogOpen, setIsLocationDialogOpen] = useState(false)
-  const [requireApproval, setRequireApproval] = useState(false)
+  const [isApprovalOpen, setIsApprovalOpen] = useState(false)
   const [isCapacityDialogOpen, setIsCapacityDialogOpen] = useState(false)
   const [capacityLimit, setCapacityLimit] = useState<number | null>(null)
   const [tempCapacity, setTempCapacity] = useState<string>("")
   const [eventPoster, setEventPoster] = useState<string | null>(null)
+  const [participantApprovals, setParticipantApprovals] = useState({
+    student: false,
+    alumni: false,
+    others: false,
+  })
 
   const generateTimeOptions = () => {
     const options = []
@@ -125,16 +129,30 @@ export default function CreateEvent() {
     })
   }
 
+  const handleParticipantApprovalChange = (participant: keyof typeof participantApprovals) => {
+    setParticipantApprovals((prev) => ({
+      ...prev,
+      [participant]: !prev[participant],
+    }))
+  }
+
+  const getApprovedParticipants = () => {
+    return Object.entries(participantApprovals)
+      .filter(([_, isApproved]) => isApproved)
+      .map(([participant]) => participant)
+      .join(", ")
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] to-50%">
-      <div className="absolute inset-0 bg-black/80 mix-blend-multiply" />
-      <div className="relative h-full  ">
+    <div className="relative min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] bg-fixed">
+      <div className="absolute inset-0 bg-black/80 mix-blend-multiply fixed" />
+      <div className="relative z-10 min-h-screen">
       <Header />
       <div className="pt-4 pb-10 sm:pt-8 sm:pb-20 flex items-center justify-center">
         <Card className="w-full max-w-[824px] p-4 sm:p-6 mx-4 sm:mx-auto">
           <div className="flex flex-col md:flex-row gap-4 md:gap-6">
-            <div className="w-full md:w-[325px] space-y-2">
-              <div className="h-[325px] bg-gray-200 rounded-md flex items-center justify-center text-gray-500 relative overflow-hidden">
+            <div className="w-full md:w-[325px] flex-shrink-0">
+              <div className="h-[325px] w-full bg-gray-200 rounded-md flex items-center justify-center text-gray-500 relative overflow-hidden">
                 {eventPoster ? (
                   <img
                     src={eventPoster || "/placeholder.svg"}
@@ -162,11 +180,14 @@ export default function CreateEvent() {
                   </Button>
                 </label>
               </div>
-              <p className="text-sm text-gray-500 text-center">Please upload .jpeg or .png files only</p>
+              <p className="text-sm text-gray-500 text-center mt-2">Please upload .jpeg or .png files only</p>
             </div>
-            <div className="flex-1 space-y-4">
-              <div>
-                <Label htmlFor="event-name">Name of Event</Label>
+            <div className="flex-1 w-full md:w-[423px] space-y-4">
+            <div>
+              <div className="flex items-center space-x-2 mb-2">
+                  <Ticket className="h-5 w-5 text-gray-500" />
+                  <Label htmlFor="event-name">Name of Event</Label>
+                </div>
                 <Input
                   id="event-name"
                   className="w-full h-[45px]"
@@ -176,39 +197,43 @@ export default function CreateEvent() {
                 />
               </div>
               <div className="space-y-2">
-              <div className="flex items-center space-x-4" style={{ width: '440px' }}>
-                  <span className="text-sm w-12">Start</span>
-                  <div className="flex-1 relative">
-                    <Input
-                      type="date"
-                      className="w-full h-[45px] pr-10"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                    />
+                <div className="space-y-2">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                    <Circle className="h-5 w-5 text-gray-500" />
+                    <span className="w-12">Start</span>
+                    <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                      <Input
+                        type="date"
+                        className="w-full h-[45px]"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                      />
+                      <Select value={startTime} onValueChange={setStartTime}>
+                        <SelectTrigger className="w-full h-[45px]">
+                          <SelectValue placeholder="Select time" />
+                        </SelectTrigger>
+                        <SelectContent>{generateTimeOptions()}</SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <Select value={startTime} onValueChange={setStartTime}>
-                    <SelectTrigger className="w-full sm:w-auto h-[45px]">
-                      <SelectValue placeholder="Select time" />
-                    </SelectTrigger>
-                    <SelectContent>{generateTimeOptions()}</SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center space-x-4" style={{ width: '440px' }}>
-                  <span className="text-sm w-12">End</span>
-                  <div className="flex-1 relative">
-                    <Input
-                      type="date"
-                      className="w-full h-[45px] pr-10"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                    />
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                    <CircleIcon className="h-5 w-5 text-gray-500" />
+                    <span className="w-12">End</span>
+                    <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                      <Input
+                        type="date"
+                        className="w-full h-[45px]"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                      />
+                      <Select value={endTime} onValueChange={setEndTime}>
+                        <SelectTrigger className="w-full h-[45px]">
+                          <SelectValue placeholder="Select time" />
+                        </SelectTrigger>
+                        <SelectContent>{generateTimeOptions()}</SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <Select value={endTime} onValueChange={setEndTime}>
-                    <SelectTrigger className="w-full sm:w-auto h-[45px]">
-                      <SelectValue placeholder="Select time" />
-                    </SelectTrigger>
-                    <SelectContent>{generateTimeOptions()}</SelectContent>
-                  </Select>
                 </div>
               </div>
               <div>
@@ -219,7 +244,7 @@ export default function CreateEvent() {
                 <Dialog open={isLocationDialogOpen} onOpenChange={setIsLocationDialogOpen}>
                   <DialogTrigger asChild>
                     <Button variant="outline" className="w-full h-[45px]">
-                      {location ? location : "Select Location"}
+                      {location ? <span className="truncate">{location}</span> : "Select Location"}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
@@ -256,18 +281,14 @@ export default function CreateEvent() {
                 <Dialog open={isDescriptionDialogOpen} onOpenChange={setIsDescriptionDialogOpen}>
                   <DialogTrigger asChild>
                     <Button variant="outline" className="w-full h-auto min-h-[45px] py-2 px-3 text-left">
-                      {description ? (
-                        <span className="text-sm text-gray-500 line-clamp-2">{description}</span>
-                      ) : (
-                        "Add Description"
-                      )}
+                      <span className="block truncate">{description ? description : "Add Description"}</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Event Description</DialogTitle>
                       <DialogDescription>
-                        Write a description for your event. Click save when you&aposre done.
+                        Write a description for your event. Click save when you're done.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-2 py-4">
@@ -288,13 +309,59 @@ export default function CreateEvent() {
               </div>
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Event Options</h3>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <UserCheck className="h-5 w-5 text-gray-500" />
-                    <Label htmlFor="approval">Require Approval</Label>
+                <Collapsible open={isApprovalOpen} onOpenChange={setIsApprovalOpen} className="w-full space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <UserCheck className="h-5 w-5 text-gray-500" />
+                      <Label>Require Approval</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-500">{getApprovedParticipants() || "None"}</span>
+                      <CollapsibleTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </CollapsibleTrigger>
+                    </div>
                   </div>
-                  <Switch id="approval" checked={requireApproval} onCheckedChange={setRequireApproval} />
-                </div>
+                  <CollapsibleContent className="mt-2">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <GraduationCap className="h-5 w-5 text-gray-500" />
+                          <Label htmlFor="approve-student">Student</Label>
+                        </div>
+                        <Switch
+                          id="approve-student"
+                          checked={participantApprovals.student}
+                          onCheckedChange={() => handleParticipantApprovalChange("student")}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Building className="h-5 w-5 text-gray-500" />
+                          <Label htmlFor="approve-alumni">Alumni</Label>
+                        </div>
+                        <Switch
+                          id="approve-alumni"
+                          checked={participantApprovals.alumni}
+                          onCheckedChange={() => handleParticipantApprovalChange("alumni")}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <User className="h-5 w-5 text-gray-500" />
+                          <Label htmlFor="approve-others">Faculty</Label>
+                        </div>
+                        <Switch
+                          id="approve-others"
+                          checked={participantApprovals.others}
+                          onCheckedChange={() => handleParticipantApprovalChange("others")}
+                        />
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Users className="h-5 w-5 text-gray-500" />
@@ -346,8 +413,8 @@ export default function CreateEvent() {
           </div>
         </Card>
       </div>
+      </div>
       <Toaster />
-    </div>
     </div>
   )
 }
