@@ -21,6 +21,8 @@ import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import { FileText, Image, MapPin, UserCheck, Users } from "lucide-react"
 import { useState } from "react"
+import { auth, db } from "@/app/firebase/config"; 
+import { doc, setDoc } from "firebase/firestore";
 
 export default function CreateEvent() {
   const { toast } = useToast()
@@ -265,7 +267,7 @@ export default function CreateEvent() {
                     <DialogHeader>
                       <DialogTitle>Event Description</DialogTitle>
                       <DialogDescription>
-                        Write a description for your event. Click save when you're done.
+                        Write a description for your event. Click save when you&aposre done.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-2 py-4">
