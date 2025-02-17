@@ -104,9 +104,6 @@ export default function EventCard({
           >
             {isCreator ? (
               <div className="flex space-x-2">
-                <Button size="sm" variant="outline" className="h-7 px-2 text-xs">
-                  Check In
-                </Button>
                 <Button size="sm" className="h-7 px-2 text-xs" onClick={handleManageClick}>
                   Manage
                 </Button>

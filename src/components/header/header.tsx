@@ -4,7 +4,7 @@ import ProfileSheet from "@/components/header/profileSheet"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "@/hooks/use-toast"
-import { Bell, Calendar, Camera, Compass, Menu, PlusCircle, Search, X } from "lucide-react"
+import { Calendar, Camera, Compass, Menu, PlusCircle, X } from "lucide-react"
 import Link from "next/link"
 import { useRef, useState } from "react"
 
@@ -74,14 +74,6 @@ export default function Header() {
                 </Button>
               </Link>
             </div>
-            <Button variant="ghost" size="icon" className="text-white">
-              <Search className="h-5 w-5" />
-              <span className="sr-only">Search</span>
-            </Button>
-            <Button variant="ghost" size="icon" className="text-white">
-              <Bell className="h-5 w-5" />
-              <span className="sr-only">Notifications</span>
-            </Button>
             <Button onClick={startScan} variant="ghost" size="icon" className="text-white">
               <Camera className="h-5 w-5" />
               <span className="sr-only">Scan QR Code</span>
@@ -119,14 +111,6 @@ export default function Header() {
                   Events
                 </Button>
               </Link>
-              <Button variant="ghost" size="sm" className="w-full justify-start text-white">
-                <Search className="h-5 w-5 mr-2" />
-                Search
-              </Button>
-              <Button variant="ghost" size="sm" className="w-full justify-start text-white">
-                <Bell className="h-5 w-5 mr-2" />
-                Notifications
-              </Button>
               <Button variant="ghost" size="sm" className="w-full justify-start text-white" onClick={startScan}>
                 <Camera className="h-5 w-5 mr-2" />
                 Scan QR Code
