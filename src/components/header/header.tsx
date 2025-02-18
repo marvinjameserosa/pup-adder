@@ -1,22 +1,60 @@
 "use client"
 
+import ProfileSheet from "@/components/header/profileSheet"
 import { Button } from "@/components/ui/button"
-import { Bell, Calendar, Compass, Menu, PlusCircle, Search, X } from "lucide-react"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { toast } from "@/hooks/use-toast"
+import { Calendar, Camera, Compass, Menu, PlusCircle, X } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
-import ProfileSheet from "./profileSheet"
-import { PupLogo } from "@/assets/puplogo";
+import { useRef, useState } from "react"
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isScannerOpen, setIsScannerOpen] = useState(false)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
 
+  const startScan = async () => {
+    if (typeof window === "undefined" || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      toast({
+        title: "Camera Access Error",
+        description: "Your browser doesn't support camera access or you're in a non-secure context.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+      }
+      setIsScannerOpen(true)
+    } catch (error) {
+      console.error("Error accessing camera:", error)
+      toast({
+        title: "Camera Access Error",
+        description: "Unable to access the camera. Please check your permissions.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const stopScan = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream
+      const tracks = stream.getTracks()
+      tracks.forEach((track) => track.stop())
+    }
+    setIsScannerOpen(false)
+  }
+
   return (
-    <nav className="w-full bg-transparent text-white">
+    <nav className="w-full bg-white text-[#722120]">
       <div className="max-w-[1360px] mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/discover" className="font-bold text-2xl text-white">
+          <Link href="/discover" className="font-bold text-2xl text-[#722120]">
             PUP Gather
           </Link>
 
@@ -24,28 +62,30 @@ export default function Header() {
           <div className="hidden md:flex items-center space-x-4">
             <div className="flex items-center space-x-4 mr-4">
               <Link href="/discover">
-                <Button variant="ghost" size="default" className="text-white">
+                <Button variant="ghost" size="default" className="text-[#722120] hover:bg-[#a41e1d]">
                   <Compass className="h-5 w-5 mr-2" />
                   Discover
                 </Button>
               </Link>
               <Link href="/events">
-                <Button variant="ghost" size="default" className="text-white">
+                <Button variant="ghost" size="default" className="text-[#722120] hover:bg-[#a41e1d]">
                   <Calendar className="h-5 w-5 mr-2" />
                   Events
                 </Button>
               </Link>
+              <Link href="/dashboard">
+                <Button variant="ghost" size="default" className="text-[#722120] hover:bg-[#a41e1d]">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Dashboard
+                </Button>
+              </Link>
             </div>
-            <Button variant="ghost" size="icon" className="text-white">
-              <Search className="h-5 w-5" />
-              <span className="sr-only">Search</span>
-            </Button>
-            <Button variant="ghost" size="icon" className="text-white">
-              <Bell className="h-5 w-5" />
-              <span className="sr-only">Notifications</span>
+            <Button onClick={startScan} variant="ghost" size="icon" className="text-[#722120] hover:bg-[#a41e1d]">
+              <Camera className="h-5 w-5" />
+              <span className="sr-only">Scan QR Code</span>
             </Button>
             <Link href="/createEvent">
-              <Button className="text-white">
+              <Button className=" hover:bg-[#722120] bg-[#a41e1d] text-white ">
                 <PlusCircle className="h-5 w-5 mr-2" />
                 Create Event
               </Button>
@@ -55,7 +95,7 @@ export default function Header() {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
-            <Button variant="ghost" size="icon" onClick={toggleMobileMenu} className="text-white">
+            <Button variant="ghost" size="icon" onClick={toggleMobileMenu} className="text-[#722120]">
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
@@ -63,41 +103,65 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-transparent text-white">
+          <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               <Link href="/discover">
-                <Button variant="ghost" size="sm" className="w-full justify-start text-white">
+                <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d]">
                   <Compass className="h-5 w-5 mr-2" />
                   Discover
                 </Button>
               </Link>
               <Link href="/events">
-                <Button variant="ghost" size="sm" className="w-full justify-start text-white">
+                <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d]">
                   <Calendar className="h-5 w-5 mr-2" />
                   Events
                 </Button>
               </Link>
-              <Button variant="ghost" size="sm" className="w-full justify-start text-white">
-                <Search className="h-5 w-5 mr-2" />
-                Search
-              </Button>
-              <Button variant="ghost" size="sm" className="w-full justify-start text-white">
-                <Bell className="h-5 w-5 mr-2" />
-                Notifications
+              <Link href="/dashboard">
+                <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d]">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d]" onClick={startScan}>
+                <Camera className="h-5 w-5 mr-2" />
+                Scan QR Code
               </Button>
               <Link href="/createEvent">
-                <Button className="w-full justify-start text-white">
+                <Button className="w-full justify-start bg-[#722120] text-white ">
                   <PlusCircle className="h-5 w-5 mr-2" />
                   Create Event
                 </Button>
               </Link>
             </div>
-            <div className="pt-4 pb-3 border-t border-gray-600">
+            <div className="pt-4 pb-3 border-t border-gray-700">
               <ProfileSheet />
             </div>
           </div>
         )}
       </div>
+
+      {/* QR Scanner Modal */}
+      <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
+        <DialogContent className="sm:max-w-md bg-[#a41e1d]">
+          <DialogHeader>
+            <DialogTitle className="text-white">QR Code Scanner</DialogTitle>
+          </DialogHeader>
+          <div className="relative w-full max-w-md bg-[#a41e1d] dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div className="aspect-square relative overflow-hidden rounded-lg">
+              <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-64 h-64 border-4 border-primary rounded-lg" />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" onClick={stopScan} variant="outline" className="bg-white/10 text-white hover:bg-[#722120]">
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </nav>
   )
 }

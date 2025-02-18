@@ -12,20 +12,21 @@ import Link from 'next/link'
 
 type SignUpForm1Props = {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  errorMsg?: string;
 };
 
-export default function SignUpForm1({onSubmit}: SignUpForm1Props){
+export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] to-50% p-4"> 
-      <div className="absolute inset-0 bg-black/80 mix-blend-multiply" />
-      <Card className="relative z-10 w-[360px] shadow-xl rounded-[24px] bg-[#2E2E2E]/60 backdrop-blur-sm flex flex-col border border-[#302F30]">
+    <div className="relative min-h-screen flex items-center justify-center bg-[url('/bg2.jpg')] "> 
+      <div className="absolute inset-0 bg-black/60 mix-blend-multiply" />
+      <Card className="relative z-10 w-[360px] shadow-xl rounded-[24px] bg-[#f2f3f7]/80 backdrop-blur-sm flex flex-col border border-[#302F30]">
         <CardHeader>
-          <CardTitle className="text-2xl text-white">Sign Up</CardTitle>
-          <CardDescription className="text-white">
-            Create an account to get started.
+          <CardTitle className="text-2xl text-[#a41e1d]">Create your account</CardTitle>
+          <CardDescription className={errorMsg ? "text-red-500" : "text-gray-600"}> 
+            {errorMsg ? errorMsg : "Complete the form to get started."}
           </CardDescription>
         </CardHeader>
-        <CardContent className="text-white">
+        <CardContent className="text-gray-800">
           <form onSubmit={onSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
@@ -51,7 +52,7 @@ export default function SignUpForm1({onSubmit}: SignUpForm1Props){
                   required 
                   className="bg-white text-black placeholder-gray-400"/>
               </div>
-              <Button type="submit" className="w-full bg-yellow-700 hover:bg-yellow-800 text-black">
+              <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-800 text-black">
                   Sign up
               </Button>
             </div>
