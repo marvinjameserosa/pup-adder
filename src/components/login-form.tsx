@@ -86,16 +86,16 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-4", className)} {...props}>
-      <Card className="shadow-xl rounded-[24px] bg-[#2E2E2E]/60 backdrop-blur-sm flex flex-col border border-[#302F30]">
+      <Card className="shadow-xl rounded-[24px] bg-[#f2f3f7]/60 backdrop-blur-sm flex flex-col border border-[#302F30]">
         <CardHeader>
         <div className="flex items-center gap-4">
       </div>
-          <CardTitle className="text-2xl text-white">Welcome to PUP Gather!</CardTitle>
-          <CardDescription className={`${error ? "text-red-500" : "text-white"}`}> 
+          <CardTitle className="text-2xl text-[#a41e1d]">Welcome to PUP Gather!</CardTitle>
+          <CardDescription className={`${error ? "text-red-500" : "text-gray-600"}`}> 
             {error ? error : "Enter your credentials to login."}
           </CardDescription>
         </CardHeader>
-        <CardContent className="text-white">
+        <CardContent className="text-gray-800">
           <form onSubmit={loginEmailPassword}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
@@ -127,7 +127,7 @@ export function LoginForm({
                   required 
                   className="bg-white text-black placeholder-gray-400"/>
               </div>
-              <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-800 text-black">
+              <Button type="submit" className="w-full bg-[#a41e1d] hover:bg-[#722120] text-white">
                 Login
               </Button>
             </div>

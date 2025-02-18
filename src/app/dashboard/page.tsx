@@ -194,18 +194,17 @@ export default function Dashboard() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(currentEvents[0])
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] bg-fixed">
-      <div className="absolute inset-0 bg-black/80 mix-blend-multiply" />
+    <div className="relative min-h-screen bg-[#f2f3f7] bg-fixed">
       <div className="relative z-10 min-h-screen">
         <Header />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Dashboard</h1>
-              <p className="text-sm sm:text-base text-gray-300">Manage your events and view participant information</p>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-[#a41e1d]">Dashboard</h1>
+              <p className="text-sm sm:text-base text-gray-800">Manage your events and view participant information</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 mt-4 md:mt-0">
-              <Card className="bg-white/10 text-white w-full sm:w-48">
+              <Card className="bg-[#722120] text-white w-full sm:w-48">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Registrations</CardTitle>
                   <Ticket className="h-4 w-4 text-muted-foreground" />
@@ -214,7 +213,7 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">{totalRegistrations}</div>
                 </CardContent>
               </Card>
-              <Card className="bg-white/10 text-white w-full sm:w-48">
+              <Card className="bg-[#722120] text-white w-full sm:w-48">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Events</CardTitle>
                   <CalendarDays className="h-4 w-4 text-muted-foreground" />
@@ -227,24 +226,24 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-1 bg-white/10 text-white overflow-hidden">
+            <Card className="lg:col-span-1 bg-[#a41e1d]  overflow-hidden">
               <CardHeader>
-                <CardTitle>Current Events</CardTitle>
+                <CardTitle className="text-[#ffd700]">Current Events</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="h-[calc(50vh-100px)] overflow-y-auto scrollbar-hide">
                   {currentEvents.map((event) => (
                     <div
                       key={event.id}
-                      className={`flex items-center justify-between w-full px-4 py-3 border-b border-white/10 cursor-pointer hover:bg-white/10 ${
-                        selectedEvent?.id === event.id ? "bg-white/20" : ""
+                      className={`flex items-center justify-between w-full px-4 py-3 border-b border-white/10 cursor-pointer hover:bg-[#722120]  ${
+                        selectedEvent?.id === event.id ? "bg-[#722120]" : ""
                       }`}
                       onClick={() => setSelectedEvent(event)}
                     >
                       <div className="flex items-center space-x-3">
                         <Calendar className="h-5 w-5" />
                         <div className="text-left">
-                          <p className="font-medium">{event.name}</p>
+                          <p className="font-medium text-white">{event.name}</p>
                           <p className="text-sm text-gray-300">{event.date}</p>
                         </div>
                       </div>
@@ -257,7 +256,7 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="lg:col-span-1 bg-white/10 text-white">
+            <Card className="lg:col-span-1 bg-[#a41e1d] text-white">
               <CardHeader>
                 <CardTitle>{selectedEvent ? selectedEvent.name : "No Event Selected"}</CardTitle>
               </CardHeader>
@@ -279,7 +278,7 @@ export default function Dashboard() {
                       </div>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="outline" className="bg-white/10 text-white hover:bg-white/20">
+                          <Button variant="outline" className="bg-white/10 text-white hover:bg-[#722120]">
                             View Participants
                           </Button>
                         </DialogTrigger>
@@ -323,9 +322,9 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="lg:col-span-1 bg-white/10 text-white overflow-hidden">
+            <Card className="lg:col-span-1 bg-[#a41e1d] text-white overflow-hidden">
               <CardHeader>
-                <CardTitle>Upcoming Events</CardTitle>
+                <CardTitle className="text-[#ffd700]">Upcoming Events</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="h-[calc(50vh-100px)] overflow-y-auto scrollbar-hide">

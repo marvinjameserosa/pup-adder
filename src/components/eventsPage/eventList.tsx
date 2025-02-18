@@ -117,10 +117,10 @@ export default function EventsList() {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] text-center">
         <Calendar className="w-16 h-16 mb-4 text-gray-400" />
-        <h3 className="text-2xl text-muted-foreground font-bold mb-2">No Upcoming Events</h3>
+        <h3 className="text-2xl text-muted-foreground font-bold mb-2 text-[#722120]">No Upcoming Events</h3>
         <p className="text-muted-foreground mb-6">You have no upcoming events. Why not host one?</p>
         <Link href="/createEvent">
-          <Button className="text-white">
+          <Button className="text-white hover:bg-[#722120] bg-[#a41e1d]">
             <PlusCircle className="h-5 w-5 mr-2" />
             Create Event
           </Button>

@@ -62,7 +62,7 @@ export default function DiscoverPage() {
       id: 1,
       image: "/discover-images/popularEvents/grandprix.jpg",
       title: "PUP Grand Prix 2025",
-      description: "Experience the thrill of competition in this year’s PUP Grand Prix.",
+      description: "Experience the thrill of high-speed competition at this year’s PUP Grand Prix! Witness the best racers in the university showcase their skills in an electrifying event filled with adrenaline, strategy, and determination. Whether you're a competitor or a spectator, this event promises an unforgettable experience packed with excitement and sportsmanship. Get ready to cheer for your favorites and see who takes the championship title!",
       details: "Join the annual PUP Grand Prix, an event full of excitement, competition, and camaraderie among students and professionals alike.",
       date: "2025-03-25",
       time: "10:00 AM - 5:00 PM",
@@ -76,7 +76,7 @@ export default function DiscoverPage() {
       id: 2,
       image: "/discover-images/popularEvents/jobfair.png",
       title: "Job Fair: We Need You!",
-      description: "Discover career opportunities at our biggest job fair of the year.",
+      description: "Unlock new career opportunities at PUP's biggest job fair of the year! Connect with top employers, explore various industries, and take the next step toward your dream job. This event brings together companies offering internships, full-time positions, and career-building workshops to help you succeed in the professional world. Don’t miss this chance to network, learn, and start your career journey with confidence.",
       details: "Explore numerous job opportunities, network with industry leaders, and kickstart your career journey at our annual job fair.",
       date: "2025-04-10",
       time: "9:00 AM - 4:00 PM",
@@ -156,28 +156,21 @@ export default function DiscoverPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] bg-fixed">
-      <div className="absolute inset-0 bg-black/80 mix-blend-multiply" />
-      <div className="relative z-10">
-        <Header />
-        <div className="flex flex-col items-center">
-          <main className="w-full max-w-[1360px] px-4 py-8 flex flex-col items-center">
-            <div className="w-full max-w-[616px] mb-8">
-              <h1 className="text-3xl sm:text-2xl md:text-3xl font-bold text-gray-200 p-1">Discover</h1>
-              <p className="text-sm text-gray-200">
-                Find and explore events that match your passion. Stay updated, register easily, and never miss out on the experiences that matter most to you.
-              </p>
-            </div>
-
-            <SearchDiscover onSearch={setSearchQuery} />
-
-            <Suspense fallback={<div className="text-center text-gray-300">Loading carousel...</div>}>
-              <EmblaCarousel slides={filteredSlides} onCardClick={handleCardClick} />
-            </Suspense>
-          </main>
+    <div className="relative min-h-screen bg-[#f2f3f7] bg-fixed">
+      <Header/>
+      <div className="w-full px-6 py-6 max-w-[1360px] mx-auto flex flex-col">
+        <div className="flex justify-between items-center mb-6">
+          <div className="max-w-xl">
+            <h1 className="text-4xl font-bold text-[#a41e1d]">Discover Events</h1>
+            <p className="text-m text-gray-700">Explore upcoming events and register easily.</p>
+          </div>
+          <SearchDiscover onSearch={setSearchQuery} />
         </div>
-      </div>
 
+        <Suspense fallback={<div className="text-center text-gray-300">Loading carousel...</div>}>
+          <EmblaCarousel slides={filteredSlides} onCardClick={handleCardClick} />
+        </Suspense>
+      </div>
       <EmblaSheet isOpen={isSheetOpen} onClose={() => setSheetOpen(false)} event={selectedEvent} />
     </div>
   );

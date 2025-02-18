@@ -144,8 +144,7 @@ export default function CreateEvent() {
   }
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] bg-fixed">
-      <div className="absolute inset-0 bg-black/80 mix-blend-multiply fixed" />
+    <div className="relative min-h-screen bg-[#f2f3f7] bg-fixed">
       <div className="relative z-10 min-h-screen">
       <Header />
       <div className="pt-4 pb-10 sm:pt-8 sm:pb-20 flex items-center justify-center">
@@ -302,7 +301,8 @@ export default function CreateEvent() {
                       />
                     </div>
                     <DialogFooter>
-                      <Button onClick={() => setIsDescriptionDialogOpen(false)}>Save</Button>
+                      <Button className="bg-[#a41e1d] text-white hover:bg-[#722120]"
+                      onClick={() => setIsDescriptionDialogOpen(false)}>Save</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -406,7 +406,8 @@ export default function CreateEvent() {
                   </div>
                 </div>
               </div>
-              <Button className="w-full" onClick={handleCreateEvent} disabled={validateForm().length > 0}>
+              <Button className="w-full bg-[#a41e1d] hover:bg-[#722120] text-white" 
+              onClick={handleCreateEvent} disabled={validateForm().length > 0}>
                 Create Event
               </Button>
             </div>
