@@ -64,33 +64,33 @@ export default function EventCard({
   return (
     <>
       <Card
-        className="overflow-hidden w-full max-w-[616px] h-[200px] flex cursor-pointer hover:shadow-lg transition-shadow"
+        className="overflow-hidden w-full max-w-[616px] h-[200px] flex cursor-pointer hover:shadow-lg transition-shadow bg-[#a41e1d] text-white"
         onClick={onClick}
       >
-        <div className="w-[100px] flex-shrink-0 flex flex-col items-center justify-center border-r">
+        <div className="w-[100px] flex-shrink-0 flex flex-col items-center justify-center border-r bg-[#722120]">
           <div className="text-xl font-bold">
             {monthNames[eventDate.getMonth()]} {eventDate.getDate()}
           </div>
-          <div className="text-sm text-muted-foreground">{dayNames[eventDate.getDay()]}</div>
+          <div className="text-sm text-muted-foreground text-white">{dayNames[eventDate.getDay()]}</div>
         </div>
         <div className="flex-grow p-4 flex flex-col justify-between">
           <div>
             <CardHeader className="p-0 pb-2">
-              <CardTitle className="text-xl line-clamp-1">{name}</CardTitle>
+              <CardTitle className="text-xl line-clamp-1 text-white">{name}</CardTitle>
             </CardHeader>
             <CardContent className="p-0 space-y-2">
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground text-white">
                 <span className="line-clamp-1">{time}</span>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground text-white">
                 <MapPin className="h-4 w-4 flex-shrink-0" />
                 <span className="line-clamp-1">{location}</span>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground text-white">
                 <User className="h-4 w-4 flex-shrink-0" />
                 <span className="line-clamp-1">Hosted by {host.name}</span>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground text-white">
                 <Users className="h-4 w-4 flex-shrink-0" />
                 <span className="line-clamp-1">
                   {availableSlots} of {totalSlots} slots available ({attendeesTotal} attendees)
@@ -104,7 +104,7 @@ export default function EventCard({
           >
             {isCreator ? (
               <div className="flex space-x-2">
-                <Button size="sm" className="h-7 px-2 text-xs" onClick={handleManageClick}>
+                <Button size="sm" variant="outline" className="h-7 px-2 bg-white/10 text-white hover:bg-[#722120]" onClick={handleManageClick}>
                   Manage
                 </Button>
               </div>
@@ -141,4 +141,3 @@ export default function EventCard({
     </>
   )
 }
-

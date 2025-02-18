@@ -200,8 +200,7 @@ export default function Dashboard() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-[#a41e1d]">Dashboard</h1>
-              <p className="text-sm sm:text-base text-gray-800">Manage your events and view participant information</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#a41e1d] mb-2">Dashboard</h1>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 mt-4 md:mt-0">
               <Card className="bg-[#722120] text-white w-full sm:w-48">
@@ -228,7 +227,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-1 bg-[#a41e1d]  overflow-hidden">
               <CardHeader>
-                <CardTitle className="text-[#ffd700]">Current Events</CardTitle>
+                <CardTitle className="text-white">Current Events</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="h-[calc(50vh-100px)] overflow-y-auto scrollbar-hide">
@@ -241,14 +240,14 @@ export default function Dashboard() {
                       onClick={() => setSelectedEvent(event)}
                     >
                       <div className="flex items-center space-x-3">
-                        <Calendar className="h-5 w-5" />
+                        <Calendar className="h-5 w-5 text-white" />
                         <div className="text-left">
                           <p className="font-medium text-white">{event.name}</p>
                           <p className="text-sm text-gray-300">{event.date}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">{event.participants.length}</p>
+                        <p className="text-sm font-medium text-white">{event.participants.length}</p>
                         <p className="text-xs text-gray-300">Participants</p>
                       </div>
                     </div>
@@ -324,7 +323,7 @@ export default function Dashboard() {
             </Card>
             <Card className="lg:col-span-1 bg-[#a41e1d] text-white overflow-hidden">
               <CardHeader>
-                <CardTitle className="text-[#ffd700]">Upcoming Events</CardTitle>
+                <CardTitle className="text-white">Upcoming Events</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="h-[calc(50vh-100px)] overflow-y-auto scrollbar-hide">

@@ -145,10 +145,11 @@ export default function CreateEvent() {
 
   return (
     <div className="relative min-h-screen bg-[#f2f3f7] bg-fixed">
+      {/* <div className="absolute inset-0 bg-black/80 mix-blend-multiply fixed" /> */}
       <div className="relative z-10 min-h-screen">
       <Header />
       <div className="pt-4 pb-10 sm:pt-8 sm:pb-20 flex items-center justify-center">
-        <Card className="w-full max-w-[824px] p-4 sm:p-6 mx-4 sm:mx-auto">
+        <Card className="bg-[#a41e1d] text-white w-full max-w-[824px] p-4 sm:p-6 mx-4 sm:mx-auto">
           <div className="flex flex-col md:flex-row gap-4 md:gap-6">
             <div className="w-full md:w-[325px] flex-shrink-0">
               <div className="h-[325px] w-full bg-gray-200 rounded-md flex items-center justify-center text-gray-500 relative overflow-hidden">
@@ -179,17 +180,17 @@ export default function CreateEvent() {
                   </Button>
                 </label>
               </div>
-              <p className="text-sm text-gray-500 text-center mt-2">Please upload .jpeg or .png files only</p>
+              <p className="text-sm text-white text-center mt-2">Please upload .jpeg or .png files only</p>
             </div>
             <div className="flex-1 w-full md:w-[423px] space-y-4">
             <div>
               <div className="flex items-center space-x-2 mb-2">
-                  <Ticket className="h-5 w-5 text-gray-500" />
+                  <Ticket className="h-5 w-5 text-white" />
                   <Label htmlFor="event-name">Name of Event</Label>
                 </div>
                 <Input
                   id="event-name"
-                  className="w-full h-[45px]"
+                  className="w-full h-[45px] text-white"
                   placeholder="Enter event name"
                   value={eventName}
                   onChange={(e) => setEventName(e.target.value)}
@@ -198,7 +199,7 @@ export default function CreateEvent() {
               <div className="space-y-2">
                 <div className="space-y-2">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                    <Circle className="h-5 w-5 text-gray-500" />
+                    <Circle className="h-5 w-5 text-white" />
                     <span className="w-12">Start</span>
                     <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                       <Input
@@ -216,7 +217,7 @@ export default function CreateEvent() {
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                    <CircleIcon className="h-5 w-5 text-gray-500" />
+                    <CircleIcon className="h-5 w-5 text-white" />
                     <span className="w-12">End</span>
                     <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                       <Input
@@ -237,23 +238,23 @@ export default function CreateEvent() {
               </div>
               <div>
                 <div className="flex items-center space-x-2 mb-2">
-                  <MapPin className="h-5 w-5 text-gray-500" />
+                  <MapPin className="h-5 w-5 text-white" />
                   <Label>Location</Label>
                 </div>
                 <Dialog open={isLocationDialogOpen} onOpenChange={setIsLocationDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full h-[45px]">
+                    <Button variant="outline" className="w-full h-[45px] text-black">
                       {location ? <span className="truncate">{location}</span> : "Select Location"}
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="bg-[#a41e1d]">
                     <DialogHeader>
-                      <DialogTitle>Event Location</DialogTitle>
-                      <DialogDescription>
+                      <DialogTitle className="text-white">Event Location</DialogTitle>
+                      <DialogDescription className="text-white">
                         Enter the location for your event or provide a virtual meeting link.
                       </DialogDescription>
                     </DialogHeader>
-                    <Command className="w-full border rounded-md">
+                    <Command className="w-full border rounded-md text-black">
                       <CommandInput
                         placeholder={isVirtual ? "Enter meeting link" : "Enter physical location"}
                         onValueChange={setLocation}
@@ -267,30 +268,30 @@ export default function CreateEvent() {
                       </CommandList>
                     </Command>
                     <DialogFooter>
-                      <Button onClick={() => setIsLocationDialogOpen(false)}>Done</Button>
+                      <Button onClick={() => setIsLocationDialogOpen(false)} variant="outline" className="bg-white/10 text-white hover:bg-[#722120]">Done</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
               </div>
               <div>
                 <div className="flex items-center space-x-2 mb-2">
-                  <FileText className="h-5 w-5 text-gray-500" />
+                  <FileText className="h-5 w-5 text-white" />
                   <Label>Event Description</Label>
                 </div>
                 <Dialog open={isDescriptionDialogOpen} onOpenChange={setIsDescriptionDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full h-auto min-h-[45px] py-2 px-3 text-left">
+                    <Button variant="outline" className="w-full h-auto min-h-[45px] py-2 px-3 text-left text-black">
                       <span className="block truncate">{description ? description : "Add Description"}</span>
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="bg-[#a41e1d]">
                     <DialogHeader>
-                      <DialogTitle>Event Description</DialogTitle>
-                      <DialogDescription>
+                      <DialogTitle className="text-white">Event Description</DialogTitle>
+                      <DialogDescription className="text-white">
                         Write a description for your event. Click save when you're done.
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-2 py-4">
+                    <div className="space-y-2 py-4 text-white">
                       <Label htmlFor="description-content">Description</Label>
                       <textarea
                         id="description-content"
@@ -301,8 +302,7 @@ export default function CreateEvent() {
                       />
                     </div>
                     <DialogFooter>
-                      <Button className="bg-[#a41e1d] text-white hover:bg-[#722120]"
-                      onClick={() => setIsDescriptionDialogOpen(false)}>Save</Button>
+                      <Button onClick={() => setIsDescriptionDialogOpen(false)} variant="outline" className="bg-white/10 text-white hover:bg-[#722120]">Save</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -312,11 +312,11 @@ export default function CreateEvent() {
                 <Collapsible open={isApprovalOpen} onOpenChange={setIsApprovalOpen} className="w-full space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <UserCheck className="h-5 w-5 text-gray-500" />
+                      <UserCheck className="h-5 w-5 text-white" />
                       <Label>Require Approval</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-500">{getApprovedParticipants() || "None"}</span>
+                      <span className="text-sm text-white">{getApprovedParticipants() || "None"}</span>
                       <CollapsibleTrigger asChild>
                         <Button variant="ghost" size="sm">
                           <ChevronDown className="h-4 w-4" />
@@ -328,7 +328,7 @@ export default function CreateEvent() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <GraduationCap className="h-5 w-5 text-gray-500" />
+                          <GraduationCap className="h-5 w-5 text-white" />
                           <Label htmlFor="approve-student">Student</Label>
                         </div>
                         <Switch
@@ -339,7 +339,7 @@ export default function CreateEvent() {
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <Building className="h-5 w-5 text-gray-500" />
+                          <Building className="h-5 w-5 text-white" />
                           <Label htmlFor="approve-alumni">Alumni</Label>
                         </div>
                         <Switch
@@ -350,7 +350,7 @@ export default function CreateEvent() {
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <User className="h-5 w-5 text-gray-500" />
+                          <User className="h-5 w-5 text-white" />
                           <Label htmlFor="approve-others">Faculty</Label>
                         </div>
                         <Switch
@@ -364,11 +364,11 @@ export default function CreateEvent() {
                 </Collapsible>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Users className="h-5 w-5 text-gray-500" />
+                    <Users className="h-5 w-5 text-white" />
                     <Label>Capacity</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-white">
                       {capacityLimit ? `${capacityLimit} attendees` : "Unlimited"}
                     </span>
                     <Dialog open={isCapacityDialogOpen} onOpenChange={setIsCapacityDialogOpen}>
@@ -406,8 +406,7 @@ export default function CreateEvent() {
                   </div>
                 </div>
               </div>
-              <Button className="w-full bg-[#a41e1d] hover:bg-[#722120] text-white" 
-              onClick={handleCreateEvent} disabled={validateForm().length > 0}>
+              <Button variant="outline" className="w-full bg-white/10 text-white hover:bg-[#722120]" onClick={handleCreateEvent} disabled={validateForm().length > 0}>
                 Create Event
               </Button>
             </div>

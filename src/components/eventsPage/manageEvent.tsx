@@ -56,18 +56,18 @@ export default function ManageEventCard({
   const attendeesList = attendees?.list ?? []
 
   return (
-    <Card className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] sm:w-[80%] md:w-[70%] lg:w-[824px] max-h-[90vh] overflow-auto">
+    <Card className="bg-[#722120] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] sm:w-[80%] md:w-[70%] lg:w-[824px] max-h-[90vh] overflow-auto">
       <CardHeader className="flex flex-row items-center justify-between sticky top-0 z-10">
-        <CardTitle className="text-xl sm:text-2xl font-bold">{name}</CardTitle>
+        <CardTitle className="text-xl sm:text-2xl font-bold text-white">{name}</CardTitle>
         <Button variant="ghost" size="icon" onClick={onClose}>
           <X className="h-4 w-4" />
         </Button>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="guests">Guests</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-white">
+            <TabsTrigger className="hover:bg-[#ffd700] data-[state=active]:bg-[#ffd700] text-[#722120]" value="overview">Overview</TabsTrigger>
+            <TabsTrigger className="hover:bg-[#ffd700] data-[state=active]:bg-[#ffd700] text-[#722120]" value="guests">Guests</TabsTrigger>
           </TabsList>
           <TabsContent value="overview">
             <div className="space-y-4 mt-4">
@@ -107,11 +107,11 @@ export default function ManageEventCard({
             </div>
           </TabsContent>
           <TabsContent value="guests">
-            <div className="mt-4 overflow-x-auto">
+            <div className="mt-4 overflow-x-auto text-white">
               <h3 className="font-semibold mb-2 text-sm sm:text-base">Guests ({attendeesTotal})</h3>
               <Table>
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className="text-white">
                     <TableHead className="w-[50px]">No.</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Category</TableHead>
@@ -138,4 +138,3 @@ export default function ManageEventCard({
     </Card>
   )
 }
-

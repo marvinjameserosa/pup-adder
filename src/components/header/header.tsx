@@ -143,11 +143,11 @@ export default function Header() {
 
       {/* QR Scanner Modal */}
       <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-[#a41e1d]">
           <DialogHeader>
-            <DialogTitle>QR Code Scanner</DialogTitle>
+            <DialogTitle className="text-white">QR Code Scanner</DialogTitle>
           </DialogHeader>
-          <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div className="relative w-full max-w-md bg-[#a41e1d] dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <div className="aspect-square relative overflow-hidden rounded-lg">
               <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline />
               <div className="absolute inset-0 flex items-center justify-center">
@@ -156,7 +156,7 @@ export default function Header() {
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" onClick={stopScan}>
+            <Button type="button" onClick={stopScan} variant="outline" className="bg-white/10 text-white hover:bg-[#722120]">
               Close
             </Button>
           </DialogFooter>
