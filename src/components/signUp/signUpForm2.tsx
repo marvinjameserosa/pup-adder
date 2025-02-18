@@ -21,14 +21,14 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
   const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] p-4">
+    <div className="relative min-h-screen flex items-center justify-center bg-[url('/bg3.jpg')] p-4">
       <div className="absolute inset-0 bg-black/80 mix-blend-multiply" />
-      <Card className="relative z-10 w-[360px] shadow-xl rounded-[24px] bg-[#2E2E2E]/60 backdrop-blur-sm flex flex-col border border-[#302F30]">
+      <Card className="relative z-10 w-[360px] shadow-xl rounded-[24px] bg-[#f2f3f7]/60  backdrop-blur-sm flex flex-col border border-[#302F30]">
         <CardHeader>
-          <CardTitle className="text-2xl text-white">Personal Information</CardTitle>
-          <CardDescription className="text-white">Finish creating your account.</CardDescription>
+          <CardTitle className="text-2xl text-[#a41e1d]">Personal Information</CardTitle>
+          <CardDescription className="text-gray-600">Finish creating your account.</CardDescription>
         </CardHeader>
-        <CardContent className="text-white">
+        <CardContent className="text-gray-800">
           <Tabs defaultValue={userType} onValueChange={(value) => setUserType(value as UserType)}>
             <div className="flex flex-col gap-4">
               <TabsList className="flex">

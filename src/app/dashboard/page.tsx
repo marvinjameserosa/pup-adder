@@ -200,7 +200,7 @@ export default function Dashboard() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 text-[#a41e1d]">Dashboard</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-[#a41e1d]">Dashboard</h1>
               <p className="text-sm sm:text-base text-gray-800">Manage your events and view participant information</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 mt-4 md:mt-0">
