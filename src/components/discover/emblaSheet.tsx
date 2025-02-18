@@ -26,13 +26,12 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-[400px] p-0 bg-gradient-to-b from-[#4A0E0E] to-[#A61B1B] text-gray-200">
-      <div className="absolute inset-0 bg-black/80 mix-blend-multiply" />
+      <SheetContent side="right" className="w-[400px] p-0 bg-[#a41e1d]/60 text-gray-200">
       <div className="relative h-full p-6 z-50 ">
         <SheetHeader>
           <SheetTitle className="text-white mt-20">{event.title}</SheetTitle>
           <SheetClose asChild>
-            <button className="absolute top-1 right-4 p-1.5 rounded-md bg-red-900 text-gray-200 hover:bg-[#8B1212] transition">✖</button>
+            <button className="absolute top-1 right-3 p-4 rounded-md bg-red-900 text-gray-200 hover:bg-[#8B1212] transition">✖</button>
           </SheetClose>
         </SheetHeader>
 
