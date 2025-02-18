@@ -25,7 +25,7 @@ interface ManageEventCardProps {
     total: number
     list: Array<{
       name: string
-      category: "Student" | "Alumni" | "Other"
+      category: "Student" | "Alumni" | "Faculty" | "Other";
       registrationDate: string
     }>
   }
