@@ -286,9 +286,9 @@ export default function CreateEvent() {
                   </DialogTrigger>
                   <DialogContent className="bg-[#a41e1d]">
                     <DialogHeader>
-                      <DialogTitle className="text-white">Event Description</DialogTitle>
-                      <DialogDescription className="text-white">
-                        Write a description for your event. Click save when you're done.
+                      <DialogTitle>Event Description</DialogTitle>
+                      <DialogDescription>
+                        Write a description for your event. Click save when you&apos;re done.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-2 py-4 text-white">
