@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/app/firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { db } from "@/app/firebase/config";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDoc, getDocs, doc } from "firebase/firestore";
 import EmblaCarousel from "@/components/discover/emblaCarousel";
 import EmblaSheet from "@/components/discover/emblaSheet";
 import SearchDiscover from "@/components/discover/searchDiscover";
@@ -43,73 +43,87 @@ export default function DiscoverPage() {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
-        router.push("/");
+        router.push("/login"); 
       }
     });
 
-    return () => unsubscribe();
+    return () => unsubscribe(); 
   }, [router]);
 
   useEffect(() => {
+    if (!isAuthenticated) return; 
+
     const fetchEvents = async () => {
       const querySnapshot = await getDocs(collection(db, "events"));
-      const eventsData: SlideType[] = querySnapshot.docs.map(doc => {
-        const data = doc.data() as EventData;
 
-        // Format dates for display
-        const formatDate = (dateString: string) => {
-          const date = new Date(dateString);
-          return date.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          });
-        };
+      const fetchUserName = async (userId: string) => {
+        try {
+          const userDocRef = doc(db, "users", userId);
+          const userDoc = await getDoc(userDocRef);
 
-        // Format times for display
-        const formatTime = (timeString: string) => {
-          const [hours, minutes] = timeString.split(':');
-          const date = new Date();
-          date.setHours(parseInt(hours), parseInt(minutes));
-          return date.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-          });
-        };
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const firstName = userData.firstName;
+            const lastName = userData.lastName;
+            return firstName.concat(" ", lastName) || userData.displayName || "Unknown User";
+          }
+          return "Unknown User";
+        } catch (error) {
+          console.error("Error fetching user:", error);
+          return "Unknown User";
+        }
+      };
 
-        const formattedStartDate = formatDate(data.startDate);
-        const formattedEndDate = formatDate(data.endDate);
-        const formattedStartTime = formatTime(data.startTime);
-        const formattedEndTime = formatTime(data.endTime);
+      const eventsData: SlideType[] = await Promise.all(
+        querySnapshot.docs.map(async (doc) => {
+          const data = doc.data() as EventData;
+          const hostName = await fetchUserName(data.createdBy);
 
-        return {
-          id: doc.id,
-          image: data.eventPoster || "/placeholder.svg",
-          title: data.eventName,
-          description: data.description || "No description available",
-          details: `Hosted by: ${data.createdBy}`,
-          // Set both old and new date/time fields
-          date: formattedStartDate,  // For compatibility
-          time: formattedStartTime,  // For compatibility
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
-          startTime: formattedStartTime,
-          endTime: formattedEndTime,
-          location: data.location,
-          host: data.createdBy,
-          availableSlots: parseInt(data.capacityLimit) || 0,
-          totalSlots: parseInt(data.capacityLimit) || 0,
-          isCreator: false,
-        };
-      });
+          const formatDate = (dateString: string) =>
+            new Date(dateString).toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            });
+
+          const formatTime = (timeString: string) => {
+            const [hours, minutes] = timeString.split(":");
+            const date = new Date();
+            date.setHours(parseInt(hours), parseInt(minutes));
+            return date.toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            });
+          };
+
+          return {
+            id: doc.id,
+            image: data.eventPoster || "/placeholder.svg",
+            title: data.eventName,
+            description: data.description || "No description available",
+            details: `Hosted by: ${hostName}`,
+            date: formatDate(data.startDate),
+            time: formatTime(data.startTime),
+            startDate: formatDate(data.startDate),
+            endDate: formatDate(data.endDate),
+            startTime: formatTime(data.startTime),
+            endTime: formatTime(data.endTime),
+            location: data.location,
+            host: hostName,
+            availableSlots: parseInt(data.capacityLimit) || 0,
+            totalSlots: parseInt(data.capacityLimit) || 0,
+            isCreator: false,
+          };
+        })
+      );
 
       setEvents(eventsData);
     };
 
     fetchEvents();
-  }, []);
+  }, [isAuthenticated]);
 
   if (isAuthenticated === null) {
     return (
@@ -118,8 +132,9 @@ export default function DiscoverPage() {
       </div>
     );
   }
+
   if (!isAuthenticated) {
-    return null;
+    return null; 
   }
 
   const filteredSlides = events.filter(
@@ -140,7 +155,9 @@ export default function DiscoverPage() {
         <div className="flex justify-between items-center mb-6">
           <div className="max-w-xl">
             <h1 className="text-4xl font-bold text-[#a41e1d]">Discover Events</h1>
-            <p className="text-m text-gray-700">Explore upcoming events and register easily.</p>
+            <p className="text-m text-gray-700">
+              Explore upcoming events and register easily.
+            </p>
           </div>
           <SearchDiscover onSearch={setSearchQuery} />
         </div>
@@ -148,7 +165,11 @@ export default function DiscoverPage() {
           <EmblaCarousel slides={filteredSlides} onCardClick={handleCardClick} />
         </Suspense>
       </div>
-      <EmblaSheet isOpen={isSheetOpen} onClose={() => setSheetOpen(false)} event={selectedEvent} />
+      <EmblaSheet
+        isOpen={isSheetOpen}
+        onClose={() => setSheetOpen(false)}
+        event={selectedEvent}
+      />
     </div>
   );
 }
