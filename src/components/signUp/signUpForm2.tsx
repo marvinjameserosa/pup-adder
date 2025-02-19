@@ -51,7 +51,7 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
 
                     <Label htmlFor="department">Department</Label>
                     <Select name="department" required>
-                      <SelectTrigger id="department">
+                      <SelectTrigger id="studentDepartment">
                         <SelectValue placeholder="Select your department" />
                       </SelectTrigger>
                       <SelectContent>
@@ -126,7 +126,7 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
 
                     <Label htmlFor="department">Department</Label>
                     <Select name="department" required>
-                      <SelectTrigger id="department">
+                      <SelectTrigger id="facultyDepartment">
                         <SelectValue placeholder="Select your department" />
                       </SelectTrigger>
                       <SelectContent>
