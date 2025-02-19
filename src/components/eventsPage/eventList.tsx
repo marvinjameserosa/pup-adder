@@ -1,12 +1,14 @@
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
-import { db, collection, getDocs } from "@/firebaseConfig"
+import { db } from "@/app/firebase/config"
+import { collection, getDocs } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
 import { Calendar, PlusCircle } from "lucide-react"
 import Link from "next/link"
 import EventCard from "./eventCard"
 import EventDrawer from "./eventDrawer"
+import { Timestamp } from "firebase/firestore"  // Ensure you import Timestamp
 
 type Event = {
   id: string
@@ -46,10 +48,28 @@ export default function EventsList() {
   useEffect(() => {
     const fetchEvents = async () => {
       const querySnapshot = await getDocs(collection(db, "events"))
-      const eventsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Event[]
+      
+      const eventsData = querySnapshot.docs.map(doc => {
+        const data = doc.data()
+
+        // Parse date if it's a Firebase Timestamp
+        const parsedDate = data.date instanceof Timestamp ? data.date.toDate().toISOString() : data.date
+
+        return {
+          id: doc.id,
+          name: data.name,
+          date: parsedDate,
+          time: data.time,
+          host: data.host,
+          location: data.location,
+          imageUrl: data.imageUrl,
+          isCreator: data.isCreator,
+          availableSlots: data.availableSlots,
+          totalSlots: data.totalSlots,
+          isGoing: data.isGoing,
+          attendees: data.attendees,
+        } as Event
+      })
 
       setEvents(eventsData)
     }

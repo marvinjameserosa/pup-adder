@@ -9,7 +9,7 @@ import useEmblaCarousel from "embla-carousel-react";
 
 
 type SlideType = {
-  id: number;
+  id: string; 
   image: string;
   title: string;
   description: string;
