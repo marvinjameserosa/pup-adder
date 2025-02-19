@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Calendar, CalendarDays, MapPin, Ticket, Users } from "lucide-react"
 import { useMemo, useState } from "react"
@@ -281,36 +281,37 @@ export default function Dashboard() {
                             View Participants
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-4xl bg-[#4A0E0E] text-white">
+                        <DialogContent className="max-w-[95vw] w-full sm:max-w-[85vw] md:max-w-[75vw] lg:max-w-4xl bg-[#4A0E0E] text-white">
                           <DialogHeader>
                             <DialogTitle>Event Participants</DialogTitle>
-                            <DialogDescription className="text-gray-300">
-                              List of participants for {selectedEvent.name}
-                            </DialogDescription>
+                            <DialogDescription className="text-gray-300">List of participants for {selectedEvent.name}</DialogDescription>
                           </DialogHeader>
                           <ScrollArea className="h-[60vh] w-full">
-                            <Table>
-                              <TableHeader>
-                                <TableRow className="border-b border-white/20">
-                                  <TableHead className="text-white">Name</TableHead>
-                                  <TableHead className="text-white">Email</TableHead>
-                                  <TableHead className="text-white">Type</TableHead>
-                                  <TableHead className="text-white">Department/College</TableHead>
-                                  <TableHead className="text-white">Registration Date</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {selectedEvent.participants.map((participant: Participant) => (
-                                  <TableRow key={participant.id} className="border-b border-white/20">
-                                    <TableCell className="text-white">{participant.name}</TableCell>
-                                    <TableCell className="text-white">{participant.email}</TableCell>
-                                    <TableCell className="text-white">{participant.type}</TableCell>
-                                    <TableCell className="text-white">{participant.department}</TableCell>
-                                    <TableCell className="text-white">{participant.registrationDate}</TableCell>
+                            <div className="w-full min-w-[640px]">
+                              <Table className="w-full">
+                                <TableHeader>
+                                  <TableRow className="border-b border-white/20">
+                                    <TableHead className="text-white whitespace-nowrap">Name</TableHead>
+                                    <TableHead className="text-white whitespace-nowrap">Email</TableHead>
+                                    <TableHead className="text-white whitespace-nowrap">Type</TableHead>
+                                    <TableHead className="text-white whitespace-nowrap">Department/College</TableHead>
+                                    <TableHead className="text-white whitespace-nowrap">Registration Date</TableHead>
                                   </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
+                                </TableHeader>
+                                <TableBody>
+                                  {selectedEvent.participants.map((participant: Participant) => (
+                                    <TableRow key={participant.id} className="border-b border-white/20">
+                                      <TableCell className="text-white whitespace-nowrap">{participant.name}</TableCell>
+                                      <TableCell className="text-white whitespace-nowrap">{participant.email}</TableCell>
+                                      <TableCell className="text-white whitespace-nowrap">{participant.type}</TableCell>
+                                      <TableCell className="text-white whitespace-nowrap">{participant.department}</TableCell>
+                                      <TableCell className="text-white whitespace-nowrap">{participant.registrationDate}</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                            <ScrollBar orientation="horizontal" />
                           </ScrollArea>
                         </DialogContent>
                       </Dialog>
