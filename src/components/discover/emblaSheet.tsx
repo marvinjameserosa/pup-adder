@@ -20,22 +20,25 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
   const router = useRouter();
 
   useEffect(() => {
+    if (!event) return;
+
     const checkRegistration = async () => {
       const user = auth.currentUser;
-      if (!user || !event) return;
+      if (!user) {
+        setRegistered(false);
+        return;
+      }
 
       try {
-        const eventRef = doc(db, "events", event.id);
-        const eventSnap = await getDoc(eventRef);
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
 
-        if (eventSnap.exists()) {
-          const eventData = eventSnap.data();
-          if (eventData.registeredUsers?.includes(user.uid)) {
-            setRegistered(true); // User already registered
-          }
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          setRegistered(userData.registeredEvents?.includes(event.id) || false);
         }
       } catch (error) {
-        console.error("Error checking registration:", error);
+        console.error("Error checking user registration:", error);
       }
     };
 
@@ -44,8 +47,9 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
 
   const handleRegister = async () => {
     const user = auth.currentUser;
+
     if (!user) {
-      router.push("/login"); // Redirect if not logged in
+      router.push("/login"); // Redirect to login if user is not logged in
       return;
     }
 
@@ -55,47 +59,44 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
       const eventRef = doc(db, "events", event.id);
       const userRef = doc(db, "users", user.uid);
 
-      const eventSnap = await getDoc(eventRef);
-      const userSnap = await getDoc(userRef);
+      const [eventSnap, userSnap] = await Promise.all([getDoc(eventRef), getDoc(userRef)]);
 
-      if (eventSnap.exists()) {
-        const eventData = eventSnap.data();
-
-        if (eventData.registeredUsers?.includes(user.uid)) {
-          alert("You are already registered for this event.");
-          setRegistered(true);
-          setLoading(false);
-          return;
-        }
-
-        if (eventData.capacityLimit && eventData.registeredUsers?.length >= parseInt(eventData.capacityLimit)) {
-          alert("No more slots available.");
-          setLoading(false);
-          return;
-        }
-
-        // Update event document
-        await updateDoc(eventRef, {
-          registeredUsers: arrayUnion(user.uid),
-        });
-
-        // Update user document
-        if (userSnap.exists()) {
-          await updateDoc(userRef, {
-            registeredEvents: arrayUnion(event.id),
-          });
-        } else {
-          // Create user document if it doesn't exist
-          await updateDoc(userRef, {
-            registeredEvents: [event.id],
-          });
-        }
-
-        alert("Successfully registered!");
-        setRegistered(true);
-      } else {
+      if (!eventSnap.exists()) {
         alert("Event not found.");
+        setLoading(false);
+        return;
       }
+
+      const eventData = eventSnap.data();
+
+      // Check if user is already registered
+      if (eventData.registeredUsers?.includes(user.uid)) {
+        alert("You are already registered for this event.");
+        setRegistered(true);
+        setLoading(false);
+        return;
+      }
+
+      // Check if there are available slots
+      if (eventData.capacityLimit && eventData.registeredUsers?.length >= parseInt(eventData.capacityLimit)) {
+        alert("No more slots available.");
+        setLoading(false);
+        return;
+      }
+
+      // Update event document: add user to registeredUsers
+      await updateDoc(eventRef, {
+        registeredUsers: arrayUnion(user.uid),
+      });
+
+      // Update user document: add event to registeredEvents
+      await updateDoc(userRef, {
+        registeredEvents: arrayUnion(event.id),
+      });
+
+      alert("Successfully registered!");
+      setRegistered(true);
+
     } catch (error) {
       console.error("Error registering user:", error);
       alert("Failed to register. Please try again.");
@@ -148,7 +149,9 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
                   </Button>
                 </Link>
               ) : registered ? (
-                <Button disabled className="w-full bg-gray-500 text-white">Already Registered</Button>
+                <Button disabled className="w-full bg-gray-500 text-white">
+                  Already Registered
+                </Button>
               ) : (
                 <Button
                   onClick={handleRegister}
