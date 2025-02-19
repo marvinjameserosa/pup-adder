@@ -2,26 +2,15 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/comp
 import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, Clock, Users } from "lucide-react";
 import Link from "next/link";
+import { SlideType } from '@/types/slideTypes';
 
-interface EmblaSheetProps {
+type EmbalaSheetType = {
   isOpen: boolean;
   onClose: () => void;
-  event: {
-    image: string;
-    title: string;
-    description: string;
-    details: string;
-    date: string;
-    time: string;
-    location: string;
-    host: string;
-    availableSlots: number;
-    totalSlots: number;
-    isCreator: boolean;
-  } | null;
-}
+  event: SlideType | null;
+};
 
-export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) {
+export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) {
   if (!event) return null;
 
   return (
