@@ -291,7 +291,7 @@ export default function CreateEvent() {
                         Write a description for your event. Click save when you&apos;re done.
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-2 py-4 text-white">
+                    <div className="space-y-2 py-4 text-gray-800">
                       <Label htmlFor="description-content">Description</Label>
                       <textarea
                         id="description-content"
