@@ -3,10 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { LogOut } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import { auth, db } from "@/app/firebase/config"; // Use Firestore DB
+import { auth, db } from "@/app/firebase/config";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore"; // Import Firestore functions
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 interface UserData {
   firstName: string;
@@ -22,46 +21,61 @@ interface UserData {
 export default function ProfileSheet() {
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      console.log("Authenticated User:", currentUser);
     });
-
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user?.uid) return;
-
-      console.log("Fetching user data for UID:", user.uid);
-
       try {
-        const userDoc = await getDoc(doc(db, "users", user.uid)); // Fetch document
+        const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           setUserData(userDoc.data() as UserData);
-          console.log("User Data:", userDoc.data());
         } else {
-          console.warn("No user data found in Firestore!");
           setUserData(null);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
-
     fetchUserData();
   }, [user?.uid]);
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      console.log("User logged out successfully.");
     } catch (error) {
       console.error("Logout failed:", error);
     }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0 || !user) return;
+    const file = event.target.files[0];
+
+    setUploading(true);
+    const reader = new FileReader();
+
+    reader.onloadend = async () => {
+      const base64String = reader.result as string;
+
+      try {
+        await updateDoc(doc(db, "users", user.uid), { profilePic: base64String });
+        setUserData((prev) => (prev ? { ...prev, profilePic: base64String } : null));
+      } catch (error) {
+        console.error("Error updating profile picture:", error);
+      } finally {
+        setUploading(false);
+      }
+    };
+
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -73,33 +87,35 @@ export default function ProfileSheet() {
             alt="Profile"
             width={40}
             height={40}
-            className="w-full h-full object-cover rounded-full"
+            className="w-10 h-10 object-cover rounded-full"
           />
         </Button>
       </SheetTrigger>
-      <SheetContent className="sm:max-w-[425px] bg-[#a41e1d]/60 text-white">
+      <SheetContent className="sm:max-w-[425px] bg-[#f2f3f7]/60 text-white">
         <SheetHeader>
-          <SheetTitle className="text-gray-200">Profile</SheetTitle>
-          <SheetDescription>Manage your account settings here.</SheetDescription>
+          <SheetTitle className="text-[#a41e1d] font-semibold">Profile</SheetTitle>
+          <SheetDescription className="text-gray-800">Manage your account settings here.</SheetDescription>
         </SheetHeader>
-        <div className="mt-6 flex flex-col space-y-6">
-          <div className="flex items-center space-x-4">
+        <div className="mt-6 flex flex-col items-center space-y-4">
+          <label className="relative cursor-pointer flex flex-col items-center">
+            <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} disabled={uploading} />
             <Image
               src={userData?.profilePic || "/user.png"}
               alt="Profile"
-              width={50}
-              height={50}
-              className="w-14 h-14 object-cover rounded-full border-2 border-white"
+              width={96}
+              height={96}
+              className="w-24 h-24 object-cover rounded-full border-2 border-white"
             />
-            <div>
-              <h3 className="text-lg font-semibold">{userData?.firstName} {userData?.lastName}</h3>
-              <p className="text-sm text-gray-300">{userData?.email}</p>
-              <p className="text-sm text-gray-300">{userData?.userType}</p>
-              <p className="text-sm text-gray-300">{userData?.department}</p>
-              <p className="text-sm text-gray-300 font-bold">Student No: {userData?.studentNumber}</p>
-            </div>
+            {uploading && <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white">Uploading...</div>}
+            <p className="text-xs text-gray-600 mt-2">Tap the icon to upload/change your profile pic</p>
+          </label>
+          <div className="text-center text-[#a41e1d]">
+            <h3 className="text-lg font-semibold">{userData?.firstName} {userData?.lastName}</h3>
+            <p className="text-sm ">{userData?.email}</p>
+            <p className="text-sm ">{userData?.userType}</p>
+            <p className="text-sm ">{userData?.department}</p>
+            <p className="text-sm font-bold">Student No: {userData?.studentNumber}</p>
           </div>
-
           <Button
             variant="outline"
             className="w-full px-4 py-2 rounded-lg text-white border-white bg-[#a41e1d] transition-all hover:bg-red-600 hover:border-red-600 flex items-center justify-center"
