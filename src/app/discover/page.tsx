@@ -10,24 +10,8 @@ import EmblaCarousel from "@/components/discover/emblaCarousel";
 import EmblaSheet from "@/components/discover/emblaSheet";
 import SearchDiscover from "@/components/discover/searchDiscover";
 import Header from "@/components/header/header";
+import { SlideType } from "@/types/slideTypes";
 import "./embla.css";
-
-type SlideType = {
-  id: string;
-  image: string;
-  title: string;
-  description: string;
-  details: string;
-  startDate: string;
-  endDate: string;
-  startTime: string;
-  endTime: string;
-  location: string;
-  host: string;
-  availableSlots: number;
-  totalSlots: number;
-  isCreator: boolean;
-};
 
 interface EventData {
   capacityLimit: string;
@@ -95,16 +79,24 @@ export default function DiscoverPage() {
           });
         };
 
+        const formattedStartDate = formatDate(data.startDate);
+        const formattedEndDate = formatDate(data.endDate);
+        const formattedStartTime = formatTime(data.startTime);
+        const formattedEndTime = formatTime(data.endTime);
+
         return {
           id: doc.id,
           image: data.eventPoster || "/placeholder.svg",
           title: data.eventName,
           description: data.description || "No description available",
           details: `Hosted by: ${data.createdBy}`,
-          startDate: formatDate(data.startDate),
-          endDate: formatDate(data.endDate),
-          startTime: formatTime(data.startTime),
-          endTime: formatTime(data.endTime),
+          // Set both old and new date/time fields
+          date: formattedStartDate,  // For compatibility
+          time: formattedStartTime,  // For compatibility
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+          startTime: formattedStartTime,
+          endTime: formattedEndTime,
           location: data.location,
           host: data.createdBy,
           availableSlots: parseInt(data.capacityLimit) || 0,
@@ -136,8 +128,8 @@ export default function DiscoverPage() {
       slide.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleCardClick = (eventData: SlideType) => {
-    setSelectedEvent(eventData);
+  const handleCardClick = (slide: SlideType) => {
+    setSelectedEvent(slide);
     setSheetOpen(true);
   };
 

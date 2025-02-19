@@ -6,22 +6,7 @@ import { DotButton, useDotButton } from "./emblaCarouselDotButtons";
 import { PrevButton, NextButton, usePrevNextButtons } from "./emblaCarouselArrowButtons";
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
-
-
-type SlideType = {
-  id: string; 
-  image: string;
-  title: string;
-  description: string;
-  details: string;
-  date: string;
-  time: string;
-  location: string;
-  host: string;
-  availableSlots: number;
-  totalSlots: number;
-  isCreator: boolean;
-};
+import { SlideType } from "@/types/slideTypes";
 
 type PropType = {
   slides: SlideType[];
