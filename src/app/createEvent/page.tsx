@@ -161,7 +161,7 @@ export default function CreateEvent() {
           setCapacityLimit(null);
           setEventPoster(null);
           setParticipantApprovals({ student: false, alumni: false, faculty: false });
-        } catch (error) {
+        } catch (error:any) {
           toast({
             title: "Error creating event",
             description: error.message,
