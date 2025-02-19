@@ -22,6 +22,10 @@ import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import { Building, ChevronDown, Circle, CircleIcon, FileText, GraduationCap, Image, MapPin, Ticket, User, UserCheck, Users } from "lucide-react"
 import { useState } from "react"
+import NextImage from "next/image";
+import { auth, db } from "@/app/firebase/config"; 
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function CreateEvent() {
   const { toast } = useToast()
@@ -43,7 +47,7 @@ export default function CreateEvent() {
   const [participantApprovals, setParticipantApprovals] = useState({
     student: false,
     alumni: false,
-    others: false,
+    faculty: false,
   })
 
   const generateTimeOptions = () => {
@@ -111,24 +115,75 @@ export default function CreateEvent() {
     return missingFields
   }
 
-  const handleCreateEvent = () => {
-    const missingFields = validateForm()
+  const handleCreateEvent = async () => {
+    const missingFields = validateForm();
     if (missingFields.length > 0) {
       toast({
         title: "Missing Information",
         description: `Please fill in the following fields: ${missingFields.join(", ")}`,
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
-
-    const creationDate = new Date().toLocaleString()
+  
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          await addDoc(collection(db, "events"), {
+            eventName,
+            startDate,
+            startTime,
+            endDate,
+            endTime,
+            isVirtual,
+            description,
+            location,
+            capacityLimit,
+            eventPoster,
+            participantApprovals,
+            createdBy: user.uid, 
+            createdAt: serverTimestamp(),
+          });
+  
+          toast({
+            title: `${eventName} is created`,
+            description: `Created successfully!`,
+          });
+  
+          setEventName("");
+          setStartDate("");
+          setStartTime("");
+          setEndDate("");
+          setEndTime("");
+          setIsVirtual(false);
+          setDescription("");
+          setLocation("");
+          setCapacityLimit(null);
+          setEventPoster(null);
+          setParticipantApprovals({ student: false, alumni: false, faculty: false });
+        } catch (error:any) {
+          toast({
+            title: "Error creating event",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to create an event.",
+          variant: "destructive",
+        });
+      }
+    });
+  
+    const creationDate = new Date().toLocaleString();
     toast({
       title: `${eventName} is created`,
       description: `Created on ${creationDate}`,
-    })
-  }
-
+    });
+  }; 
+  
   const handleParticipantApprovalChange = (participant: keyof typeof participantApprovals) => {
     setParticipantApprovals((prev) => ({
       ...prev,
@@ -154,10 +209,12 @@ export default function CreateEvent() {
             <div className="w-full md:w-[325px] flex-shrink-0">
               <div className="h-[325px] w-full bg-gray-200 rounded-md flex items-center justify-center text-gray-500 relative overflow-hidden">
                 {eventPoster ? (
-                  <img
-                    src={eventPoster || "/placeholder.svg"}
-                    alt="Event Poster"
-                    className="w-full h-full object-cover"
+                  <NextImage
+                  src={eventPoster || "/placeholder.svg"}
+                  alt="Event Poster"
+                  width={500} // Adjust width as needed
+                  height={500} // Adjust height as needed
+                  className="w-full h-full object-cover"
                   />
                 ) : (
                   <span>Event Poster</span>
@@ -351,12 +408,12 @@ export default function CreateEvent() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <User className="h-5 w-5 text-white" />
-                          <Label htmlFor="approve-others">Faculty</Label>
+                          <Label htmlFor="approve-faculty">Faculty</Label>
                         </div>
                         <Switch
-                          id="approve-others"
-                          checked={participantApprovals.others}
-                          onCheckedChange={() => handleParticipantApprovalChange("others")}
+                          id="approve-faculty"
+                          checked={participantApprovals.faculty}
+                          onCheckedChange={() => handleParticipantApprovalChange("faculty")}
                         />
                       </div>
                     </div>
