@@ -56,7 +56,6 @@ export default function DiscoverPage() {
       const eventsData: SlideType[] = querySnapshot.docs.map(doc => {
         const data = doc.data() as EventData;
 
-        // Format dates for display
         const formatDate = (dateString: string) => {
           const date = new Date(dateString);
           return date.toLocaleDateString('en-US', {
@@ -67,7 +66,6 @@ export default function DiscoverPage() {
           });
         };
 
-        // Format times for display
         const formatTime = (timeString: string) => {
           const [hours, minutes] = timeString.split(':');
           const date = new Date();
@@ -90,9 +88,8 @@ export default function DiscoverPage() {
           title: data.eventName,
           description: data.description || "No description available",
           details: `Hosted by: ${data.createdBy}`,
-          // Set both old and new date/time fields
-          date: formattedStartDate,  // For compatibility
-          time: formattedStartTime,  // For compatibility
+          date: formattedStartDate,  
+          time: formattedStartTime, 
           startDate: formattedStartDate,
           endDate: formattedEndDate,
           startTime: formattedStartTime,
