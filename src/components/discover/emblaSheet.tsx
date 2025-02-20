@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
+import { generateTicket } from "@/utils/getTickets";
 
 type EmbalaSheetType = {
   isOpen: boolean;
@@ -94,10 +95,16 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
   };
 
   const handleGetTicket = () => {
+    if (!event?.id || !user?.uid) {
+      toast({ variant: "destructive", title: "Error", description: "Missing event or user information." });
+      return;
+    }
+
+    generateTicket(event.id, user.uid);
     toast({ variant: "default", title: "Ticket", description: "Ticket downloaded! 🎟️" });
   };
 
-  const hasTicket = () => registered && Math.random() > 0.5; // Placeholder logic
+  const hasTicket = () => registered; // Updated to reflect actual registration status
 
   if (!event) return null;
 
