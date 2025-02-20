@@ -44,7 +44,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
         
         if (userSnap.exists()) {
           const userData = userSnap.data();
-          setRegistered(userData.registeredEvents?.includes(event.id) || false);
+          setRegistered(userData.registeredEvents?.[event.id] !== undefined || false);
         }
         
         const eventRef = doc(db, "events", event.id);
@@ -62,7 +62,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
     
     checkUserStatus();
   }, [user, event?.id, isOpen, showErrorToast]);
-
+  
   const handleRegister = async () => {
     if (!user) {
       router.push("/");
@@ -114,9 +114,12 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
         });
         return;
       }
-      
+
       await updateDoc(eventRef, { registeredUsers: arrayUnion(user.uid) });
-      await updateDoc(userRef, { registeredEvents: arrayUnion(event.id) });
+      
+      await updateDoc(userRef, { 
+        [`registeredEvents.${event.id}`]: false 
+      });
       
       toast({ 
         variant: "default", 

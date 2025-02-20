@@ -45,15 +45,11 @@
         if (userSnap.exists()) {
           const userData = userSnap.data();
           let registeredEvents = userData.registeredEvents;
-          
-          // Check what type of data structure we're dealing with
+
           if (!registeredEvents) {
-            // If it doesn't exist, initialize as empty array
             registeredEvents = [];
           } else if (typeof registeredEvents === 'object' && !Array.isArray(registeredEvents)) {
-            // It's an object/map style structure
             if (registeredEvents[eventId] !== undefined) {
-              // Update the status to true
               await updateDoc(userRef, {
                 [`registeredEvents.${eventId}`]: true
               });
@@ -61,27 +57,23 @@
             } else {
               setDetectedCode("Event not registered for this user");
             }
-            return; // Exit early since we've handled the object case
+            return;
           }
-          
-          // If we reach here, we're dealing with an array or we've initialized an empty array
+
           if (!Array.isArray(registeredEvents)) {
             console.error("registeredEvents is not an array:", registeredEvents);
             setDetectedCode("Data structure error");
             return;
           }
-          
-          // Find the index of the event in the array
+
           const eventIndex = registeredEvents.findIndex((item) => 
             Array.isArray(item) && item[0] === eventId
           );
           
           if (eventIndex !== -1) {
-            // Event found - create a new array with the updated boolean value
             const updatedEvents = [...registeredEvents];
             updatedEvents[eventIndex] = [eventId, true];
-            
-            // Update the entire array in Firestore
+
             await updateDoc(userRef, {
               registeredEvents: updatedEvents
             });

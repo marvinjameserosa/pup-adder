@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/app/firebase/config";
@@ -12,6 +11,7 @@ import SearchDiscover from "@/components/discover/searchDiscover";
 import Header from "@/components/header/header";
 import { SlideType } from "@/types/slideTypes";
 import "./embla.css";
+import Loading from "@/components/loading"
 
 interface EventData {
   capacityLimit: string;
@@ -35,6 +35,7 @@ export default function DiscoverPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [events, setEvents] = useState<SlideType[]>([]);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -46,91 +47,87 @@ export default function DiscoverPage() {
         router.push("/"); 
       }
     });
-
     return () => unsubscribe(); 
   }, [router]);
 
   useEffect(() => {
     if (!isAuthenticated) return; 
-
+    
     const fetchEvents = async () => {
-      const querySnapshot = await getDocs(collection(db, "events"));
-
-      const fetchUserName = async (userId: string) => {
-        try {
-          const userDocRef = doc(db, "users", userId);
-          const userDoc = await getDoc(userDocRef);
-
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            const firstName = userData.firstName;
-            const lastName = userData.lastName;
-            return firstName.concat(" ", lastName) || userData.displayName || "Unknown User";
+      setIsLoadingEvents(true);
+      try {
+        const querySnapshot = await getDocs(collection(db, "events"));
+        const fetchUserName = async (userId: string) => {
+          try {
+            const userDocRef = doc(db, "users", userId);
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              const firstName = userData.firstName;
+              const lastName = userData.lastName;
+              return firstName.concat(" ", lastName) || userData.displayName || "Unknown User";
+            }
+            return "Unknown User";
+          } catch (error) {
+            console.error("Error fetching user:", error);
+            return "Unknown User";
           }
-          return "Unknown User";
-        } catch (error) {
-          console.error("Error fetching user:", error);
-          return "Unknown User";
-        }
-      };
+        };
 
-      const eventsData: SlideType[] = await Promise.all(
-        querySnapshot.docs.map(async (doc) => {
-          const data = doc.data() as EventData;
-          const hostName = await fetchUserName(data.createdBy);
-
-          const formatDate = (dateString: string) =>
-            new Date(dateString).toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            });
-
-          const formatTime = (timeString: string) => {
-            const [hours, minutes] = timeString.split(":");
-            const date = new Date();
-            date.setHours(parseInt(hours), parseInt(minutes));
-            return date.toLocaleTimeString("en-US", {
-              hour: "numeric",
-              minute: "2-digit",
-              hour12: true,
-            });
-          };
-
-          return {
-            id: doc.id,
-            image: data.eventPoster || "/placeholder.svg",
-            title: data.eventName,
-            description: data.description || "No description available",
-            details: `Hosted by: ${hostName}`,
-            date: formatDate(data.startDate),
-            time: formatTime(data.startTime),
-            startDate: formatDate(data.startDate),
-            endDate: formatDate(data.endDate),
-            startTime: formatTime(data.startTime),
-            endTime: formatTime(data.endTime),
-            location: data.location,
-            host: hostName,
-            availableSlots: parseInt(data.capacityLimit) || 0,
-            totalSlots: parseInt(data.capacityLimit) || 0,
-            isCreator: false,
-          };
-        })
-      );
-
-      setEvents(eventsData);
+        const eventsData: SlideType[] = await Promise.all(
+          querySnapshot.docs.map(async (doc) => {
+            const data = doc.data() as EventData;
+            const hostName = await fetchUserName(data.createdBy);
+            const formatDate = (dateString: string) =>
+              new Date(dateString).toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
+            const formatTime = (timeString: string) => {
+              const [hours, minutes] = timeString.split(":");
+              const date = new Date();
+              date.setHours(parseInt(hours), parseInt(minutes));
+              return date.toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true,
+              });
+            };
+            return {
+              id: doc.id,
+              image: data.eventPoster || "/placeholder.svg",
+              title: data.eventName,
+              description: data.description || "No description available",
+              details: `Hosted by: ${hostName}`,
+              date: formatDate(data.startDate),
+              time: formatTime(data.startTime),
+              startDate: formatDate(data.startDate),
+              endDate: formatDate(data.endDate),
+              startTime: formatTime(data.startTime),
+              endTime: formatTime(data.endTime),
+              location: data.location,
+              host: hostName,
+              availableSlots: parseInt(data.capacityLimit) || 0,
+              totalSlots: parseInt(data.capacityLimit) || 0,
+              isCreator: false,
+            };
+          })
+        );
+        setEvents(eventsData);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      } finally {
+        setIsLoadingEvents(false);
+      }
     };
-
+    
     fetchEvents();
   }, [isAuthenticated]);
 
   if (isAuthenticated === null) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
-        Checking authentication...
-      </div>
-    );
+    return <Loading message="Authenticating..." />;
   }
 
   if (!isAuthenticated) {
@@ -160,12 +157,21 @@ export default function DiscoverPage() {
             </p>
           </div>
           <div className="mt-4 lg:mt-0 w-full lg:w-1/2">
-          <SearchDiscover onSearch={setSearchQuery} />
+            <SearchDiscover onSearch={setSearchQuery} />
           </div>
         </div>
-        <Suspense fallback={<div className="text-center text-gray-300">Loading carousel...</div>}>
-          <EmblaCarousel slides={filteredSlides} onCardClick={handleCardClick} />
-        </Suspense>
+        
+        {isLoadingEvents ? (
+          <div className="flex justify-center items-center h-64">
+            <Loading message="Loading events..." />
+          </div>
+        ) : (
+          <Suspense fallback={<div className="flex justify-center items-center h-64">
+            <Loading message="Loading carousel..." />
+          </div>}>
+            <EmblaCarousel slides={filteredSlides} onCardClick={handleCardClick} />
+          </Suspense>
+        )}
       </div>
       <EmblaSheet
         isOpen={isSheetOpen}
