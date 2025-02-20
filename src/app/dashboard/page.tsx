@@ -1,5 +1,7 @@
 "use client"
+import { db } from "@/app/firebase/config"
 import Header from "@/components/header/header"
+import Loading from "@/components/loading"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -12,11 +14,9 @@ import {
 } from "@/components/ui/dialog"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { collection, doc, getDoc, getDocs } from "firebase/firestore"
 import { Calendar, CalendarDays, MapPin, Ticket, Users } from "lucide-react"
 import { useEffect, useState } from "react"
-import { db } from "@/app/firebase/config";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore"
-import Loading from "@/components/loading"
 
 interface EventData {
   eventName?: string;
@@ -230,22 +230,22 @@ export default function Dashboard() {
       <div className="relative z-10 min-h-screen">
         <Header />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#a41e1d] mb-2">Dashboard</h1>
-            <div className="flex flex-col sm:flex-row gap-4 mt-4 md:mt-0">
-              <Card className="bg-[#722120] text-white w-full sm:w-48">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 p-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#a41e1d]">Dashboard</h1>
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+              <Card className="bg-[#722120] text-white p-4">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">Total Registrations</CardTitle>
-                  <Ticket className="h-4 w-4 text-muted-foreground" />
+                  <Ticket className="h-4 w-4 text-muted-foreground text-white" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{totalRegistrations}</div>
                 </CardContent>
               </Card>
-              <Card className="bg-[#722120] text-white w-full sm:w-48">
+              <Card className="bg-[#722120] text-white p-4">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">Total Events</CardTitle>
-                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                  <CalendarDays className="h-4 w-4 text-muted-foreground text-white" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{events.length}</div>
@@ -304,7 +304,7 @@ export default function Dashboard() {
                       </div>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="outline" className="bg-white/10 text-white hover:bg-[#722120]">View Participants</Button>
+                          <Button variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white">View Participants</Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-[95vw] sm:max-w-[85vw] md:max-w-[75vw] lg:max-w-4xl bg-[#4A0E0E] text-white">
                           <DialogHeader>

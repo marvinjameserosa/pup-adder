@@ -1,16 +1,16 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, Clock, Users } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
-import { SlideType } from '@/types/slideTypes';
 import { auth, db } from "@/app/firebase/config";
-import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
+import { SlideType } from '@/types/slideTypes';
 import { generateTicket } from "@/utils/getTickets";
+import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
+import { CalendarDays, Clock, MapPin, Users } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 type EmbalaSheetType = {
   isOpen: boolean;
@@ -158,34 +158,28 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-[400px] p-0 bg-[#a41e1d]/60 text-gray-200">
-        <div className="relative h-full p-6 z-50">
+      <SheetContent className="sm:max-w-[425px] bg-[#f2f3f7]/60 text-white">
           <SheetHeader>
-            <SheetTitle className="text-white mt-20">{event.title}</SheetTitle>
-            <SheetClose asChild>
-              <button className="absolute top-1 right-3 p-4 rounded-md bg-red-900 text-gray-200 hover:bg-[#8B1212] transition">
-                ✖
-              </button>
-            </SheetClose>
+            <SheetTitle className="text-2xl text-[#a41e1d] font-bold p-2">{event.title}</SheetTitle>
           </SheetHeader>
           <div className="mt-4 space-y-4">
             <Image src={event.image} alt={event.title} width={400} height={200} className="w-full h-[200px] object-cover rounded-lg shadow-md" />
-            <p className="text-gray-300">{event.details}</p>
+            <p className="text-[#a41e1d]">{event.details}</p>
             <div className="space-y-2 text-sm text-gray-400">
-              <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4 text-gray-200" />
+              <div className="flex items-center space-x-2 text-[#a41e1d]">
+                <CalendarDays className="h-5 w-5 text-[#a41e1d]" />
                 <span>{event.date}</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Clock className="h-4 w-4 text-gray-200" />
+              <div className="flex items-center space-x-2 text-[#a41e1d]">
+                <Clock className="h-5 w-5 text-[#a41e1d]" />
                 <span>{event.time}</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <MapPin className="h-4 w-4 text-gray-200" />
+              <div className="flex items-center space-x-2 text-[#a41e1d]">
+                <MapPin className="h-5 w-5 text-[#a41e1d]" />
                 <span>{event.location}</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Users className="h-4 w-4 text-gray-200" />
+              <div className="flex items-center space-x-2 text-[#a41e1d]">
+                <Users className="h-5 w-5 text-[#a41e1d]" />
                 <span>{event.availableSlots} of {event.totalSlots} slots available</span>
               </div>
             </div>
@@ -211,8 +205,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
               )}
             </div>
           </div>
-          <Toaster />
-        </div>
+        <Toaster />
       </SheetContent>
     </Sheet>
   );

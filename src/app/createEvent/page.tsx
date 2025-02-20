@@ -1,5 +1,6 @@
 "use client"
 
+import { auth, db } from "@/app/firebase/config"
 import Header from "@/components/header/header"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -20,12 +21,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
-import { Building, ChevronDown, Circle, CircleIcon, FileText, GraduationCap, Image, MapPin, Ticket, User, UserCheck, Users } from "lucide-react"
+import { onAuthStateChanged } from "firebase/auth"
+import { addDoc, collection, serverTimestamp } from "firebase/firestore"
+import { Building, ChevronDown, Clock, FileText, GraduationCap, Image, MapPin, Ticket, User, UserCheck, Users } from "lucide-react"
+import NextImage from "next/image"
 import { useState } from "react"
-import NextImage from "next/image";
-import { auth, db } from "@/app/firebase/config"; 
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
 
 export default function CreateEvent() {
   const { toast } = useToast()
@@ -256,7 +256,7 @@ export default function CreateEvent() {
               <div className="space-y-2">
                 <div className="space-y-2">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                    <Circle className="h-5 w-5 text-white" />
+                    <Clock className="h-5 w-5 text-white" />
                     <span className="w-12">Start</span>
                     <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                       <Input
@@ -274,7 +274,7 @@ export default function CreateEvent() {
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                    <CircleIcon className="h-5 w-5 text-white" />
+                    <Clock className="h-5 w-5 text-white" />
                     <span className="w-12">End</span>
                     <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                       <Input
@@ -325,7 +325,7 @@ export default function CreateEvent() {
                       </CommandList>
                     </Command>
                     <DialogFooter>
-                      <Button onClick={() => setIsLocationDialogOpen(false)} variant="outline" className="bg-white/10 text-white hover:bg-[#722120]">Done</Button>
+                      <Button onClick={() => setIsLocationDialogOpen(false)} variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white">Done</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -359,7 +359,7 @@ export default function CreateEvent() {
                       />
                     </div>
                     <DialogFooter>
-                      <Button onClick={() => setIsDescriptionDialogOpen(false)} variant="outline" className="bg-white/10 text-white hover:bg-[#722120]">Save</Button>
+                      <Button onClick={() => setIsDescriptionDialogOpen(false)} variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white">Save</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -434,16 +434,16 @@ export default function CreateEvent() {
                           <Users className="h-4 w-4" />
                         </Button>
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent className="bg-[#a41e1d]">
                         <DialogHeader>
-                          <DialogTitle>Set Event Capacity</DialogTitle>
-                          <DialogDescription>
+                          <DialogTitle className="text-white">Set Event Capacity</DialogTitle>
+                          <DialogDescription className="text-white">
                             Enter the maximum number of attendees or choose unlimited capacity.
                           </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
                           <div className="space-y-2">
-                            <Label htmlFor="capacity">Number of Attendees</Label>
+                            <Label htmlFor="capacity" className="text-white">Number of Attendees</Label>
                             <Input
                               id="capacity"
                               placeholder="Enter capacity limit"
@@ -453,10 +453,10 @@ export default function CreateEvent() {
                           </div>
                         </div>
                         <DialogFooter>
-                          <Button variant="outline" onClick={handleRemoveCapacity}>
+                          <Button variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white" onClick={handleRemoveCapacity}>
                             Remove Limit
                           </Button>
-                          <Button onClick={handleSetCapacity}>Set Limit</Button>
+                          <Button variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white" onClick={handleSetCapacity}>Set Limit</Button>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>

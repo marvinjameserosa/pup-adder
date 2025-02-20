@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { auth, db } from "@/app/firebase/config";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -8,12 +8,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { LogOut } from "lucide-react";
-import Image from "next/image";
-import { auth, db } from "@/app/firebase/config";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { LogOut } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface UserData {
   firstName: string;

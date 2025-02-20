@@ -209,7 +209,7 @@ export default function Header() {
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" onClick={stopScan} variant="outline" className="bg-white/10 text-white hover:bg-[#722120]">
+            <Button type="button" onClick={stopScan} variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white">
               Close
             </Button>
           </DialogFooter>
