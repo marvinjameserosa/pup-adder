@@ -1,104 +1,114 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useMemo } from "react"
-import { db } from "@/app/firebase/config"
-import { collection, getDocs } from "firebase/firestore"
-import { Button } from "@/components/ui/button"
-import { Calendar, PlusCircle } from "lucide-react"
-import Link from "next/link"
-import EventCard from "./eventCard"
-import EventDrawer from "./eventDrawer"
-import { Timestamp } from "firebase/firestore"  // Ensure you import Timestamp
+import { useEffect, useState, useMemo } from "react";
+import { db, auth } from "@/app/firebase/config";
+import { doc, getDoc, Timestamp } from "firebase/firestore";
+import { Button } from "@/components/ui/button";
+import { Calendar, PlusCircle } from "lucide-react";
+import Link from "next/link";
+import EventCard from "./eventCard";
+import EventDrawer from "./eventDrawer";
 
-type Event = {
-  id: string
-  name: string
-  date: string
-  time: string
-  host: {
-    name: string
-    email: string
-    phone: string
-  }
-  location: string
-  imageUrl: string
-  isCreator: boolean
-  availableSlots: number
-  totalSlots: number
-  isGoing: boolean
-  attendees: {
-    total: number
-    list: Array<{
-      name: string
-      category: "Student" | "Alumni" | "Faculty"
-      registrationDate: string
-    }>
-  }
+// Standardized EventData Type
+interface EventData {
+  id: string;
+  capacityLimit: string;
+  createdAt: string;
+  createdBy: string;
+  description: string;
+  endDate: string; // Always a string
+  startDate: string; // Always a string
+  startTime: string;
+  endTime: string;
+  eventName: string;
+  eventPoster: string;
+  isVirtual: boolean;
+  location: string;
+  participantApprovals: Array<any>;
 }
 
-export default function EventsList() {
-  const [events, setEvents] = useState<Event[]>([])
-  const [visibleEvents, setVisibleEvents] = useState(3)
-  const [filter, setFilter] = useState<"upcoming" | "past">("upcoming")
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const currentDate = new Date()
+interface EventsListProps {
+  initialFilter: "upcoming" | "past";
+  onFilterChange: (filter: "upcoming" | "past") => void;
+}
 
-  // 🔥 Fetch events from Firebase
+// Helper function to format event data
+const formatEventData = (event: any): EventData => ({
+  ...event,
+  startDate: event.startDate instanceof Timestamp ? event.startDate.toDate().toISOString() : event.startDate,
+  endDate: event.endDate instanceof Timestamp ? event.endDate.toDate().toISOString() : event.endDate,
+});
+
+export default function EventsList({ initialFilter, onFilterChange }: EventsListProps) {
+  const [events, setEvents] = useState<EventData[]>([]);
+  const [visibleEvents, setVisibleEvents] = useState(3);
+  const [filter, setFilter] = useState<"upcoming" | "past">(initialFilter);
+  const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const currentDate = new Date();
+
   useEffect(() => {
     const fetchEvents = async () => {
-      const querySnapshot = await getDocs(collection(db, "events"))
-      
-      const eventsData = querySnapshot.docs.map(doc => {
-        const data = doc.data()
+      const user = auth.currentUser;
+      if (!user) {
+        console.log("No user logged in");
+        return;
+      }
 
-        // Parse date if it's a Firebase Timestamp
-        const parsedDate = data.date instanceof Timestamp ? data.date.toDate().toISOString() : data.date
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
 
-        return {
-          id: doc.id,
-          name: data.name,
-          date: parsedDate,
-          time: data.time,
-          host: data.host,
-          location: data.location,
-          imageUrl: data.imageUrl,
-          isCreator: data.isCreator,
-          availableSlots: data.availableSlots,
-          totalSlots: data.totalSlots,
-          isGoing: data.isGoing,
-          attendees: data.attendees,
-        } as Event
-      })
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const registeredEvents = userData.registeredEvents || [];
 
-      setEvents(eventsData)
-    }
+        const eventsData = await Promise.all(
+          registeredEvents.map(async (eventId: string) => {
+            const eventDocRef = doc(db, "events", eventId);
+            const eventDocSnap = await getDoc(eventDocRef);
+            if (eventDocSnap.exists()) {
+              return formatEventData({ id: eventDocSnap.id, ...eventDocSnap.data() });
+            }
+            return null;
+          })
+        );
 
-    fetchEvents()
-  }, [])
+        setEvents(eventsData.filter((event): event is EventData => event !== null));
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  useEffect(() => {
+    console.log("Received new filter:", initialFilter);
+    setFilter(initialFilter);
+  }, [initialFilter]);
 
   // Filter and sort events
   const filteredEvents = useMemo(() => {
     return events
       .filter((event) => {
-        const eventDate = new Date(event.date)
-        return filter === "upcoming" ? eventDate >= currentDate : eventDate < currentDate
+        const eventEndDate = new Date(event.endDate);
+        const isUpcoming = eventEndDate >= currentDate;
+        console.log(`Event: ${event.eventName}, EndDate: ${event.endDate}, Upcoming: ${isUpcoming}`);
+        return filter === "upcoming" ? isUpcoming : !isUpcoming;
       })
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-  }, [events, filter, currentDate])
+      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+  }, [events, filter, currentDate]);
 
   const loadMore = () => {
-    setVisibleEvents((prevVisible) => Math.min(prevVisible + 3, filteredEvents.length))
-  }
+    setVisibleEvents((prevVisible) => Math.min(prevVisible + 3, filteredEvents.length));
+  };
 
-  const handleEventClick = (event: Event) => {
-    setSelectedEvent(event)
-    setIsDrawerOpen(true)
-  }
+  const handleEventClick = (event: EventData) => {
+    setSelectedEvent(event);
+    setIsDrawerOpen(true);
+  };
 
   const closeDrawer = () => {
-    setIsDrawerOpen(false)
-  }
+    setIsDrawerOpen(false);
+  };
 
   return (
     <div className="w-full max-w-[616px] space-y-6">
@@ -118,22 +128,7 @@ export default function EventsList() {
         <>
           <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
             {filteredEvents.slice(0, visibleEvents).map((event) => (
-              <EventCard
-                key={event.id}
-                id={event.id}
-                name={event.name}
-                date={event.date}
-                time={event.time}
-                host={event.host}
-                location={event.location}
-                imageUrl={event.imageUrl}
-                isCreator={event.isCreator}
-                availableSlots={event.availableSlots}
-                totalSlots={event.totalSlots}
-                isGoing={event.isGoing}
-                attendees={event.attendees}
-                onClick={() => handleEventClick(event)}
-              />
+              <EventCard key={event.id} event={event} onClick={() => handleEventClick(event)} />
             ))}
           </div>
           {visibleEvents < filteredEvents.length && (
@@ -145,5 +140,5 @@ export default function EventsList() {
       )}
       <EventDrawer event={selectedEvent} isOpen={isDrawerOpen} onClose={closeDrawer} />
     </div>
-  )
+  );
 }

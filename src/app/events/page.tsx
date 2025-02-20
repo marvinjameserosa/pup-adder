@@ -9,6 +9,7 @@ export default function Events() {
   const [currentFilter, setCurrentFilter] = useState<"upcoming" | "past">("upcoming")
 
   const handleFilterChange = (value: string) => {
+    console.log("Tab clicked:", value); // Log when tab is clicked
     setCurrentFilter(value as "upcoming" | "past")
     window.dispatchEvent(new CustomEvent("filterChange", { detail: { filter: value } }))
   }
@@ -17,10 +18,12 @@ export default function Events() {
     return (
       <Tabs value={currentFilter} onValueChange={handleFilterChange} className="w-auto">
         <TabsList className="grid w-full grid-cols-2 border-1px solid">
-          <TabsTrigger className="hover:bg-[#ffd700] data-[state=active]:bg-[#ffd700] text-[#722120] " 
-                value="upcoming">Upcoming</TabsTrigger>
-          <TabsTrigger className="hover:bg-[#ffd700] data-[state=active]:bg-[#ffd700] text-[#722120]" 
-                value="past">Past</TabsTrigger>
+          <TabsTrigger className="hover:bg-[#ffd700] data-[state=active]:bg-[#ffd700] text-[#722120]" value="upcoming">
+            Upcoming
+          </TabsTrigger>
+          <TabsTrigger className="hover:bg-[#ffd700] data-[state=active]:bg-[#ffd700] text-[#722120]" value="past">
+            Past
+          </TabsTrigger>
         </TabsList>
       </Tabs>
     )
@@ -39,7 +42,7 @@ export default function Events() {
               </div>
             </div>
             <Suspense fallback={<div className="text-center text-gray-300">Loading events...</div>}>
-              <EventsList />
+              <EventsList initialFilter={currentFilter} onFilterChange={handleFilterChange} />
             </Suspense>
           </main>
         </div>
