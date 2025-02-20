@@ -13,48 +13,47 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Calendar, CalendarDays, MapPin, Ticket, Users } from "lucide-react"
-import { useEffect,   useState } from "react"
-import { db} from "@/app/firebase/config";
+import { useEffect, useState } from "react"
+import { db } from "@/app/firebase/config";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore"
 import Loading from "@/components/loading"
 
-interface User {
-  id: string
-  name: string
-  email: string
-  type?: string
-  department?: string
+interface EventData {
+  eventName?: string;
+  startDate?: { seconds: number };
+  endDate?: { seconds: number };
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  description?: string;
+  registeredUsers?: string[];
+  createdAt?: { seconds: number };
 }
 
-interface EventData {
-  title: string
-  date: string
-  time: string
-  location: string
-  details: string
-  image: string
-  createdBy: string
-  registeredUsers: string[]
-  createdAt: {
-    seconds: number;
-    nanoseconds: number;
-  }
-  availableSlots: number
-  totalSlots: number
-  capacityLimit: string
+interface User {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  userType?: string;
+  department?: string;
 }
 
 interface Participant extends User {
-  registrationDate: string
+  registrationDate: string;
 }
 
 interface Event {
-  id: string
-  name: string
-  date: string
-  location: string
-  description: string
-  participants: Participant[]
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  description: string;
+  participants: Participant[];
+  date: string; 
 }
 
 export default function Dashboard() {
@@ -84,13 +83,15 @@ export default function Dashboard() {
   
                   participants.push({
                     id: userId,
-                    name: `${userData.firstName ?? "Unknown"} ${userData.lastName ?? ""}`.trim(),
+                    firstName: userData.firstName || "Unknown",
+                    lastName: userData.lastName || "",
                     email: userData.email || "Not provided",
-                    type: userData.userType || "Not specified",
+                    userType: userData.userType || "Not specified",
                     department: userData.department || "Not specified",
                     registrationDate: new Date(
-                      eventData.createdAt?.seconds * 1000 || Date.now()
+                      (eventData.createdAt?.seconds ?? Math.floor(Date.now() / 1000)) * 1000
                     ).toLocaleDateString(),
+                    
                   });
                 }
               } catch (error) {
@@ -98,16 +99,28 @@ export default function Dashboard() {
               }
             }
           }
-  
-          const formatTimestampToDate = (timestamp) => {
-            if (!timestamp || !timestamp.seconds) return null;
+          const formatTimestampToDate = (timestamp: { seconds: number } | undefined) => {
+            if (!timestamp || typeof timestamp.seconds !== 'number') return null;
             const date = new Date(timestamp.seconds * 1000);
             return isNaN(date.getTime()) ? null : date;
           };
   
           const startDate = formatTimestampToDate(eventData.startDate);
           const endDate = formatTimestampToDate(eventData.endDate);
-  
+
+          let formattedDate = "Date not specified";
+          if (startDate) {
+            formattedDate = startDate.toLocaleDateString();
+            if (eventData.startTime) {
+              formattedDate += ` at ${eventData.startTime}`;
+            }
+          } else if (typeof eventData.startDate === 'string') {
+            formattedDate = eventData.startDate;
+            if (eventData.startTime) {
+              formattedDate += ` at ${eventData.startTime}`;
+            }
+          }
+
           return {
             id: eventDoc.id,
             name: eventData.eventName || "Untitled Event",
@@ -118,6 +131,7 @@ export default function Dashboard() {
             location: eventData.location || "No location specified",
             description: eventData.description || "No description available",
             participants,
+            date: formattedDate
           };
         });
   
@@ -135,22 +149,59 @@ export default function Dashboard() {
         const upcoming: Event[] = [];
   
         eventsData.forEach((event) => {
-          const startDateParts = event.startDate?.split("/").map(Number);
-          const endDateParts = event.endDate?.split("/").map(Number);
-  
           let startDate: Date | null = null;
           let endDate: Date | null = null;
-  
-          if (startDateParts?.length === 3) {
-            startDate = new Date(startDateParts[2], startDateParts[0] - 1, startDateParts[1]);
+          
+          try {
+            if (event.startDate && event.startDate !== "No start date specified") {
+              const parts = event.startDate.split('/');
+              if (parts.length === 3) {
+                startDate = new Date(
+                  parseInt(parts[2]), 
+                  parseInt(parts[0]) - 1, 
+                  parseInt(parts[1]) 
+                );
+            
+                if (isNaN(startDate.getTime())) {
+                  startDate = null;
+                }
+              }
+            }
+            
+            if (event.endDate && event.endDate !== "No end date specified") {
+              const parts = event.endDate.split('/');
+              if (parts.length === 3) {
+                endDate = new Date(
+                  parseInt(parts[2]), 
+                  parseInt(parts[0]) - 1, 
+                  parseInt(parts[1]) 
+                );
+                if (isNaN(endDate.getTime())) {
+                  endDate = null;
+                }
+              }
+            }
+          } catch (error) {
+            console.error("Error parsing date:", error);
           }
-  
-          if (endDateParts?.length === 3) {
-            endDate = new Date(endDateParts[2], endDateParts[0] - 1, endDateParts[1]);
-          }
-  
-          if (endDate && endDate < now) {
-            current.push(event);
+          
+          if (startDate && endDate) {
+            if (startDate <= now && endDate >= now) {
+              current.push(event);
+            } else if (startDate > now) {
+              upcoming.push(event);
+            } else if (endDate < now) {
+            }
+          } else if (startDate) {
+            if (startDate > now) {
+              upcoming.push(event);
+            } else {
+              current.push(event); 
+            }
+          } else if (endDate) {
+            if (endDate >= now) {
+              current.push(event);
+            }
           } else {
             upcoming.push(event);
           }
@@ -169,14 +220,11 @@ export default function Dashboard() {
     fetchEvents();
   }, []);  
   
-
   if (loading) {
     return (
       <Loading message="Fetching latest events..." />
-
     )
   }
-
   return (
     <div className="relative min-h-screen bg-[#f2f3f7] bg-fixed">
       <div className="relative z-10 min-h-screen">
@@ -279,9 +327,9 @@ export default function Dashboard() {
                                   {selectedEvent.participants && selectedEvent.participants.length > 0 ? (
                                     selectedEvent.participants.map((participant) => (
                                       <TableRow key={participant.id} className="border-b border-white/20">
-                                        <TableCell className="text-white">{participant.name}</TableCell>
+                                        <TableCell className="text-white">{`${participant.firstName || ''} ${participant.lastName || ''}`}</TableCell>
                                         <TableCell className="text-white">{participant.email}</TableCell>
-                                        <TableCell className="text-white">{participant.type || "Not specified"}</TableCell>
+                                        <TableCell className="text-white">{participant.userType || "Not specified"}</TableCell>
                                         <TableCell className="text-white">{participant.department || "Not specified"}</TableCell>
                                         <TableCell className="text-white">{participant.registrationDate}</TableCell>
                                       </TableRow>
