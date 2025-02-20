@@ -7,7 +7,7 @@
     position: relative;
     width: 100%;
     height: 100%;
-    background-color: rgba(128, 0, 0, 0.9);
+    background-color: #a41e1d;
   }
   .embla__viewport {
     overflow: hidden;
@@ -19,29 +19,15 @@
     gap: 16px;
     max-width: 900px;
   }
-  /*.embla__slide {
-    transform: translate3d(0, 0, 0);
-    flex: 0 0 var(--slide-size);
-    flex-direction: row; /* Image on the left, text on the right 
-    min-width: 0;
-    padding-left: var(--slide-spacing);
-    width: 100%;
-    max-width: 800px;
-    height: 100%;
-    max-height: 800px;
-    display: flex;
-    align-items: stretch; /* Ensure both image and text sections expand equally 
-    background-color: #a41e1d;
-    opacity: 1;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    overflow: hidden;
-}*/
+
 .embla__slide {
   flex: 0 0 var(--slide-size);
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   display: flex;
-  align-items: stretch;
+  flex-direction: column;
+  align-items: center;
   background-color: #a41e1d;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -49,16 +35,6 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-
-/*.embla__slide__content {
-  flex: 1;
-  padding: 20px;
-  text-align: left; /* Align text to the left 
-  color: #1b1919;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}*/
 .embla__slide__content {
   flex: 1;
   padding: 20px;
@@ -66,14 +42,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: linear-gradient(90deg, #a41e1d, #800000);
 }
- /* .embla__slide__title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #ffffff ;
-    margin-bottom: 10px;
-  }*/
   .embla__slide__title {
     font-size: 1.8rem;
     font-weight: bold;
@@ -81,27 +50,16 @@
     margin-bottom: 8px;
   }
 
-/*  .embla__slide__description {
-    font-size: 1rem;
-    color: #666;
-  }*/
   .embla__slide__description {
     font-size: 1rem;
     color: #fff;
     opacity: 0.9;
   }
 
- /* .embla__slide__image {
-    width: 50%;
-    height: 400px;
-    padding: 10px;
-    border-radius: 20px;
-    object-fit: cover;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}*/
 .embla__slide__image {
-  width: 50%;
-  height: 100%;
+  margin-top: 10px;
+  width: 90%;
+  height: 400px;
   object-fit: cover;
 }
 

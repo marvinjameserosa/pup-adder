@@ -5,8 +5,9 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { CalendarDays, MapPin, Users } from "lucide-react"
 
+// Make sure this Event interface matches the one in EventsList.tsx
 interface Event {
-  id: number
+  id: string // Firestore IDs are usually strings
   name: string
   date: string
   time: string
