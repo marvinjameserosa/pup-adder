@@ -102,6 +102,16 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
     }
   };
 
+  const hasTicket = () => {
+    // Replace with actual logic later
+    return registered && Math.random() > 0.5; // Randomly returns true or false
+  };
+
+  // 🎟️ Dummy function to handle getting a ticket
+  const handleGetTicket = () => {
+    alert("Ticket downloaded! 🎟️");
+  };
+
   if (!event) return null;
 
   return (
@@ -146,7 +156,18 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
                   </Button>
                 </Link>
               ) : registered ? (
-                <Button disabled className="w-full bg-gray-500 text-white">Already Registered</Button>
+                hasTicket ? (
+                  <Button
+                    onClick={handleGetTicket}
+                    className="w-full  bg-yellow-500 hover:bg-yellow-800 text-white"
+                  >
+                    Get Ticket
+                  </Button>
+                ) : (
+                  <Button disabled className="w-full bg-gray-500 text-white">
+                    Already Registered
+                  </Button>
+                )
               ) : (
                 <Button
                   onClick={handleRegister}
@@ -156,6 +177,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
                   {loading ? "Registering..." : "Click to Register"}
                 </Button>
               )}
+              
             </div>
           </div>
         </div>
