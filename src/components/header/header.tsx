@@ -7,7 +7,7 @@
   import Link from "next/link"
   import { useEffect, useRef, useState, useCallback } from "react"
   import { auth, db } from "@/app/firebase/config"; 
-  import { doc, setDoc } from "firebase/firestore";
+  import { doc, getDoc, updateDoc } from "firebase/firestore";
 
   export default function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -23,30 +23,81 @@
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
     
     const handleQRCodeDetected = useCallback(async (decodedText: string) => {
-      setDetectedCode(decodedText);
-      setIsScannerOpen(false); 
-      setIsAlertOpen(true);
+      setIsScannerOpen(false)
+      setIsAlertOpen(true)
     
       if (!auth.currentUser) {
         toast({
           title: "Authentication Required",
           description: "Please sign in to save scanned codes.",
           variant: "destructive",
-        });
-        return;
+        })
+        return
       }
     
       try {
-        const userDoc = doc(db, "users", auth.currentUser.uid, "scans", new Date().toISOString());
-        await setDoc(userDoc, {
-          code: decodedText,
-          scannedAt: new Date(),
-        });
-
+        const { eventId, userId } = JSON.parse(decodedText);
+        
+        const userRef = doc(db, "users", userId);
+        
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          let registeredEvents = userData.registeredEvents;
+          
+          // Check what type of data structure we're dealing with
+          if (!registeredEvents) {
+            // If it doesn't exist, initialize as empty array
+            registeredEvents = [];
+          } else if (typeof registeredEvents === 'object' && !Array.isArray(registeredEvents)) {
+            // It's an object/map style structure
+            if (registeredEvents[eventId] !== undefined) {
+              // Update the status to true
+              await updateDoc(userRef, {
+                [`registeredEvents.${eventId}`]: true
+              });
+              setDetectedCode("Attendance marked successfully");
+            } else {
+              setDetectedCode("Event not registered for this user");
+            }
+            return; // Exit early since we've handled the object case
+          }
+          
+          // If we reach here, we're dealing with an array or we've initialized an empty array
+          if (!Array.isArray(registeredEvents)) {
+            console.error("registeredEvents is not an array:", registeredEvents);
+            setDetectedCode("Data structure error");
+            return;
+          }
+          
+          // Find the index of the event in the array
+          const eventIndex = registeredEvents.findIndex((item) => 
+            Array.isArray(item) && item[0] === eventId
+          );
+          
+          if (eventIndex !== -1) {
+            // Event found - create a new array with the updated boolean value
+            const updatedEvents = [...registeredEvents];
+            updatedEvents[eventIndex] = [eventId, true];
+            
+            // Update the entire array in Firestore
+            await updateDoc(userRef, {
+              registeredEvents: updatedEvents
+            });
+            
+            setDetectedCode("Attendance marked successfully");
+          } else {
+            setDetectedCode("Event not registered for this user");
+          }
+        } else {
+          throw new Error("User not found");
+        }
       } catch (error) {
-        console.error("Firestore Error:", error);
+        console.error("Error processing QR code:", error);
+        setDetectedCode(`Error: ${error instanceof Error ? error.message : "Unknown error"}`);
       }
-    }, []);
+    }, [])
     
     
 
