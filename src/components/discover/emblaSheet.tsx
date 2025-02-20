@@ -5,7 +5,7 @@ import Link from "next/link";
 import { SlideType } from '@/types/slideTypes';
 import { auth, db } from "@/app/firebase/config";
 import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type EmbalaSheetType = {
@@ -19,37 +19,13 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
   const [registered, setRegistered] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!event) return;
-
-    const checkRegistration = async () => {
-      const user = auth.currentUser;
-      if (!user) {
-        setRegistered(false);
-        return;
-      }
-
-      try {
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          const userData = userSnap.data();
-          setRegistered(userData.registeredEvents?.includes(event.id) || false);
-        }
-      } catch (error) {
-        console.error("Error checking user registration:", error);
-      }
-    };
-
-    checkRegistration();
-  }, [event]);
+  if (!event) return null;
 
   const handleRegister = async () => {
     const user = auth.currentUser;
 
     if (!user) {
-      router.push("/login"); // Redirect to login if user is not logged in
+      router.push("/login"); // Redirect if not logged in
       return;
     }
 
@@ -57,46 +33,36 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
 
     try {
       const eventRef = doc(db, "events", event.id);
-      const userRef = doc(db, "users", user.uid);
+      const eventSnap = await getDoc(eventRef);
 
-      const [eventSnap, userSnap] = await Promise.all([getDoc(eventRef), getDoc(userRef)]);
+      if (eventSnap.exists()) {
+        const eventData = eventSnap.data();
 
-      if (!eventSnap.exists()) {
-        alert("Event not found.");
-        setLoading(false);
-        return;
-      }
+        // Check if user is already registered
+        if (eventData.registeredUsers?.includes(user.uid)) {
+          alert("You are already registered for this event.");
+          setRegistered(true);
+          setLoading(false);
+          return;
+        }
 
-      const eventData = eventSnap.data();
+        // Check if slots are available
+        if (eventData.capacityLimit && eventData.registeredUsers?.length >= parseInt(eventData.capacityLimit)) {
+          alert("No more slots available.");
+          setLoading(false);
+          return;
+        }
 
-      // Check if user is already registered
-      if (eventData.registeredUsers?.includes(user.uid)) {
-        alert("You are already registered for this event.");
+        // Add the user to registeredUsers array in Firestore
+        await updateDoc(eventRef, {
+          registeredUsers: arrayUnion(user.uid),
+        });
+
+        alert("Successfully registered!");
         setRegistered(true);
-        setLoading(false);
-        return;
+      } else {
+        alert("Event not found.");
       }
-
-      // Check if there are available slots
-      if (eventData.capacityLimit && eventData.registeredUsers?.length >= parseInt(eventData.capacityLimit)) {
-        alert("No more slots available.");
-        setLoading(false);
-        return;
-      }
-
-      // Update event document: add user to registeredUsers
-      await updateDoc(eventRef, {
-        registeredUsers: arrayUnion(user.uid),
-      });
-
-      // Update user document: add event to registeredEvents
-      await updateDoc(userRef, {
-        registeredEvents: arrayUnion(event.id),
-      });
-
-      alert("Successfully registered!");
-      setRegistered(true);
-
     } catch (error) {
       console.error("Error registering user:", error);
       alert("Failed to register. Please try again.");
@@ -104,8 +70,6 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
       setLoading(false);
     }
   };
-
-  if (!event) return null;
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -149,9 +113,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
                   </Button>
                 </Link>
               ) : registered ? (
-                <Button disabled className="w-full bg-gray-500 text-white">
-                  Already Registered
-                </Button>
+                <Button disabled className="w-full bg-gray-500 text-white">Already Registered</Button>
               ) : (
                 <Button
                   onClick={handleRegister}

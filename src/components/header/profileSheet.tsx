@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { LogOut } from "lucide-react";
 import Image from "next/image";
 import { auth, db } from "@/app/firebase/config";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 interface UserData {
   firstName: string;
@@ -22,6 +30,7 @@ export default function ProfileSheet() {
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [uploading, setUploading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -50,6 +59,7 @@ export default function ProfileSheet() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      router.push("/"); 
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -106,14 +116,18 @@ export default function ProfileSheet() {
               height={96}
               className="w-24 h-24 object-cover rounded-full border-2 border-white"
             />
-            {uploading && <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white">Uploading...</div>}
+            {uploading && (
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white">
+                Uploading...
+              </div>
+            )}
             <p className="text-xs text-gray-600 mt-2">Tap the icon to upload/change your profile pic</p>
           </label>
           <div className="text-center text-[#a41e1d]">
             <h3 className="text-lg font-semibold">{userData?.firstName} {userData?.lastName}</h3>
-            <p className="text-sm ">{userData?.email}</p>
-            <p className="text-sm ">{userData?.userType}</p>
-            <p className="text-sm ">{userData?.department}</p>
+            <p className="text-sm">{userData?.email}</p>
+            <p className="text-sm">{userData?.userType}</p>
+            <p className="text-sm">{userData?.department}</p>
             <p className="text-sm font-bold">Student No: {userData?.studentNumber}</p>
           </div>
           <Button
