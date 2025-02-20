@@ -2,43 +2,69 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/comp
 import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, Clock, Users } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { SlideType } from '@/types/slideTypes';
 import { auth, db } from "@/app/firebase/config";
 import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 type EmbalaSheetType = {
   isOpen: boolean;
   onClose: () => void;
-  event: SlideType | null;
+  event?: SlideType | null;
 };
 
 export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) {
   const [loading, setLoading] = useState(false);
   const [registered, setRegistered] = useState(false);
   const router = useRouter();
+  const user = auth.currentUser;
 
-  if (!event) return null;
+  useEffect(() => {
+    const checkRegistration = async () => {
+      if (!user || !event?.id || !isOpen) return; 
+  
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+  
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          setRegistered(userData.registeredEvents?.includes(event.id) || false);
+        }
+      } catch (error) {
+        console.error("Error checking registration:", error);
+      }
+    };
+  
+    checkRegistration();
+  }, [user, event?.id, isOpen]); 
+  
+  
 
   const handleRegister = async () => {
-    const user = auth.currentUser;
-
     if (!user) {
-      router.push("/login"); // Redirect if not logged in
+      router.push("/");
       return;
     }
 
     setLoading(true);
 
     try {
+      if (!event?.id) {
+        alert("Event information is missing.");
+        setLoading(false);
+        return;
+      }
+
       const eventRef = doc(db, "events", event.id);
+      const userRef = doc(db, "users", user.uid);
       const eventSnap = await getDoc(eventRef);
 
       if (eventSnap.exists()) {
         const eventData = eventSnap.data();
 
-        // Check if user is already registered
         if (eventData.registeredUsers?.includes(user.uid)) {
           alert("You are already registered for this event.");
           setRegistered(true);
@@ -46,16 +72,21 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
           return;
         }
 
-        // Check if slots are available
-        if (eventData.capacityLimit && eventData.registeredUsers?.length >= parseInt(eventData.capacityLimit)) {
+        if (
+          eventData.capacityLimit &&
+          eventData.registeredUsers?.length >= parseInt(eventData.capacityLimit)
+        ) {
           alert("No more slots available.");
           setLoading(false);
           return;
         }
 
-        // Add the user to registeredUsers array in Firestore
         await updateDoc(eventRef, {
           registeredUsers: arrayUnion(user.uid),
+        });
+
+        await updateDoc(userRef, {
+          registeredEvents: arrayUnion(event.id),
         });
 
         alert("Successfully registered!");
@@ -71,6 +102,8 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
     }
   };
 
+  if (!event) return null;
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent side="right" className="w-[400px] p-0 bg-[#a41e1d]/60 text-gray-200">
@@ -83,7 +116,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
           </SheetHeader>
 
           <div className="mt-4 space-y-4">
-            <img src={event.image} alt={event.title} className="w-full h-[200px] object-cover rounded-lg shadow-md" />
+            <Image src={event.image} alt={event.title} width={400} height={200} className="w-full h-[200px] object-cover rounded-lg shadow-md" />
             <p className="text-gray-300">{event.details}</p>
 
             <div className="space-y-2 text-sm text-gray-400">
@@ -129,4 +162,4 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
       </SheetContent>
     </Sheet>
   );
-}
+} 
