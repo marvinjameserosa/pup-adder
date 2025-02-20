@@ -152,14 +152,16 @@ export default function DiscoverPage() {
     <div className="relative min-h-screen bg-[#f2f3f7] bg-fixed">
       <Header />
       <div className="w-full px-6 py-6 max-w-[1360px] mx-auto flex flex-col">
-        <div className="flex justify-between items-center mb-6">
-          <div className="max-w-xl">
-            <h1 className="text-4xl font-bold text-[#a41e1d]">Discover Events</h1>
-            <p className="text-m text-gray-700">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6">
+          <div className="max-w-xl text-center lg:text-left">
+            <h1 className="text-3xl sm:text-4xl font-bold text-[#a41e1d]">Discover Events</h1>
+            <p className="text-gray-700 mt-2">
               Explore upcoming events and register easily.
             </p>
           </div>
+          <div className="mt-4 lg:mt-0 w-full lg:w-1/2">
           <SearchDiscover onSearch={setSearchQuery} />
+          </div>
         </div>
         <Suspense fallback={<div className="text-center text-gray-300">Loading carousel...</div>}>
           <EmblaCarousel slides={filteredSlides} onCardClick={handleCardClick} />
