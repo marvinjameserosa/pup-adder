@@ -3,21 +3,37 @@
 import EventsList from "@/components/eventsPage/eventList"
 import Header from "@/components/header/header"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Suspense, useState } from "react"
+import { Suspense, useState, useEffect } from "react"
+import { auth } from "@/app/firebase/config"
+import { onAuthStateChanged } from "firebase/auth"
+import { useRouter } from "next/navigation"
+import Loading from "@/components/loading"
 
 export default function Events() {
   const [currentFilter, setCurrentFilter] = useState<"upcoming" | "past">("upcoming")
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.push("/") 
+      } else {
+        setLoading(false) 
+      }
+    })
+    return () => unsubscribe()
+  }, [router])
 
   const handleFilterChange = (value: string) => {
-    console.log("Tab clicked:", value); // Log when tab is clicked
+    console.log("Tab clicked:", value)
     setCurrentFilter(value as "upcoming" | "past")
     window.dispatchEvent(new CustomEvent("filterChange", { detail: { filter: value } }))
   }
-
   function FilterToggle() {
     return (
       <Tabs value={currentFilter} onValueChange={handleFilterChange} className="w-auto">
-        <TabsList className="grid w-full grid-cols-2 border-1px solid">
+        <TabsList className="grid w-full grid-cols-2 border">
           <TabsTrigger className="hover:bg-[#ffd700] data-[state=active]:bg-[#ffd700] text-[#722120]" value="upcoming">
             Upcoming
           </TabsTrigger>
@@ -28,7 +44,11 @@ export default function Events() {
       </Tabs>
     )
   }
-
+  if (loading) {
+    return (
+      <Loading message="Authenticating..." />
+    )
+  }
   return (
     <div className="relative min-h-screen bg-[#f2f3f7] bg-fixed">
       <div className="relative z-10 min-h-screen">
@@ -50,4 +70,3 @@ export default function Events() {
     </div>
   )
 }
-
