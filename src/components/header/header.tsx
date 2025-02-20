@@ -1,21 +1,40 @@
 "use client"
-
 import ProfileSheet from "@/components/header/profileSheet"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "@/hooks/use-toast"
 import { Calendar, Camera, Compass, Menu, PlusCircle, X } from "lucide-react"
 import Link from "next/link"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScannerOpen, setIsScannerOpen] = useState(false)
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
 
-  const startScan = async () => {
+  // Clean up function to stop camera when component unmounts
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        const tracks = streamRef.current.getTracks()
+        tracks.forEach((track) => track.stop())
+      }
+    }
+  }, [])
+
+  // Effect to initialize camera when scanner is opened
+  useEffect(() => {
+    if (isScannerOpen) {
+      initializeCamera()
+    } else {
+      stopCamera()
+    }
+  }, [isScannerOpen])
+
+  const initializeCamera = async () => {
     if (typeof window === "undefined" || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       toast({
         title: "Camera Access Error",
@@ -26,11 +45,29 @@ export default function Header() {
     }
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      })
+      
+      streamRef.current = stream
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play().catch(err => {
+            console.error("Error playing video:", err)
+            toast({
+              title: "Video Playback Error",
+              description: "Unable to play camera stream.",
+              variant: "destructive",
+            })
+          })
+        }
       }
-      setIsScannerOpen(true)
     } catch (error) {
       console.error("Error accessing camera:", error)
       toast({
@@ -38,15 +75,27 @@ export default function Header() {
         description: "Unable to access the camera. Please check your permissions.",
         variant: "destructive",
       })
+      setIsScannerOpen(false)
     }
   }
 
-  const stopScan = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream
-      const tracks = stream.getTracks()
+  const stopCamera = () => {
+    if (streamRef.current) {
+      const tracks = streamRef.current.getTracks()
       tracks.forEach((track) => track.stop())
+      streamRef.current = null
     }
+    
+    if (videoRef.current) {
+      videoRef.current.srcObject = null
+    }
+  }
+
+  const startScan = () => {
+    setIsScannerOpen(true)
+  }
+
+  const stopScan = () => {
     setIsScannerOpen(false)
   }
 
@@ -57,78 +106,72 @@ export default function Header() {
           <Link href="/discover" className="font-bold text-2xl text-[#722120]">
             PUP Gather
           </Link>
-
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
             <div className="flex items-center space-x-4 mr-4">
               <Link href="/discover">
-                <Button variant="ghost" size="default" className="text-[#722120] hover:bg-[#a41e1d]">
+                <Button variant="ghost" size="default" className="text-[#722120] hover:bg-[#a41e1d] hover:text-white">
                   <Compass className="h-5 w-5 mr-2" />
                   Discover
                 </Button>
               </Link>
               <Link href="/events">
-                <Button variant="ghost" size="default" className="text-[#722120] hover:bg-[#a41e1d]">
+                <Button variant="ghost" size="default" className="text-[#722120] hover:bg-[#a41e1d] hover:text-white">
                   <Calendar className="h-5 w-5 mr-2" />
                   Events
                 </Button>
               </Link>
               <Link href="/dashboard">
-                <Button variant="ghost" size="default" className="text-[#722120] hover:bg-[#a41e1d]">
+                <Button variant="ghost" size="default" className="text-[#722120] hover:bg-[#a41e1d] hover:text-white">
                   <Calendar className="h-5 w-5 mr-2" />
                   Dashboard
                 </Button>
               </Link>
             </div>
-            <Button onClick={startScan} variant="ghost" size="icon" className="text-[#722120] hover:bg-[#a41e1d]">
+            <Button onClick={startScan} variant="ghost" size="icon" className="text-[#722120] hover:bg-[#a41e1d] hover:text-white">
               <Camera className="h-5 w-5" />
               <span className="sr-only">Scan QR Code</span>
             </Button>
             <Link href="/createEvent">
-              <Button className=" hover:bg-[#722120] bg-[#a41e1d] text-white ">
+              <Button className="hover:bg-[#722120] bg-[#a41e1d] text-white">
                 <PlusCircle className="h-5 w-5 mr-2" />
                 Create Event
               </Button>
             </Link>
             <ProfileSheet />
           </div>
-
-          {/* Mobile Menu Button */}
           <div className="md:hidden">
             <Button variant="ghost" size="icon" onClick={toggleMobileMenu} className="text-[#722120]">
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               <Link href="/discover">
-                <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d]">
+                <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d] hover:text-white">
                   <Compass className="h-5 w-5 mr-2" />
                   Discover
                 </Button>
               </Link>
               <Link href="/events">
-                <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d]">
+                <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d] hover:text-white">
                   <Calendar className="h-5 w-5 mr-2" />
                   Events
                 </Button>
               </Link>
               <Link href="/dashboard">
-                <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d]">
+                <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d] hover:text-white">
                   <Calendar className="h-5 w-5 mr-2" />
                   Dashboard
                 </Button>
               </Link>
-              <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d]" onClick={startScan}>
+              <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d] hover:text-white" onClick={startScan}>
                 <Camera className="h-5 w-5 mr-2" />
                 Scan QR Code
               </Button>
               <Link href="/createEvent">
-                <Button className="w-full justify-start bg-[#722120] text-white ">
+                <Button className="w-full justify-start bg-[#722120] text-white hover:bg-[#a41e1d]">
                   <PlusCircle className="h-5 w-5 mr-2" />
                   Create Event
                 </Button>
@@ -140,18 +183,28 @@ export default function Header() {
           </div>
         )}
       </div>
-
       {/* QR Scanner Modal */}
-      <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
+      <Dialog open={isScannerOpen} onOpenChange={(open) => {
+        setIsScannerOpen(open)
+        if (!open) stopCamera()
+      }}>
         <DialogContent className="sm:max-w-md bg-[#a41e1d]">
           <DialogHeader>
             <DialogTitle className="text-white">QR Code Scanner</DialogTitle>
           </DialogHeader>
           <div className="relative w-full max-w-md bg-[#a41e1d] dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <div className="aspect-square relative overflow-hidden rounded-lg">
-              <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline />
+              <video 
+                ref={videoRef} 
+                className="w-full h-full object-cover" 
+                autoPlay 
+                playsInline 
+                muted
+              />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-64 h-64 border-4 border-primary rounded-lg" />
+                <div className="w-64 h-64 border-4 border-white/80 border-dashed rounded-lg">
+                  <div className="absolute inset-0 border-4 border-white/20 rounded-lg animate-pulse"></div>
+                </div>
               </div>
             </div>
           </div>

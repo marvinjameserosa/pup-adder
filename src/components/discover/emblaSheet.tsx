@@ -6,7 +6,7 @@ import Image from "next/image";
 import { SlideType } from '@/types/slideTypes';
 import { auth, db } from "@/app/firebase/config";
 import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
@@ -21,74 +21,116 @@ type EmbalaSheetType = {
 export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) {
   const [loading, setLoading] = useState(false);
   const [registered, setRegistered] = useState(false);
+  const [isEventCreator, setIsEventCreator] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   const user = auth.currentUser;
 
-  useEffect(() => {
-    const checkRegistration = async () => {
-      if (!user || !event?.id || !isOpen) return;
+  const showErrorToast = useCallback((message: string) => {
+    toast({ 
+      variant: "destructive", 
+      title: "Error", 
+      description: message 
+    });
+  }, [toast]);
 
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      if (!user || !event?.id || !isOpen) return;
+      
       try {
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
-
+        
         if (userSnap.exists()) {
           const userData = userSnap.data();
           setRegistered(userData.registeredEvents?.includes(event.id) || false);
         }
+        
+        const eventRef = doc(db, "events", event.id);
+        const eventSnap = await getDoc(eventRef);
+        
+        if (eventSnap.exists()) {
+          const eventData = eventSnap.data();
+          setIsEventCreator(eventData.createdBy === user.uid);
+        }
       } catch (error) {
-        console.error("Error checking registration:", error);
-        toast({ variant: "destructive", title: "Error", description: "Failed to check registration status." });
+        console.error("Error fetching user data:", error);
+        showErrorToast("Failed to check user status.");
       }
     };
-
-    checkRegistration();
-  }, [user, event?.id, isOpen, toast]);
+    
+    checkUserStatus();
+  }, [user, event?.id, isOpen, showErrorToast]);
 
   const handleRegister = async () => {
     if (!user) {
       router.push("/");
       return;
     }
-
+    
     setLoading(true);
-
+    
     try {
       if (!event?.id) {
-        toast({ variant: "destructive", title: "Error", description: "Event information is missing." });
+        toast({ 
+          variant: "destructive", 
+          title: "Error", 
+          description: "Event information is missing." 
+        });
         return;
       }
-
+      
       const eventRef = doc(db, "events", event.id);
       const userRef = doc(db, "users", user.uid);
       const eventSnap = await getDoc(eventRef);
-
-      if (eventSnap.exists()) {
-        const eventData = eventSnap.data();
-
-        if (eventData.registeredUsers?.includes(user.uid)) {
-          toast({ variant: "default", title: "Info", description: "You are already registered for this event." });
-          setRegistered(true);
-          return;
-        }
-
-        if (eventData.capacityLimit && eventData.registeredUsers?.length >= parseInt(eventData.capacityLimit)) {
-          toast({ variant: "destructive", title: "Full", description: "No more slots available." });
-          return;
-        }
-
-        await updateDoc(eventRef, { registeredUsers: arrayUnion(user.uid) });
-        await updateDoc(userRef, { registeredEvents: arrayUnion(event.id) });
-
-        toast({ variant: "default", title: "Success", description: "Successfully registered!" });
-        setRegistered(true);
-      } else {
-        toast({ variant: "destructive", title: "Error", description: "Event not found." });
+      
+      if (!eventSnap.exists()) {
+        toast({ 
+          variant: "destructive", 
+          title: "Error", 
+          description: "Event not found." 
+        });
+        return;
       }
+      
+      const eventData = eventSnap.data();
+      
+      if (eventData.registeredUsers?.includes(user.uid)) {
+        toast({ 
+          variant: "default", 
+          title: "Info", 
+          description: "You are already registered." 
+        });
+        setRegistered(true);
+        return;
+      }
+      
+      if (eventData.capacityLimit && eventData.registeredUsers?.length >= parseInt(eventData.capacityLimit)) {
+        toast({ 
+          variant: "destructive", 
+          title: "Full", 
+          description: "No more slots available." 
+        });
+        return;
+      }
+      
+      await updateDoc(eventRef, { registeredUsers: arrayUnion(user.uid) });
+      await updateDoc(userRef, { registeredEvents: arrayUnion(event.id) });
+      
+      toast({ 
+        variant: "default", 
+        title: "Success", 
+        description: "Successfully registered!" 
+      });
+      setRegistered(true);
     } catch (error) {
-      console.error("Error registering user:", error);
-      toast({ variant: "destructive", title: "Error", description: "Failed to register. Please try again." });
+      console.error("Registration error:", error);
+      toast({ 
+        variant: "destructive", 
+        title: "Error", 
+        description: "Registration failed. Try again." 
+      });
     } finally {
       setLoading(false);
     }
@@ -96,15 +138,21 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
 
   const handleGetTicket = () => {
     if (!event?.id || !user?.uid) {
-      toast({ variant: "destructive", title: "Error", description: "Missing event or user information." });
+      toast({ 
+        variant: "destructive", 
+        title: "Error", 
+        description: "Missing event or user info." 
+      });
       return;
     }
-
+    
     generateTicket(event.id, user.uid);
-    toast({ variant: "default", title: "Ticket", description: "Ticket downloaded! 🎟️" });
+    toast({ 
+      variant: "default", 
+      title: "Ticket", 
+      description: "Ticket downloaded! 🎟️" 
+    });
   };
-
-  const hasTicket = () => registered; // Updated to reflect actual registration status
 
   if (!event) return null;
 
@@ -120,11 +168,9 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
               </button>
             </SheetClose>
           </SheetHeader>
-
           <div className="mt-4 space-y-4">
             <Image src={event.image} alt={event.title} width={400} height={200} className="w-full h-[200px] object-cover rounded-lg shadow-md" />
             <p className="text-gray-300">{event.details}</p>
-
             <div className="space-y-2 text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4 text-gray-200" />
@@ -143,24 +189,17 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmbalaSheetType) 
                 <span>{event.availableSlots} of {event.totalSlots} slots available</span>
               </div>
             </div>
-
             <div className="mt-6">
-              {event.isCreator ? (
+              {isEventCreator ? (
                 <Link href="/dashboard">
                   <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">
                     Go to Dashboard
                   </Button>
                 </Link>
               ) : registered ? (
-                hasTicket() ? (
-                  <Button onClick={handleGetTicket} className="w-full bg-yellow-500 hover:bg-yellow-800 text-white">
-                    Get Ticket
-                  </Button>
-                ) : (
-                  <Button disabled className="w-full bg-gray-500 text-white">
-                    Already Registered
-                  </Button>
-                )
+                <Button onClick={handleGetTicket} className="w-full bg-yellow-500 hover:bg-yellow-800 text-white">
+                  Get Ticket
+                </Button>
               ) : (
                 <Button
                   onClick={handleRegister}

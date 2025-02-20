@@ -43,7 +43,7 @@ export default function DiscoverPage() {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
-        router.push("/login"); 
+        router.push("/"); 
       }
     });
 
