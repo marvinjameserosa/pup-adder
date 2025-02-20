@@ -16,6 +16,7 @@ import { Calendar, CalendarDays, MapPin, Ticket, Users } from "lucide-react"
 import { useEffect,   useState } from "react"
 import { db} from "@/app/firebase/config";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore"
+import Loading from "@/components/loading"
 
 interface User {
   id: string
@@ -171,9 +172,8 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f2f3f7]">
-        <p className="text-lg font-semibold text-[#a41e1d]">Loading events...</p>
-      </div>
+      <Loading message="Fetching latest events..." />
+
     )
   }
 
