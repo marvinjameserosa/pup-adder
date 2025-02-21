@@ -1,13 +1,13 @@
 "use client"
 
+import { auth } from "@/app/firebase/config"
 import EventsList from "@/components/eventsPage/eventList"
 import Header from "@/components/header/header"
+import Loading from "@/components/loading"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Suspense, useState, useEffect } from "react"
-import { auth } from "@/app/firebase/config"
 import { onAuthStateChanged } from "firebase/auth"
 import { useRouter } from "next/navigation"
-import Loading from "@/components/loading"
+import { Suspense, useEffect, useState } from "react"
 
 export default function Events() {
   const [currentFilter, setCurrentFilter] = useState<"upcoming" | "past">("upcoming")
@@ -45,7 +45,7 @@ export default function Events() {
   }
   if (loading) {
     return (
-      <Loading message="Authenticating..." />
+      <Loading message="Loading events page..." />
     )
   }
   return (

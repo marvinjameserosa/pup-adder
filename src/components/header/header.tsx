@@ -1,13 +1,13 @@
   "use client"
-  import ProfileSheet from "@/components/header/profileSheet"
-  import { Button } from "@/components/ui/button"
-  import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-  import { toast } from "@/hooks/use-toast"
-  import { Calendar, Camera, Compass, Menu, PlusCircle, X } from "lucide-react"
-  import Link from "next/link"
-  import { useEffect, useRef, useState, useCallback } from "react"
-  import { auth, db } from "@/app/firebase/config"; 
-  import { doc, getDoc, updateDoc } from "firebase/firestore";
+  import { auth, db } from "@/app/firebase/config"
+import ProfileSheet from "@/components/header/profileSheet"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { toast } from "@/hooks/use-toast"
+import { doc, getDoc, updateDoc } from "firebase/firestore"
+import { Calendar, Camera, CheckCircle, Compass, Menu, PlusCircle, X } from "lucide-react"
+import Link from "next/link"
+import { useCallback, useEffect, useRef, useState } from "react"
 
   export default function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -237,7 +237,7 @@
                 </Link>
                 <Link href="/dashboard">
                   <Button variant="ghost" size="default" className="text-[#722120] hover:bg-[#a41e1d] hover:text-white">
-                    <Calendar className="h-5 w-5 mr-2" />
+                    <CheckCircle className="h-5 w-5 mr-2" />
                     Dashboard
                   </Button>
                 </Link>
@@ -277,7 +277,7 @@
                 </Link>
                 <Link href="/dashboard">
                   <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d] hover:text-white">
-                    <Calendar className="h-5 w-5 mr-2" />
+                    <CheckCircle className="h-5 w-5 mr-2" />
                     Dashboard
                   </Button>
                 </Link>
@@ -303,94 +303,90 @@
             </div>
           )}
         </div>
-        <Dialog 
-          open={isScannerOpen} 
-          onOpenChange={handleDialogChange}
-        >
-          <DialogContent className="sm:max-w-md bg-[#a41e1d]">
-            <DialogHeader>
-              <DialogTitle className="text-white">QR Code Scanner</DialogTitle>
-            </DialogHeader>
-            <div className="relative w-full max-w-md bg-[#a41e1d] dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="aspect-square relative overflow-hidden rounded-lg bg-black">
-                <div 
-                  ref={scannerContainerRef} 
-                  className="w-full h-full"
-                  style={{ minHeight: "300px" }}
-                >
+        <Dialog open={isScannerOpen} onOpenChange={handleDialogChange}>
+        <DialogContent className="sm:max-w-md bg-[#a41e1d] max-h-[90vh] overflow-y-auto p-4 flex flex-col items-center">
+          <DialogHeader className="w-full">
+            <DialogTitle className="text-white text-center">QR Code Scanner</DialogTitle>
+          </DialogHeader>
+          <div className="relative w-full max-w-[300px] sm:max-w-md mx-auto bg-[#a41e1d] dark:bg-gray-800 rounded-lg shadow-lg">
+            <div className="aspect-square relative overflow-hidden rounded-lg bg-black">
+              <div
+                ref={scannerContainerRef}
+                className="w-full h-full"
+                style={{ minHeight: "250px", maxHeight: "60vh" }}
+              ></div>
+              {!isScanning && !cameraError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+                  <div className="text-white text-center">
+                    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white mx-auto mb-3"></div>
+                    <p>Initializing camera...</p>
+                  </div>
                 </div>
-                {!isScanning && !cameraError && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/70">
-                    <div className="text-white text-center">
-                      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white mx-auto mb-3"></div>
-                      <p>Initializing camera...</p>
-                    </div>
-                  </div>
-                )}
-                {cameraError && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/80">
-                    <div className="text-white text-center p-4 max-w-xs">
-                      <X className="h-10 w-10 text-red-500 mx-auto mb-3" />
-                      <p className="text-red-300 font-bold">Camera Error</p>
-                      <p className="mt-2 text-sm overflow-hidden overflow-ellipsis">
-                        {cameraError.length > 100 ? cameraError.substring(0, 100) + '...' : cameraError}
-                      </p>
-                      <Button 
-                        className="mt-4 bg-white text-red-700 hover:bg-gray-200"
-                        onClick={() => {
-                          setCameraError(null);
-                          initializeScanner();
-                        }}
-                      >
-                        Retry
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                {isScanning && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <p className="text-white text-sm mt-4 bg-black/40 px-3 py-1 rounded-full">
-                      Position QR code in the center
+              )}
+              {cameraError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/80">
+                  <div className="text-white text-center p-4 max-w-xs">
+                    <X className="h-10 w-10 text-red-500 mx-auto mb-3" />
+                    <p className="text-red-300 font-bold">Camera Error</p>
+                    <p className="mt-2 text-sm overflow-hidden overflow-ellipsis">
+                      {cameraError.length > 100 ? cameraError.substring(0, 100) + "..." : cameraError}
                     </p>
+                    <Button
+                      className="mt-4 bg-white text-red-700 hover:bg-gray-200"
+                      onClick={() => {
+                        setCameraError(null)
+                        initializeScanner()
+                      }}
+                    >
+                      Retry
+                    </Button>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
               {isScanning && (
-                <Button 
-                  className="absolute bottom-8 right-8 rounded-full w-12 h-12 p-0 bg-white/20 hover:bg-white/40 text-white"
-                  onClick={switchCamera}
-                >
-                  <Camera className="h-6 w-6" />
-                </Button>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <p className="text-white text-sm mt-4 bg-black/40 px-3 py-1 rounded-full">
+                    Position QR code in the center
+                  </p>
+                </div>
               )}
             </div>
-            <DialogFooter>
-              <Button type="button" onClick={() => setIsScannerOpen(false)} variant="outline" className="bg-white/10 text-white hover:bg-[#722120]">
-                Close
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        <Dialog open={isAlertOpen} onOpenChange={(open) => setIsAlertOpen(open)}>
-          <DialogContent className="sm:max-w-md rounded-2xl shadow-lg">
-            <DialogHeader>
-              <DialogTitle className="text-[#722120]">🎉 QR Code Detected!</DialogTitle>
-            </DialogHeader>
-            <div className="p-4 text-center">
-              <p className="text-gray-800 break-words font-medium">
-                {detectedCode ?? "No code detected"}
-              </p>
-            </div>
-            <DialogFooter>    
-              <Button 
-                onClick={() => setIsAlertOpen(false)} 
-                className="bg-[#722120] text-white hover:bg-[#a41e1d] w-full" 
+            {isScanning && (
+              <Button
+                className="absolute bottom-4 right-4 rounded-full w-10 h-10 p-0 bg-white/20 hover:bg-white/40 text-white"
+                onClick={switchCamera}
               >
-                OK
+                <Camera className="h-5 w-5" />
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>     
+            )}
+          </div>
+          <DialogFooter className="mt-4 w-full">
+            <Button
+              type="button"
+              onClick={() => setIsScannerOpen(false)}
+              variant="outline"
+              className="bg-white/10 text-white hover:bg-[#722120] w-full"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isAlertOpen} onOpenChange={(open) => setIsAlertOpen(open)}>
+        <DialogContent className="sm:max-w-md rounded-2xl shadow-lg">
+          <DialogHeader>
+            <DialogTitle className="text-[#722120]">🎉 QR Code Detected!</DialogTitle>
+          </DialogHeader>
+          <div className="p-4 text-center">
+            <p className="text-gray-800 break-words font-medium">{detectedCode ?? "No code detected"}</p>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setIsAlertOpen(false)} className="bg-[#722120] text-white hover:bg-[#a41e1d] w-full">
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>     
       </nav>
     )
   }

@@ -1,17 +1,16 @@
 "use client";
-import React, { useState, useEffect, Suspense } from "react";
-import { useRouter } from "next/navigation";
-import { auth } from "@/app/firebase/config";
-import { onAuthStateChanged } from "firebase/auth";
-import { db } from "@/app/firebase/config";
-import { collection, getDoc, getDocs, doc } from "firebase/firestore";
+import { auth, db } from "@/app/firebase/config";
 import EmblaCarousel from "@/components/discover/emblaCarousel";
 import EmblaSheet from "@/components/discover/emblaSheet";
 import SearchDiscover from "@/components/discover/searchDiscover";
 import Header from "@/components/header/header";
-import { SlideType } from "@/types/slideTypes";
-import "./embla.css";
 import Loading from "@/components/loading";
+import { SlideType } from "@/types/slideTypes";
+import { onAuthStateChanged } from "firebase/auth";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import "./embla.css";
 
 interface EventData {
   capacityLimit: string;
@@ -31,6 +30,7 @@ interface EventData {
 
 export default function DiscoverPage() {
   const [selectedEvent, setSelectedEvent] = useState<SlideType | null>(null);
+  const [loading, setLoading] = useState<boolean>(true)
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -130,7 +130,7 @@ export default function DiscoverPage() {
   if (isAuthenticated === null || isLoadingEvents) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-[#f2f3f7]">
-        <Loading message={isAuthenticated === null ? "Authenticating..." : "Loading events..."} />
+        <Loading message={isAuthenticated === null ? "Authenticating..." : "Loading discover page..."} />
       </div>
     );
   }

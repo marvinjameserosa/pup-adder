@@ -2,9 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type UserType = "Student" | "Alumni" | "Faculty";
@@ -55,17 +55,17 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         <SelectValue placeholder="Select your department" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="CPE">BS Computer Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Civil Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Electronics Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Industrial Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Mechanical Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Computer Science</SelectItem>
-                        <SelectItem value="accountancy">BS Accountancy</SelectItem>
-                        <SelectItem value="management">BS Business Management</SelectItem>
-                        <SelectItem value="architecture">BS Architecture</SelectItem>
-                        <SelectItem value="architecture">BS Information Techonology</SelectItem>
-                        <SelectItem value="architecture">BS Management Accounting</SelectItem>
+                        <SelectItem value="BSCPE">BS Computer Engineering</SelectItem>
+                        <SelectItem value="BSCE">BS Civil Engineering</SelectItem>
+                        <SelectItem value="BSEE">BS Electronics Engineering</SelectItem>
+                        <SelectItem value="BSIE">BS Industrial Engineering</SelectItem>
+                        <SelectItem value="BSME">BS Mechanical Engineering</SelectItem>
+                        <SelectItem value="BSCS">BS Computer Science</SelectItem>
+                        <SelectItem value="BSA">BS Accountancy</SelectItem>
+                        <SelectItem value="BSM">BS Business Management</SelectItem>
+                        <SelectItem value="BSArch">BS Architecture</SelectItem>
+                        <SelectItem value="BSIT">BS Information Techonology</SelectItem>
+                        <SelectItem value="BSMA">BS Management Accounting</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -85,17 +85,17 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         <SelectValue placeholder="Select your Department" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="CPE">BS Computer Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Civil Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Electronics Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Industrial Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Mechanical Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Computer Science</SelectItem>
-                        <SelectItem value="accountancy">BS Accountancy</SelectItem>
-                        <SelectItem value="management">BS Business Management</SelectItem>
-                        <SelectItem value="architecture">BS Architecture</SelectItem>
-                        <SelectItem value="architecture">BS Information Techonology</SelectItem>
-                        <SelectItem value="architecture">BS Management Accounting</SelectItem>
+                        <SelectItem value="BSCPE">BS Computer Engineering</SelectItem>
+                        <SelectItem value="BSCE">BS Civil Engineering</SelectItem>
+                        <SelectItem value="BSEE">BS Electronics Engineering</SelectItem>
+                        <SelectItem value="BSIE">BS Industrial Engineering</SelectItem>
+                        <SelectItem value="BSME">BS Mechanical Engineering</SelectItem>
+                        <SelectItem value="BSCS">BS Computer Science</SelectItem>
+                        <SelectItem value="BSA">BS Accountancy</SelectItem>
+                        <SelectItem value="BSM">BS Business Management</SelectItem>
+                        <SelectItem value="BSArch">BS Architecture</SelectItem>
+                        <SelectItem value="BSIT">BS Information Techonology</SelectItem>
+                        <SelectItem value="BSMA">BS Management Accounting</SelectItem>
                       </SelectContent>
                     </Select>
 
@@ -130,17 +130,17 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         <SelectValue placeholder="Select your department" />
                       </SelectTrigger>
                       <SelectContent>
-                      <SelectItem value="CPE">BS Computer Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Civil Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Electronics Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Industrial Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Mechanical Engineering</SelectItem>
-                        <SelectItem value="CPE">BS Computer Science</SelectItem>
-                        <SelectItem value="accountancy">BS Accountancy</SelectItem>
-                        <SelectItem value="management">BS Business Management</SelectItem>
-                        <SelectItem value="architecture">BS Architecture</SelectItem>
-                        <SelectItem value="architecture">BS Information Techonology</SelectItem>
-                        <SelectItem value="architecture">BS Management Accounting</SelectItem>
+                        <SelectItem value="BSCPE">BS Computer Engineering</SelectItem>
+                        <SelectItem value="BSCE">BS Civil Engineering</SelectItem>
+                        <SelectItem value="BSEE">BS Electronics Engineering</SelectItem>
+                        <SelectItem value="BSIE">BS Industrial Engineering</SelectItem>
+                        <SelectItem value="BSME">BS Mechanical Engineering</SelectItem>
+                        <SelectItem value="BSCS">BS Computer Science</SelectItem>
+                        <SelectItem value="BSA">BS Accountancy</SelectItem>
+                        <SelectItem value="BSM">BS Business Management</SelectItem>
+                        <SelectItem value="BSArch">BS Architecture</SelectItem>
+                        <SelectItem value="BSIT">BS Information Techonology</SelectItem>
+                        <SelectItem value="BSMA">BS Management Accounting</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
