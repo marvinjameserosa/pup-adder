@@ -26,7 +26,6 @@ export default function Events() {
   }, [router])
 
   const handleFilterChange = (value: string) => {
-    console.log("Tab clicked:", value)
     setCurrentFilter(value as "upcoming" | "past")
     window.dispatchEvent(new CustomEvent("filterChange", { detail: { filter: value } }))
   }
