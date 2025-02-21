@@ -13,7 +13,7 @@ export default function Events() {
   const [currentFilter, setCurrentFilter] = useState<"upcoming" | "past">("upcoming")
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-
+  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -24,11 +24,12 @@ export default function Events() {
     })
     return () => unsubscribe()
   }, [router])
-
+  
   const handleFilterChange = (value: string) => {
     setCurrentFilter(value as "upcoming" | "past")
     window.dispatchEvent(new CustomEvent("filterChange", { detail: { filter: value } }))
   }
+  
   function FilterToggle() {
     return (
       <Tabs value={currentFilter} onValueChange={handleFilterChange} className="w-auto">
@@ -45,7 +46,9 @@ export default function Events() {
   }
   if (loading) {
     return (
-      <Loading message="Loading events page..." />
+      <div className="min-h-screen flex items-center justify-center bg-[#f2f3f7]">
+        <Loading message="Loading events page..." />
+      </div>
     )
   }
   return (
