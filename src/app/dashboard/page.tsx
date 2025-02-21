@@ -15,9 +15,8 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { collection, doc, getDoc, getDocs } from "firebase/firestore"
-import { Calendar, CalendarDays, MapPin, Ticket, Users } from "lucide-react"
+import { Calendar, CalendarDays, Download, MapPin, Ticket, Users } from "lucide-react"
 import { useEffect, useState } from "react"
-
 interface EventData {
   eventName?: string;
   startDate?: { seconds: number };
@@ -29,7 +28,6 @@ interface EventData {
   registeredUsers?: string[];
   createdAt?: { seconds: number };
 }
-
 interface User {
   id: string;
   firstName?: string;
@@ -37,12 +35,14 @@ interface User {
   email?: string;
   userType?: string;
   department?: string;
+  registeredEvents?: {
+    [eventId: string]: boolean;
+  };
 }
-
 interface Participant extends User {
   registrationDate: string;
+  checkedIn: boolean;
 }
-
 interface Event {
   id: string;
   name: string;
@@ -55,7 +55,6 @@ interface Event {
   participants: Participant[];
   date: string; 
 }
-
 export default function Dashboard() {
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState<boolean>(true)
@@ -64,6 +63,55 @@ export default function Dashboard() {
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
   const [totalRegistrations, setTotalRegistrations] = useState<number>(0)
 
+  const downloadParticipantsCSV = () => {
+    if (!selectedEvent || !selectedEvent.participants || selectedEvent.participants.length === 0) {
+      return;
+    }
+    const headers = [
+      "Name", 
+      "Email", 
+      "Type", 
+      "Department/College", 
+      "Registration Date", 
+      "Check-in Status"
+    ];
+    const csvRows = [
+      headers.join(','),
+      ...selectedEvent.participants.map(p => {
+        const name = `${p.firstName || ''} ${p.lastName || ''}`.trim();
+        const email = p.email || '';
+        const type = p.userType || 'Not specified';
+        const department = p.department || 'Not specified';
+        const regDate = p.registrationDate;
+        const status = p.checkedIn ? 'Checked In' : 'Not Checked In';
+        const escapeCsvField = (field: string) => {
+          if (field.includes(',') || field.includes('"') || field.includes('\n')) {
+            return `"${field.replace(/"/g, '""')}"`;
+          }
+          return field;
+        };
+        
+        return [
+          escapeCsvField(name),
+          escapeCsvField(email),
+          escapeCsvField(type),
+          escapeCsvField(department),
+          escapeCsvField(regDate),
+          escapeCsvField(status)
+        ].join(',');
+      })
+    ].join('\n');
+    const blob = new Blob([csvRows], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${selectedEvent.name.replace(/\s+/g, '_')}_participants.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
   useEffect(() => {
     const fetchEvents = async () => {
       setLoading(true);
@@ -80,6 +128,8 @@ export default function Dashboard() {
                 const userDoc = await getDoc(doc(db, "users", userId));
                 if (userDoc.exists()) {
                   const userData = userDoc.data() as User;
+                  const isCheckedIn = !!(userData.registeredEvents && 
+                                     userData.registeredEvents[eventDoc.id]);
   
                   participants.push({
                     id: userId,
@@ -91,7 +141,8 @@ export default function Dashboard() {
                     registrationDate: new Date(
                       (eventData.createdAt?.seconds ?? Math.floor(Date.now() / 1000)) * 1000
                     ).toLocaleDateString(),
-                    
+                    registeredEvents: userData.registeredEvents,
+                    checkedIn: isCheckedIn
                   });
                 }
               } catch (error) {
@@ -107,7 +158,6 @@ export default function Dashboard() {
   
           const startDate = formatTimestampToDate(eventData.startDate);
           const endDate = formatTimestampToDate(eventData.endDate);
-
           let formattedDate = "Date not specified";
           if (startDate) {
             formattedDate = startDate.toLocaleDateString();
@@ -120,7 +170,6 @@ export default function Dashboard() {
               formattedDate += ` at ${eventData.startTime}`;
             }
           }
-
           return {
             id: eventDoc.id,
             name: eventData.eventName || "Untitled Event",
@@ -309,7 +358,9 @@ export default function Dashboard() {
                         <DialogContent className="max-w-[95vw] sm:max-w-[85vw] md:max-w-[75vw] lg:max-w-4xl bg-[#4A0E0E] text-white">
                           <DialogHeader>
                             <DialogTitle>Event Participants</DialogTitle>
-                            <DialogDescription className="text-gray-300">List of participants for {selectedEvent.name}</DialogDescription>
+                            <DialogDescription className="text-gray-300">
+                              List of participants for {selectedEvent.name}
+                            </DialogDescription>
                           </DialogHeader>
                           <ScrollArea className="h-[60vh] w-full">
                             <div className="w-full min-w-[640px]">
@@ -321,6 +372,7 @@ export default function Dashboard() {
                                     <TableHead className="text-white">Type</TableHead>
                                     <TableHead className="text-white">Department/College</TableHead>
                                     <TableHead className="text-white">Registration Date</TableHead>
+                                    <TableHead className="text-white">Admission Status</TableHead>
                                   </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -332,11 +384,16 @@ export default function Dashboard() {
                                         <TableCell className="text-white">{participant.userType || "Not specified"}</TableCell>
                                         <TableCell className="text-white">{participant.department || "Not specified"}</TableCell>
                                         <TableCell className="text-white">{participant.registrationDate}</TableCell>
+                                        <TableCell className="text-white">
+                                          <span className={`px-2 py-1 rounded-full text-xs ${participant.checkedIn ? 'bg-green-700' : 'bg-yellow-700'}`}>
+                                            {participant.checkedIn ? 'Checked In' : 'Not Checked In'}
+                                          </span>
+                                        </TableCell>
                                       </TableRow>
                                     ))
                                   ) : (
                                     <TableRow>
-                                      <TableCell colSpan={5} className="text-center text-white">No participants registered yet</TableCell>
+                                      <TableCell colSpan={6} className="text-center text-white">No participants registered yet</TableCell>
                                     </TableRow>
                                   )}
                                 </TableBody>
@@ -344,6 +401,19 @@ export default function Dashboard() {
                             </div>
                             <ScrollBar orientation="horizontal" />
                           </ScrollArea>
+                          <div className="text-center">
+                          {selectedEvent.participants && selectedEvent.participants.length > 0 && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="w-40 bg-yellow-500 hover:bg-yellow-800 text-black"
+                                  onClick={downloadParticipantsCSV}
+                                >
+                                  <Download className="mr-2 h-4 w-4" />
+                                  Download
+                                </Button>
+                              )}
+                          </div>
                         </DialogContent>
                       </Dialog>
                     </>
