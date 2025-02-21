@@ -17,6 +17,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { collection, doc, getDoc, getDocs } from "firebase/firestore"
 import { Calendar, CalendarDays, Download, MapPin, Ticket, Users } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
+
 interface EventData {
   eventName?: string;
   startDate?: { seconds: number };
@@ -62,6 +65,24 @@ export default function Dashboard() {
   const [currentEvents, setCurrentEvents] = useState<Event[]>([])
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
   const [totalRegistrations, setTotalRegistrations] = useState<number>(0)
+  const [authChecking, setAuthChecking] = useState<boolean>(true)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
+  const router = useRouter()
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setAuthChecking(false);
+      if (user) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+        router.push('/');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
 
   const downloadParticipantsCSV = () => {
     if (!selectedEvent || !selectedEvent.participants || selectedEvent.participants.length === 0) {
@@ -114,6 +135,8 @@ export default function Dashboard() {
   
   useEffect(() => {
     const fetchEvents = async () => {
+      if (!isAuthenticated) return;
+      
       setLoading(true);
       try {
         const eventsSnapshot = await getDocs(collection(db, "events"));
@@ -266,8 +289,18 @@ export default function Dashboard() {
       }
     };
   
-    fetchEvents();
-  }, []);  
+    if (isAuthenticated) {
+      fetchEvents();
+    }
+  }, [isAuthenticated]);  
+  
+  if (authChecking) {
+    return <Loading message="Verifying your login..." />;
+  }
+  
+  if (!isAuthenticated) {
+    return <Loading message="Please login to access the dashboard..." />;
+  }
   
   if (loading) {
     return (
