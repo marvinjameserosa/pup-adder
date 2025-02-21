@@ -123,7 +123,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
     
     try {
       generateTicket(event.id, user.uid);
-      await updateDoc(doc(db, "users", user.uid), { [`registeredEvents.${event.id}`]: true });
+      await updateDoc(doc(db, "users", user.uid), { [`registeredEvents.${event.id}`]: false });
       setTicketGenerated(true);
       toast({ variant: "default", title: "Ticket", description: "Ticket downloaded! 🎟️" });
     } catch (error) {
