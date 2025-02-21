@@ -1,17 +1,16 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetClose } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, Clock, Users, Check, Loader2 } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
-import { SlideType } from '@/types/slideTypes';
 import { auth, db } from "@/app/firebase/config";
-import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
+import { SlideType } from '@/types/slideTypes';
 import { generateTicket } from "@/utils/getTickets";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
+import { Calendar, Check, Clock, Loader2, MapPin, Users } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean; onClose: () => void; event?: SlideType | null; }) {
   const [loading, setLoading] = useState(false);
@@ -136,26 +135,17 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetTitle className="text-white mt-20">{event.title}</SheetTitle>
-      <SheetContent side="right" className="w-[90vw] sm:w-[400px] max-w-[400px] p-0 bg-[#a41e1d]/60 text-gray-200">
+      <SheetContent className="sm:max-w-[425px] bg-[#f2f3f7]/60 text-white">
         <div className="relative h-full p-6 z-50">
           {isLoadingUserData ? (
             <div className="flex flex-col justify-center items-center h-full space-y-4">
               <Loader2 className="h-10 w-10 text-white animate-spin" />
-              <p className="text-white text-center">Loading event details...</p>
+              <p className="text-white text-center">Loading discover page...</p>
             </div>
           ) : (
             <>
               <SheetHeader>
-                <SheetTitle className="text-white mt-20">{event.title}</SheetTitle>
-                <SheetClose asChild>
-                  <button 
-                    aria-label="Close"
-                    className="absolute top-1 right-3 p-4 rounded-md bg-red-900 text-gray-200 hover:bg-[#8B1212] transition"
-                  >
-                    ✖
-                  </button>
-                </SheetClose>
+                <SheetTitle className="text-2xl text-[#a41e1d] font-bold">{event.title}</SheetTitle>
               </SheetHeader>
               <div className="mt-4 space-y-4">
                 <Image
@@ -165,12 +155,12 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
                   height={200}
                   className="w-full h-[200px] object-cover rounded-lg shadow-md"
                 />
-                <p className="text-gray-300">{event.details}</p>
-                <div className="space-y-2 text-sm text-gray-400">
-                  <div className="flex items-center space-x-2"><Calendar className="h-4 w-4 text-gray-200" /><span>{event.date}</span></div>
-                  <div className="flex items-center space-x-2"><Clock className="h-4 w-4 text-gray-200" /><span>{event.time}</span></div>
-                  <div className="flex items-center space-x-2"><MapPin className="h-4 w-4 text-gray-200" /><span>{event.location}</span></div>
-                  <div className="flex items-center space-x-2"><Users className="h-4 w-4 text-gray-200" /><span>{event.availableSlots} of {event.totalSlots} slots available</span></div>
+                <p className="text-[#a41e1d]">{event.details}</p>
+                <div className="space-y-2 text-sm text-[#a41e1d]">
+                  <div className="flex items-center space-x-2"><Calendar className="h-4 w-4 text-[#a41e1d]" /><span>{event.date}</span></div>
+                  <div className="flex items-center space-x-2"><Clock className="h-4 w-4 text-[#a41e1d]" /><span>{event.time}</span></div>
+                  <div className="flex items-center space-x-2"><MapPin className="h-4 w-4 text-[#a41e1d]" /><span>{event.location}</span></div>
+                  <div className="flex items-center space-x-2"><Users className="h-4 w-4 text-[#a41e1d]" /><span>{event.availableSlots} of {event.totalSlots} slots available</span></div>
                 </div>
                 <div className="mt-6">
                   {isEventCreator ? (
