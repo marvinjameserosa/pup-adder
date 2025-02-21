@@ -1,5 +1,5 @@
 "use client"
-
+import { auth, db } from "@/app/firebase/config"
 import Header from "@/components/header/header"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -20,15 +20,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
-import { Building, ChevronDown, Circle, CircleIcon, FileText, GraduationCap, Image, MapPin, Ticket, User, UserCheck, Users } from "lucide-react"
-import { useState } from "react"
-import NextImage from "next/image";
-import { auth, db } from "@/app/firebase/config"; 
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth"
+import { addDoc, collection, serverTimestamp } from "firebase/firestore"
+import { Building, ChevronDown, Clock, FileText, GraduationCap, Image, MapPin, Ticket, User, UserCheck, Users } from "lucide-react"
+import NextImage from "next/image"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import Loading from "@/components/loading"
 
 export default function CreateEvent() {
   const { toast } = useToast()
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<any>(null)
   const [eventName, setEventName] = useState("")
   const [startDate, setStartDate] = useState("")
   const [startTime, setStartTime] = useState("")
@@ -49,6 +53,24 @@ export default function CreateEvent() {
     alumni: false,
     faculty: false,
   })
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser)
+      } else {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to create events.",
+          variant: "destructive",
+        })
+        router.push("/")
+      }
+      setLoading(false)
+    })
+
+    return () => unsubscribe()
+  }, [router, toast])
 
   const generateTimeOptions = () => {
     const options = []
@@ -116,74 +138,73 @@ export default function CreateEvent() {
   }
 
   const handleCreateEvent = async () => {
-    const missingFields = validateForm();
+    const missingFields = validateForm()
     if (missingFields.length > 0) {
       toast({
         title: "Missing Information",
         description: `Please fill in the following fields: ${missingFields.join(", ")}`,
         variant: "destructive",
-      });
-      return;
+      })
+      return
     }
-  
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          await addDoc(collection(db, "events"), {
-            eventName,
-            startDate,
-            startTime,
-            endDate,
-            endTime,
-            isVirtual,
-            description,
-            location,
-            capacityLimit,
-            eventPoster,
-            participantApprovals,
-            createdBy: user.uid, 
-            createdAt: serverTimestamp(),
-          });
-  
-          toast({
-            title: `${eventName} is created`,
-            description: `Created successfully!`,
-          });
-  
-          setEventName("");
-          setStartDate("");
-          setStartTime("");
-          setEndDate("");
-          setEndTime("");
-          setIsVirtual(false);
-          setDescription("");
-          setLocation("");
-          setCapacityLimit(null);
-          setEventPoster(null);
-          setParticipantApprovals({ student: false, alumni: false, faculty: false });
-        } catch (error:any) {
-          toast({
-            title: "Error creating event",
-            description: error.message,
-            variant: "destructive",
-          });
-        }
-      } else {
-        toast({
-          title: "Authentication Required",
-          description: "Please log in to create an event.",
-          variant: "destructive",
-        });
-      }
-    });
-  
-    const creationDate = new Date().toLocaleString();
-    toast({
-      title: `${eventName} is created`,
-      description: `Created on ${creationDate}`,
-    });
-  }; 
-  
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to create an event.",
+        variant: "destructive",
+      })
+      router.push("/login")
+      return
+    }
+
+    try {
+      setLoading(true)
+      await addDoc(collection(db, "events"), {
+        eventName,
+        startDate,
+        startTime,
+        endDate,
+        endTime,
+        isVirtual,
+        description,
+        location,
+        capacityLimit,
+        eventPoster,
+        participantApprovals,
+        createdBy: user.uid,
+        creatorEmail: user.email,
+        creatorDisplayName: user.displayName || "Anonymous User",
+        createdAt: serverTimestamp(),
+        status: "pending", 
+      })
+
+      toast({
+        title: "Event Created Successfully",
+        description: `${eventName} has been created and is awaiting approval.`,
+      })
+      setEventName("")
+      setStartDate("")
+      setStartTime("")
+      setEndDate("")
+      setEndTime("")
+      setIsVirtual(false)
+      setDescription("")
+      setLocation("")
+      setCapacityLimit(null)
+      setEventPoster(null)
+      setParticipantApprovals({ student: false, alumni: false, faculty: false })
+
+    } catch (error: any) {
+      toast({
+        title: "Error Creating Event",
+        description: error.message || "An unexpected error occurred",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleParticipantApprovalChange = (participant: keyof typeof participantApprovals) => {
     setParticipantApprovals((prev) => ({
       ...prev,
@@ -198,278 +219,282 @@ export default function CreateEvent() {
       .join(", ")
   }
 
+  // Show loading state while checking authentication
+  if (loading) {
+    return <Loading />
+  }
+
   return (
     <div className="relative min-h-screen bg-[#f2f3f7] bg-fixed">
-      {/* <div className="absolute inset-0 bg-black/80 mix-blend-multiply fixed" /> */}
       <div className="relative z-10 min-h-screen">
-      <Header />
-      <div className="pt-4 pb-10 sm:pt-8 sm:pb-20 flex items-center justify-center">
-        <Card className="bg-[#a41e1d] text-white w-full max-w-[824px] p-4 sm:p-6 mx-4 sm:mx-auto">
-          <div className="flex flex-col md:flex-row gap-4 md:gap-6">
-            <div className="w-full md:w-[325px] flex-shrink-0">
-              <div className="h-[325px] w-full bg-gray-200 rounded-md flex items-center justify-center text-gray-500 relative overflow-hidden">
-                {eventPoster ? (
-                  <NextImage
-                  src={eventPoster || "/placeholder.svg"}
-                  alt="Event Poster"
-                  width={500} // Adjust width as needed
-                  height={500} // Adjust height as needed
-                  className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span>Event Poster</span>
-                )}
-                <label htmlFor="poster-upload" className="absolute bottom-2 right-2">
-                  <input
-                    id="poster-upload"
-                    type="file"
-                    accept=".jpeg,.jpg,.png"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                  />
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="cursor-pointer"
-                    onClick={() => document.getElementById("poster-upload")?.click()}
-                  >
-                    <Image className="h-4 w-4" />
-                  </Button>
-                </label>
-              </div>
-              <p className="text-sm text-white text-center mt-2">Please upload .jpeg or .png files only</p>
-            </div>
-            <div className="flex-1 w-full md:w-[423px] space-y-4">
-            <div>
-              <div className="flex items-center space-x-2 mb-2">
-                  <Ticket className="h-5 w-5 text-white" />
-                  <Label htmlFor="event-name">Name of Event</Label>
+        <Header />
+        <div className="pt-4 pb-10 sm:pt-8 sm:pb-20 flex items-center justify-center">
+          <Card className="bg-[#a41e1d] text-white w-full max-w-[824px] p-4 sm:p-6 mx-4 sm:mx-auto">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+              <div className="w-full md:w-[325px] flex-shrink-0">
+                <div className="h-[325px] w-full bg-gray-200 rounded-md flex items-center justify-center text-gray-500 relative overflow-hidden">
+                  {eventPoster ? (
+                    <NextImage
+                      src={eventPoster || "/placeholder.svg"}
+                      alt="Event Poster"
+                      width={500}
+                      height={500}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>Event Poster</span>
+                  )}
+                  <label htmlFor="poster-upload" className="absolute bottom-2 right-2">
+                    <input
+                      id="poster-upload"
+                      type="file"
+                      accept=".jpeg,.jpg,.png"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                    />
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="cursor-pointer"
+                      onClick={() => document.getElementById("poster-upload")?.click()}
+                    >
+                      <Image className="h-4 w-4" />
+                    </Button>
+                  </label>
                 </div>
-                <Input
-                  id="event-name"
-                  className="w-full h-[45px] text-white"
-                  placeholder="Enter event name"
-                  value={eventName}
-                  onChange={(e) => setEventName(e.target.value)}
-                />
+                <p className="text-sm text-white text-center mt-2">Please upload .jpeg or .png files only</p>
               </div>
-              <div className="space-y-2">
+              <div className="flex-1 w-full md:w-[423px] space-y-4">
+                <div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Ticket className="h-5 w-5 text-white" />
+                    <Label htmlFor="event-name">Name of Event</Label>
+                  </div>
+                  <Input
+                    id="event-name"
+                    className="w-full h-[45px] text-white"
+                    placeholder="Enter event name"
+                    value={eventName}
+                    onChange={(e) => setEventName(e.target.value)}
+                  />
+                </div>
                 <div className="space-y-2">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                    <Circle className="h-5 w-5 text-white" />
-                    <span className="w-12">Start</span>
-                    <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                      <Input
-                        type="date"
-                        className="w-full h-[45px]"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                      />
-                      <Select value={startTime} onValueChange={setStartTime}>
-                        <SelectTrigger className="w-full h-[45px]">
-                          <SelectValue placeholder="Select time" />
-                        </SelectTrigger>
-                        <SelectContent>{generateTimeOptions()}</SelectContent>
-                      </Select>
+                  <div className="space-y-2">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                      <Clock className="h-5 w-5 text-white" />
+                      <span className="w-12">Start</span>
+                      <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                        <Input
+                          type="date"
+                          className="w-full h-[45px]"
+                          value={startDate}
+                          onChange={(e) => setStartDate(e.target.value)}
+                        />
+                        <Select value={startTime} onValueChange={setStartTime}>
+                          <SelectTrigger className="w-full h-[45px]">
+                            <SelectValue placeholder="Select time" />
+                          </SelectTrigger>
+                          <SelectContent>{generateTimeOptions()}</SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                      <Clock className="h-5 w-5 text-white" />
+                      <span className="w-12">End</span>
+                      <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                        <Input
+                          type="date"
+                          className="w-full h-[45px]"
+                          value={endDate}
+                          onChange={(e) => setEndDate(e.target.value)}
+                        />
+                        <Select value={endTime} onValueChange={setEndTime}>
+                          <SelectTrigger className="w-full h-[45px]">
+                            <SelectValue placeholder="Select time" />
+                          </SelectTrigger>
+                          <SelectContent>{generateTimeOptions()}</SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                    <CircleIcon className="h-5 w-5 text-white" />
-                    <span className="w-12">End</span>
-                    <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                      <Input
-                        type="date"
-                        className="w-full h-[45px]"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                      />
-                      <Select value={endTime} onValueChange={setEndTime}>
-                        <SelectTrigger className="w-full h-[45px]">
-                          <SelectValue placeholder="Select time" />
-                        </SelectTrigger>
-                        <SelectContent>{generateTimeOptions()}</SelectContent>
-                      </Select>
-                    </div>
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <MapPin className="h-5 w-5 text-white" />
+                    <Label>Location</Label>
                   </div>
+                  <Dialog open={isLocationDialogOpen} onOpenChange={setIsLocationDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="w-full h-[45px] text-black">
+                        {location ? <span className="truncate">{location}</span> : "Select Location"}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-[#a41e1d]">
+                      <DialogHeader>
+                        <DialogTitle className="text-white">Event Location</DialogTitle>
+                        <DialogDescription className="text-white">
+                          Enter the location for your event or provide a virtual meeting link.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <Command className="w-full border rounded-md text-black">
+                        <CommandInput
+                          placeholder={isVirtual ? "Enter meeting link" : "Enter physical location"}
+                          onValueChange={setLocation}
+                        />
+                        <CommandList>
+                          <CommandEmpty>No results found.</CommandEmpty>
+                          <CommandGroup>
+                            <CommandItem onSelect={() => setIsVirtual(false)}>Physical Location</CommandItem>
+                            <CommandItem onSelect={() => setIsVirtual(true)}>Virtual Meeting</CommandItem>
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                      <DialogFooter>
+                        <Button onClick={() => setIsLocationDialogOpen(false)} variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white">Done</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
-              </div>
-              <div>
-                <div className="flex items-center space-x-2 mb-2">
-                  <MapPin className="h-5 w-5 text-white" />
-                  <Label>Location</Label>
+                <div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <FileText className="h-5 w-5 text-white" />
+                    <Label>Event Description</Label>
+                  </div>
+                  <Dialog open={isDescriptionDialogOpen} onOpenChange={setIsDescriptionDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="w-full h-auto min-h-[45px] py-2 px-3 text-left text-black">
+                        <span className="block truncate">{description ? description : "Add Description"}</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-[#a41e1d]">
+                      <DialogHeader>
+                        <DialogTitle>Event Description</DialogTitle>
+                        <DialogDescription>
+                          Write a description for your event. Click save when you&apos;re done.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-2 py-4 text-gray-800">
+                        <Label htmlFor="description-content">Description</Label>
+                        <textarea
+                          id="description-content"
+                          className="w-full h-40 p-2 border rounded-md"
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          placeholder="Enter event description"
+                        />
+                      </div>
+                      <DialogFooter>
+                        <Button onClick={() => setIsDescriptionDialogOpen(false)} variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white">Save</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
-                <Dialog open={isLocationDialogOpen} onOpenChange={setIsLocationDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full h-[45px] text-black">
-                      {location ? <span className="truncate">{location}</span> : "Select Location"}
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-[#a41e1d]">
-                    <DialogHeader>
-                      <DialogTitle className="text-white">Event Location</DialogTitle>
-                      <DialogDescription className="text-white">
-                        Enter the location for your event or provide a virtual meeting link.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <Command className="w-full border rounded-md text-black">
-                      <CommandInput
-                        placeholder={isVirtual ? "Enter meeting link" : "Enter physical location"}
-                        onValueChange={setLocation}
-                      />
-                      <CommandList>
-                        <CommandEmpty>No results found.</CommandEmpty>
-                        <CommandGroup>
-                          <CommandItem onSelect={() => setIsVirtual(false)}>Physical Location</CommandItem>
-                          <CommandItem onSelect={() => setIsVirtual(true)}>Virtual Meeting</CommandItem>
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                    <DialogFooter>
-                      <Button onClick={() => setIsLocationDialogOpen(false)} variant="outline" className="bg-white/10 text-white hover:bg-[#722120]">Done</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
-              <div>
-                <div className="flex items-center space-x-2 mb-2">
-                  <FileText className="h-5 w-5 text-white" />
-                  <Label>Event Description</Label>
-                </div>
-                <Dialog open={isDescriptionDialogOpen} onOpenChange={setIsDescriptionDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full h-auto min-h-[45px] py-2 px-3 text-left text-black">
-                      <span className="block truncate">{description ? description : "Add Description"}</span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-[#a41e1d]">
-                    <DialogHeader>
-                      <DialogTitle>Event Description</DialogTitle>
-                      <DialogDescription>
-                        Write a description for your event. Click save when you&apos;re done.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-2 py-4 text-gray-800">
-                      <Label htmlFor="description-content">Description</Label>
-                      <textarea
-                        id="description-content"
-                        className="w-full h-40 p-2 border rounded-md"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Enter event description"
-                      />
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Event Options</h3>
+                  <Collapsible open={isApprovalOpen} onOpenChange={setIsApprovalOpen} className="w-full space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <UserCheck className="h-5 w-5 text-white" />
+                        <Label>Require Approval</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-white">{getApprovedParticipants() || "None"}</span>
+                        <CollapsibleTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <ChevronDown className="h-4 w-4" />
+                          </Button>
+                        </CollapsibleTrigger>
+                      </div>
                     </div>
-                    <DialogFooter>
-                      <Button onClick={() => setIsDescriptionDialogOpen(false)} variant="outline" className="bg-white/10 text-white hover:bg-[#722120]">Save</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Event Options</h3>
-                <Collapsible open={isApprovalOpen} onOpenChange={setIsApprovalOpen} className="w-full space-y-2">
+                    <CollapsibleContent className="mt-2">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <GraduationCap className="h-5 w-5 text-white" />
+                            <Label htmlFor="approve-student">Student</Label>
+                          </div>
+                          <Switch
+                            id="approve-student"
+                            checked={participantApprovals.student}
+                            onCheckedChange={() => handleParticipantApprovalChange("student")}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Building className="h-5 w-5 text-white" />
+                            <Label htmlFor="approve-alumni">Alumni</Label>
+                          </div>
+                          <Switch
+                            id="approve-alumni"
+                            checked={participantApprovals.alumni}
+                            onCheckedChange={() => handleParticipantApprovalChange("alumni")}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <User className="h-5 w-5 text-white" />
+                            <Label htmlFor="approve-faculty">Faculty</Label>
+                          </div>
+                          <Switch
+                            id="approve-faculty"
+                            checked={participantApprovals.faculty}
+                            onCheckedChange={() => handleParticipantApprovalChange("faculty")}
+                          />
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <UserCheck className="h-5 w-5 text-white" />
-                      <Label>Require Approval</Label>
+                      <Users className="h-5 w-5 text-white" />
+                      <Label>Capacity</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-white">{getApprovedParticipants() || "None"}</span>
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <ChevronDown className="h-4 w-4" />
-                        </Button>
-                      </CollapsibleTrigger>
-                    </div>
-                  </div>
-                  <CollapsibleContent className="mt-2">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <GraduationCap className="h-5 w-5 text-white" />
-                          <Label htmlFor="approve-student">Student</Label>
-                        </div>
-                        <Switch
-                          id="approve-student"
-                          checked={participantApprovals.student}
-                          onCheckedChange={() => handleParticipantApprovalChange("student")}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Building className="h-5 w-5 text-white" />
-                          <Label htmlFor="approve-alumni">Alumni</Label>
-                        </div>
-                        <Switch
-                          id="approve-alumni"
-                          checked={participantApprovals.alumni}
-                          onCheckedChange={() => handleParticipantApprovalChange("alumni")}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <User className="h-5 w-5 text-white" />
-                          <Label htmlFor="approve-faculty">Faculty</Label>
-                        </div>
-                        <Switch
-                          id="approve-faculty"
-                          checked={participantApprovals.faculty}
-                          onCheckedChange={() => handleParticipantApprovalChange("faculty")}
-                        />
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-5 w-5 text-white" />
-                    <Label>Capacity</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-white">
-                      {capacityLimit ? `${capacityLimit} attendees` : "Unlimited"}
-                    </span>
-                    <Dialog open={isCapacityDialogOpen} onOpenChange={setIsCapacityDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <Users className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Set Event Capacity</DialogTitle>
-                          <DialogDescription>
-                            Enter the maximum number of attendees or choose unlimited capacity.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="capacity">Number of Attendees</Label>
-                            <Input
-                              id="capacity"
-                              placeholder="Enter capacity limit"
-                              value={tempCapacity}
-                              onChange={(e) => setTempCapacity(e.target.value)}
-                            />
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button variant="outline" onClick={handleRemoveCapacity}>
-                            Remove Limit
+                      <span className="text-sm text-white">
+                        {capacityLimit ? `${capacityLimit} attendees` : "Unlimited"}
+                      </span>
+                      <Dialog open={isCapacityDialogOpen} onOpenChange={setIsCapacityDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <Users className="h-4 w-4" />
                           </Button>
-                          <Button onClick={handleSetCapacity}>Set Limit</Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                        </DialogTrigger>
+                        <DialogContent className="bg-[#a41e1d]">
+                          <DialogHeader>
+                            <DialogTitle className="text-white">Set Event Capacity</DialogTitle>
+                            <DialogDescription className="text-white">
+                              Enter the maximum number of attendees or choose unlimited capacity.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="capacity" className="text-white">Number of Attendees</Label>
+                              <Input
+                                id="capacity"
+                                placeholder="Enter capacity limit"
+                                value={tempCapacity}
+                                onChange={(e) => setTempCapacity(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <Button variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white" onClick={handleRemoveCapacity}>
+                              Remove Limit
+                            </Button>
+                            <Button variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white" onClick={handleSetCapacity}>Set Limit</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </div>
                 </div>
+                <Button variant="outline" className="w-full bg-white/10 text-white hover:bg-[#722120]" onClick={handleCreateEvent} disabled={validateForm().length > 0}>
+                  Create Event
+                </Button>
               </div>
-              <Button variant="outline" className="w-full bg-white/10 text-white hover:bg-[#722120]" onClick={handleCreateEvent} disabled={validateForm().length > 0}>
-                Create Event
-              </Button>
             </div>
-          </div>
-        </Card>
-      </div>
+          </Card>
+        </div>
       </div>
       <Toaster />
     </div>

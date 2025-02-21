@@ -11,7 +11,7 @@ import SearchDiscover from "@/components/discover/searchDiscover";
 import Header from "@/components/header/header";
 import { SlideType } from "@/types/slideTypes";
 import "./embla.css";
-import Loading from "@/components/loading"
+import Loading from "@/components/loading";
 
 interface EventData {
   capacityLimit: string;
@@ -44,15 +44,15 @@ export default function DiscoverPage() {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
-        router.push("/"); 
+        router.push("/");
       }
     });
-    return () => unsubscribe(); 
+    return () => unsubscribe();
   }, [router]);
 
   useEffect(() => {
-    if (!isAuthenticated) return; 
-    
+    if (!isAuthenticated) return;
+
     const fetchEvents = async () => {
       setIsLoadingEvents(true);
       try {
@@ -122,16 +122,21 @@ export default function DiscoverPage() {
         setIsLoadingEvents(false);
       }
     };
-    
+
     fetchEvents();
   }, [isAuthenticated]);
 
-  if (isAuthenticated === null) {
-    return <Loading message="Authenticating..." />;
+  // Full-screen loading for authentication and event loading
+  if (isAuthenticated === null || isLoadingEvents) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-[#f2f3f7]">
+        <Loading message={isAuthenticated === null ? "Authenticating..." : "Loading events..."} />
+      </div>
+    );
   }
 
   if (!isAuthenticated) {
-    return null; 
+    return null;
   }
 
   const filteredSlides = events.filter(
@@ -152,32 +157,24 @@ export default function DiscoverPage() {
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6">
           <div className="max-w-xl text-center lg:text-left">
             <h1 className="text-3xl sm:text-4xl font-bold text-[#a41e1d]">Discover Events</h1>
-            <p className="text-gray-700 mt-2">
-              Explore upcoming events and register easily.
-            </p>
+            <p className="text-gray-700 mt-2">Explore upcoming events and register easily.</p>
           </div>
           <div className="mt-4 lg:mt-0 w-full lg:w-1/2">
             <SearchDiscover onSearch={setSearchQuery} />
           </div>
         </div>
-        
-        {isLoadingEvents ? (
-          <div className="flex justify-center items-center h-64">
-            <Loading message="Loading events..." />
-          </div>
-        ) : (
-          <Suspense fallback={<div className="flex justify-center items-center h-64">
-            <Loading message="Loading carousel..." />
-          </div>}>
-            <EmblaCarousel slides={filteredSlides} onCardClick={handleCardClick} />
-          </Suspense>
-        )}
+
+        <Suspense
+          fallback={
+            <div className="flex justify-center items-center h-64">
+              <Loading message="Loading carousel..." />
+            </div>
+          }
+        >
+          <EmblaCarousel slides={filteredSlides} onCardClick={handleCardClick} />
+        </Suspense>
       </div>
-      <EmblaSheet
-        isOpen={isSheetOpen}
-        onClose={() => setSheetOpen(false)}
-        event={selectedEvent}
-      />
+      <EmblaSheet isOpen={isSheetOpen} onClose={() => setSheetOpen(false)} event={selectedEvent} />
     </div>
   );
 }
