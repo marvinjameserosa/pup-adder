@@ -38,7 +38,7 @@ export const generateTicket = async (eventId: string, userId: string) => {
       color: rgb(0.65, 0.16, 0.16), 
     });
 
-    page.drawText("EVENT TICKET", {
+    page.drawText("PUP GATHER", {
       x: width / 2 - 60,
       y: height - 30,
       size: 16,
