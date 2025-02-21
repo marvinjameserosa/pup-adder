@@ -15,7 +15,7 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { collection, doc, getDoc, getDocs } from "firebase/firestore"
-import { Calendar, CalendarDays, MapPin, Ticket, Users } from "lucide-react"
+import { Calendar, CalendarDays, Download, MapPin, Ticket, Users } from "lucide-react"
 import { useEffect, useState } from "react"
 interface EventData {
   eventName?: string;
@@ -62,6 +62,56 @@ export default function Dashboard() {
   const [currentEvents, setCurrentEvents] = useState<Event[]>([])
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
   const [totalRegistrations, setTotalRegistrations] = useState<number>(0)
+
+  const downloadParticipantsCSV = () => {
+    if (!selectedEvent || !selectedEvent.participants || selectedEvent.participants.length === 0) {
+      return;
+    }
+    const headers = [
+      "Name", 
+      "Email", 
+      "Type", 
+      "Department/College", 
+      "Registration Date", 
+      "Check-in Status"
+    ];
+    const csvRows = [
+      headers.join(','),
+      ...selectedEvent.participants.map(p => {
+        const name = `${p.firstName || ''} ${p.lastName || ''}`.trim();
+        const email = p.email || '';
+        const type = p.userType || 'Not specified';
+        const department = p.department || 'Not specified';
+        const regDate = p.registrationDate;
+        const status = p.checkedIn ? 'Checked In' : 'Not Checked In';
+        const escapeCsvField = (field: string) => {
+          if (field.includes(',') || field.includes('"') || field.includes('\n')) {
+            return `"${field.replace(/"/g, '""')}"`;
+          }
+          return field;
+        };
+        
+        return [
+          escapeCsvField(name),
+          escapeCsvField(email),
+          escapeCsvField(type),
+          escapeCsvField(department),
+          escapeCsvField(regDate),
+          escapeCsvField(status)
+        ].join(',');
+      })
+    ].join('\n');
+    const blob = new Blob([csvRows], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${selectedEvent.name.replace(/\s+/g, '_')}_participants.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
   useEffect(() => {
     const fetchEvents = async () => {
       setLoading(true);
@@ -78,10 +128,8 @@ export default function Dashboard() {
                 const userDoc = await getDoc(doc(db, "users", userId));
                 if (userDoc.exists()) {
                   const userData = userDoc.data() as User;
-                  
-                  // Check if user has checked in for this event
-                  const isCheckedIn = userData.registeredEvents && 
-                                     userData.registeredEvents[eventDoc.id] === true;
+                  const isCheckedIn = !!(userData.registeredEvents && 
+                                     userData.registeredEvents[eventDoc.id]);
   
                   participants.push({
                     id: userId,
@@ -310,7 +358,9 @@ export default function Dashboard() {
                         <DialogContent className="max-w-[95vw] sm:max-w-[85vw] md:max-w-[75vw] lg:max-w-4xl bg-[#4A0E0E] text-white">
                           <DialogHeader>
                             <DialogTitle>Event Participants</DialogTitle>
-                            <DialogDescription className="text-gray-300">List of participants for {selectedEvent.name}</DialogDescription>
+                            <DialogDescription className="text-gray-300">
+                              List of participants for {selectedEvent.name}
+                            </DialogDescription>
                           </DialogHeader>
                           <ScrollArea className="h-[60vh] w-full">
                             <div className="w-full min-w-[640px]">
@@ -351,6 +401,19 @@ export default function Dashboard() {
                             </div>
                             <ScrollBar orientation="horizontal" />
                           </ScrollArea>
+                          <div className="text-center">
+                          {selectedEvent.participants && selectedEvent.participants.length > 0 && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="w-40 bg-yellow-500 hover:bg-yellow-800 text-black"
+                                  onClick={downloadParticipantsCSV}
+                                >
+                                  <Download className="mr-2 h-4 w-4" />
+                                  Download
+                                </Button>
+                              )}
+                          </div>
                         </DialogContent>
                       </Dialog>
                     </>
