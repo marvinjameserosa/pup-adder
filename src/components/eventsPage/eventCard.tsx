@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import type React from "react"
 
 import { Badge } from "@/components/ui/badge"
@@ -39,10 +40,10 @@ export default function EventCard({ event, onClick }: EventCardProps) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
+      setUser(currentUser)
+    })
+    return () => unsubscribe()
+  }, [])
 
   const eventDate = new Date(event.startDate)
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -106,19 +107,20 @@ export default function EventCard({ event, onClick }: EventCardProps) {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Badge variant="secondary" className="h-7 px-2 text-xs">
-                  Registered
-                </Badge>
-              </div>
+              <Badge variant="secondary" className="h-7 px-2 text-xs">
+                Registered
+              </Badge>
             )}
           </CardFooter>
         </div>
-        <div className="flex-shrink-0 w-[193px] h-[193px]">
-          <img
+        <div className="flex-shrink-0 w-[193px] h-[193px] relative">
+          <Image
             src={event.eventPoster || "/placeholder.svg"}
             alt={event.eventName}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover rounded-none"
+            sizes="(max-width: 768px) 100px, (max-width: 1024px) 150px, 193px"
+            priority
           />
         </div>
       </Card>

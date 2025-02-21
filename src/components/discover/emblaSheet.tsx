@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { generateTicket } from "@/utils/getTickets";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean; onClose: () => void; event?: SlideType | null; }) {
   const [loading, setLoading] = useState(false);
