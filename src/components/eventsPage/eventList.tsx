@@ -7,6 +7,7 @@ import { Calendar, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import EventCard from "./eventCard";
 import EventDrawer from "./eventDrawer";
+import Loading from "@/components/loading";
 
 interface EventData {
   id: string;
@@ -61,7 +62,6 @@ export default function EventsList({ initialFilter, onFilterChange }: EventsList
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
           let eventIds: string[] = [];
-
           const registeredEvents = userData.registeredEvents;
           console.log("Raw registeredEvents:", registeredEvents);
           
@@ -82,6 +82,7 @@ export default function EventsList({ initialFilter, onFilterChange }: EventsList
             setLoading(false);
             return;
           }
+          
           const eventsData = await Promise.all(
             eventIds.map(async (eventId: string) => {
               try {
@@ -171,7 +172,7 @@ export default function EventsList({ initialFilter, onFilterChange }: EventsList
     <div className="w-full max-w-[616px] space-y-6">
       {loading ? (
         <div className="flex items-center justify-center h-[200px]">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#a41e1d]"></div>
+          <Loading />
         </div>
       ) : filteredEvents.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] text-center">
