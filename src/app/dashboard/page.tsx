@@ -14,11 +14,11 @@ import {
 } from "@/components/ui/dialog"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { collection, doc, getDoc, getDocs } from "firebase/firestore"
 import { Calendar, CalendarDays, Download, MapPin, Ticket, Users } from "lucide-react"
-import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { useEffect, useState } from "react"
 
 interface EventData {
   eventName?: string;
@@ -304,7 +304,7 @@ export default function Dashboard() {
   
   if (loading) {
     return (
-      <Loading message="Fetching latest events..." />
+      <Loading message="Loading dashboard page..." />
     )
   }
   return (
