@@ -171,8 +171,10 @@ export default function EventsList({ initialFilter, onFilterChange }: EventsList
   return (
     <div className="w-full max-w-[616px] space-y-6">
       {loading ? (
-        <div className="flex items-center justify-center h-[200px]">
-          <Loading />
+        <div className="flex flex-col space-y-4 h-[200px] pt-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="w-full h-24 bg-gray-200 rounded-lg animate-pulse"></div>
+          ))}
         </div>
       ) : filteredEvents.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] text-center">
