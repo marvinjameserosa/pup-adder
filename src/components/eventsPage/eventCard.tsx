@@ -1,59 +1,69 @@
-"use client"
-
-import type React from "react"
-
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { MapPin, Users } from "lucide-react"
-import { useState, useEffect } from "react"
-import ManageEventCard from "./manageEvent"
-import { onAuthStateChanged } from "firebase/auth"
-import { auth } from "@/app/firebase/config"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { MapPin, Users } from "lucide-react";
+import { useState, useEffect } from "react";
+import ManageEventCard from "./manageEvent";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "@/app/firebase/config";
+import { doc, getDoc } from "firebase/firestore";
+import { generateTicket } from "@/utils/getTickets";
 
 interface EventData {
-  id: string
-  capacityLimit: string
-  createdAt: string
-  createdBy: string
-  description: string
-  endDate: string
-  startDate: string
-  startTime: string
-  endTime: string
-  eventName: string
-  eventPoster: string
-  isVirtual: boolean
-  location: string
-  participantApprovals: Array<any>
+  id: string;
+  capacityLimit: string;
+  createdAt: string;
+  createdBy: string;
+  description: string;
+  endDate: string;
+  startDate: string;
+  startTime: string;
+  endTime: string;
+  eventName: string;
+  eventPoster: string;
+  isVirtual: boolean;
+  location: string;
+  participantApprovals: Array<any>;
 }
 
 interface EventCardProps {
-  event: EventData
-  onClick: () => void
+  event: EventData;
+  onClick: () => void;
 }
 
 export default function EventCard({ event, onClick }: EventCardProps) {
-  const [showManageCard, setShowManageCard] = useState(false)
-  const [user, setUser] = useState<any>(null)
+  const [showManageCard, setShowManageCard] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [checkedIn, setCheckedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        const userRef = doc(db, "users", currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          setCheckedIn(userData.registeredEvents?.[event.id] === true);
+        }
+      }
+      setLoading(false);
     });
-    return () => unsubscribe();
-  }, []);
 
-  const eventDate = new Date(event.startDate)
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    return () => unsubscribe();
+  }, [event.id]);
+
+  const eventDate = new Date(event.startDate);
+  const currentDate = new Date();
+  const isUpcoming = eventDate >= currentDate;
 
   const handleManageClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setShowManageCard(true)
-  }
+    e.stopPropagation();
+    setShowManageCard(true);
+  };
 
-  const isCreator = event.createdBy === user?.uid
+  const isCreator = event.createdBy === user?.uid;
 
   return (
     <>
@@ -63,9 +73,11 @@ export default function EventCard({ event, onClick }: EventCardProps) {
       >
         <div className="w-[100px] flex-shrink-0 flex flex-col items-center justify-center border-r bg-[#722120]">
           <div className="text-xl font-bold">
-            {monthNames[eventDate.getMonth()]} {eventDate.getDate()}
+            {eventDate.toLocaleString("default", { month: "short" })} {eventDate.getDate()}
           </div>
-          <div className="text-sm text-muted-foreground text-white">{dayNames[eventDate.getDay()]}</div>
+          <div className="text-sm text-muted-foreground text-white">
+            {eventDate.toLocaleString("default", { weekday: "long" })}
+          </div>
         </div>
         <div className="flex-grow p-4 flex flex-col justify-between">
           <div>
@@ -74,9 +86,7 @@ export default function EventCard({ event, onClick }: EventCardProps) {
             </CardHeader>
             <CardContent className="p-0 space-y-2">
               <div className="flex items-center space-x-2 text-sm text-muted-foreground text-white">
-                <span className="line-clamp-1">
-                  {event.startTime} - {event.endTime}
-                </span>
+                <span className="line-clamp-1">{event.startTime} - {event.endTime}</span>
               </div>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground text-white">
                 <MapPin className="h-4 w-4 flex-shrink-0" />
@@ -107,9 +117,27 @@ export default function EventCard({ event, onClick }: EventCardProps) {
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                <Badge variant="secondary" className="h-7 px-2 text-xs">
-                  Registered
-                </Badge>
+                {loading ? (
+                  <Badge variant="secondary" className="h-7 px-2 text-xs">Loading...</Badge>
+                ) : isUpcoming ? (
+                  checkedIn ? (
+                    <Badge variant="secondary" className="h-7 px-2 text-xs">Checked In</Badge>
+                  ) : (
+                    <Button
+                      size="sm"
+                      className="h-7 px-2 bg-green-500 text-white hover:bg-green-600"
+                      onClick={() => {
+                        if (!user?.uid) {
+                          console.error("User ID is missing!");
+                          return;
+                        }
+                        generateTicket(event.id, user.uid);
+                      }}
+                    >
+                      Get Ticket
+                    </Button>
+                  )
+                ) : null}
               </div>
             )}
           </CardFooter>
@@ -124,5 +152,5 @@ export default function EventCard({ event, onClick }: EventCardProps) {
       </Card>
       {showManageCard && <ManageEventCard event={event} onClose={() => setShowManageCard(false)} />}
     </>
-  )
+  );
 }
