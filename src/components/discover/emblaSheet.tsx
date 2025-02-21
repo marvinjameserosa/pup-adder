@@ -135,7 +135,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetTitle className="text-white mt-20">{event.title}</SheetTitle>
-      <SheetContent side="right" className="w-[400px] p-0 bg-[#a41e1d]/60 text-gray-200">
+      <SheetContent side="right" className="w-[90vw] sm:w-[400px] max-w-[400px] p-0 bg-[#a41e1d]/60 text-gray-200">
         <div className="relative h-full p-6 z-50">
           {isLoadingUserData ? (
             <div className="flex flex-col justify-center items-center h-full space-y-4">
