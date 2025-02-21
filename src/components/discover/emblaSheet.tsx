@@ -42,9 +42,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
         
         if (userSnap.exists()) {
           const userData = userSnap.data();
-          // Check if event.id exists in registeredEvents
           setRegistered(userData.registeredEvents && event.id in userData.registeredEvents);
-          // Check if it's set to true specifically
           setTicketGenerated(userData.registeredEvents?.[event.id] === true);
         }
         
@@ -124,7 +122,6 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
     try {
       generateTicket(event.id, user.uid);
       await updateDoc(doc(db, "users", user.uid), { [`registeredEvents.${event.id}`]: false });
-      setTicketGenerated(true);
       toast({ variant: "default", title: "Ticket", description: "Ticket downloaded! 🎟️" });
     } catch (error) {
       console.error("Error generating ticket:", error);
