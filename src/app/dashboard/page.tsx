@@ -17,7 +17,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { collection, doc, getDoc, getDocs } from "firebase/firestore"
 import { Calendar, CalendarDays, MapPin, Ticket, Users } from "lucide-react"
 import { useEffect, useState } from "react"
-
 interface EventData {
   eventName?: string;
   startDate?: { seconds: number };
@@ -29,7 +28,6 @@ interface EventData {
   registeredUsers?: string[];
   createdAt?: { seconds: number };
 }
-
 interface User {
   id: string;
   firstName?: string;
@@ -37,12 +35,14 @@ interface User {
   email?: string;
   userType?: string;
   department?: string;
+  registeredEvents?: {
+    [eventId: string]: boolean;
+  };
 }
-
 interface Participant extends User {
   registrationDate: string;
+  checkedIn: boolean;
 }
-
 interface Event {
   id: string;
   name: string;
@@ -55,7 +55,6 @@ interface Event {
   participants: Participant[];
   date: string; 
 }
-
 export default function Dashboard() {
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState<boolean>(true)
@@ -63,7 +62,6 @@ export default function Dashboard() {
   const [currentEvents, setCurrentEvents] = useState<Event[]>([])
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
   const [totalRegistrations, setTotalRegistrations] = useState<number>(0)
-
   useEffect(() => {
     const fetchEvents = async () => {
       setLoading(true);
@@ -80,6 +78,10 @@ export default function Dashboard() {
                 const userDoc = await getDoc(doc(db, "users", userId));
                 if (userDoc.exists()) {
                   const userData = userDoc.data() as User;
+                  
+                  // Check if user has checked in for this event
+                  const isCheckedIn = userData.registeredEvents && 
+                                     userData.registeredEvents[eventDoc.id] === true;
   
                   participants.push({
                     id: userId,
@@ -91,7 +93,8 @@ export default function Dashboard() {
                     registrationDate: new Date(
                       (eventData.createdAt?.seconds ?? Math.floor(Date.now() / 1000)) * 1000
                     ).toLocaleDateString(),
-                    
+                    registeredEvents: userData.registeredEvents,
+                    checkedIn: isCheckedIn
                   });
                 }
               } catch (error) {
@@ -107,7 +110,6 @@ export default function Dashboard() {
   
           const startDate = formatTimestampToDate(eventData.startDate);
           const endDate = formatTimestampToDate(eventData.endDate);
-
           let formattedDate = "Date not specified";
           if (startDate) {
             formattedDate = startDate.toLocaleDateString();
@@ -120,7 +122,6 @@ export default function Dashboard() {
               formattedDate += ` at ${eventData.startTime}`;
             }
           }
-
           return {
             id: eventDoc.id,
             name: eventData.eventName || "Untitled Event",
@@ -321,6 +322,7 @@ export default function Dashboard() {
                                     <TableHead className="text-white">Type</TableHead>
                                     <TableHead className="text-white">Department/College</TableHead>
                                     <TableHead className="text-white">Registration Date</TableHead>
+                                    <TableHead className="text-white">Admission Status</TableHead>
                                   </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -332,11 +334,16 @@ export default function Dashboard() {
                                         <TableCell className="text-white">{participant.userType || "Not specified"}</TableCell>
                                         <TableCell className="text-white">{participant.department || "Not specified"}</TableCell>
                                         <TableCell className="text-white">{participant.registrationDate}</TableCell>
+                                        <TableCell className="text-white">
+                                          <span className={`px-2 py-1 rounded-full text-xs ${participant.checkedIn ? 'bg-green-700' : 'bg-yellow-700'}`}>
+                                            {participant.checkedIn ? 'Checked In' : 'Not Checked In'}
+                                          </span>
+                                        </TableCell>
                                       </TableRow>
                                     ))
                                   ) : (
                                     <TableRow>
-                                      <TableCell colSpan={5} className="text-center text-white">No participants registered yet</TableCell>
+                                      <TableCell colSpan={6} className="text-center text-white">No participants registered yet</TableCell>
                                     </TableRow>
                                   )}
                                 </TableBody>
