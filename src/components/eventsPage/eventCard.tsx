@@ -1,56 +1,50 @@
 "use client"
 
+import type React from "react"
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { MapPin, User, Users } from "lucide-react"
-import { useState } from "react"
+import { MapPin, Users } from "lucide-react"
+import { useState, useEffect } from "react"
 import ManageEventCard from "./manageEvent"
+import { onAuthStateChanged } from "firebase/auth"
+import { auth } from "@/app/firebase/config"
+
+interface EventData {
+  id: string
+  capacityLimit: string
+  createdAt: string
+  createdBy: string
+  description: string
+  endDate: string
+  startDate: string
+  startTime: string
+  endTime: string
+  eventName: string
+  eventPoster: string
+  isVirtual: boolean
+  location: string
+  participantApprovals: Array<any>
+}
 
 interface EventCardProps {
-  id: string
-  name: string
-  date: string
-  time: string
-  host: {
-    name: string
-    email: string
-    phone: string
-  }
-  location: string
-  imageUrl: string
-  isCreator: boolean
-  availableSlots: number
-  totalSlots: number
-  isGoing: boolean
-  attendees?: {
-    total: number
-    list: Array<{
-      name: string
-      category: "Student" | "Alumni" | "Faculty"
-      registrationDate: string
-    }>
-  }
+  event: EventData
   onClick: () => void
 }
 
-export default function EventCard({
-  id,
-  name,
-  date,
-  time,
-  host,
-  location,
-  imageUrl,
-  isCreator,
-  availableSlots,
-  totalSlots,
-  isGoing,
-  attendees,
-  onClick,
-}: EventCardProps) {
+export default function EventCard({ event, onClick }: EventCardProps) {
   const [showManageCard, setShowManageCard] = useState(false)
-  const eventDate = new Date(date)
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const eventDate = new Date(event.startDate)
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
   const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -59,7 +53,7 @@ export default function EventCard({
     setShowManageCard(true)
   }
 
-  const attendeesTotal = attendees?.total ?? 0
+  const isCreator = event.createdBy === user?.uid
 
   return (
     <>
@@ -76,24 +70,22 @@ export default function EventCard({
         <div className="flex-grow p-4 flex flex-col justify-between">
           <div>
             <CardHeader className="p-0 pb-2">
-              <CardTitle className="text-xl line-clamp-1 text-white">{name}</CardTitle>
+              <CardTitle className="text-xl line-clamp-1 text-white">{event.eventName}</CardTitle>
             </CardHeader>
             <CardContent className="p-0 space-y-2">
               <div className="flex items-center space-x-2 text-sm text-muted-foreground text-white">
-                <span className="line-clamp-1">{time}</span>
+                <span className="line-clamp-1">
+                  {event.startTime} - {event.endTime}
+                </span>
               </div>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground text-white">
                 <MapPin className="h-4 w-4 flex-shrink-0" />
-                <span className="line-clamp-1">{location}</span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground text-white">
-                <User className="h-4 w-4 flex-shrink-0" />
-                <span className="line-clamp-1">Hosted by {host.name}</span>
+                <span className="line-clamp-1">{event.location}</span>
               </div>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground text-white">
                 <Users className="h-4 w-4 flex-shrink-0" />
                 <span className="line-clamp-1">
-                  {availableSlots} of {totalSlots} slots available ({attendeesTotal} attendees)
+                  {event.participantApprovals.length} of {event.capacityLimit} slots filled
                 </span>
               </div>
             </CardContent>
@@ -104,40 +96,33 @@ export default function EventCard({
           >
             {isCreator ? (
               <div className="flex space-x-2">
-                <Button size="sm" variant="outline" className="h-7 px-2 bg-white/10 text-white hover:bg-[#722120]" onClick={handleManageClick}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-2 bg-white/10 text-white hover:bg-[#722120]"
+                  onClick={handleManageClick}
+                >
                   Manage
                 </Button>
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                {isGoing && (
-                  <Badge variant="secondary" className="h-7 px-2 text-xs">
-                    Going
-                  </Badge>
-                )}
+                <Badge variant="secondary" className="h-7 px-2 text-xs">
+                  Registered
+                </Badge>
               </div>
             )}
           </CardFooter>
         </div>
         <div className="flex-shrink-0 w-[193px] h-[193px]">
-          <img src={imageUrl || "/placeholder.svg"} alt={name} className="w-full h-full object-cover" />
+          <img
+            src={event.eventPoster || "/placeholder.svg"}
+            alt={event.eventName}
+            className="w-full h-full object-cover"
+          />
         </div>
       </Card>
-      {showManageCard && (
-        <ManageEventCard
-          id={id}
-          name={name}
-          date={date}
-          time={time}
-          host={host}
-          location={location}
-          imageUrl={imageUrl}
-          availableSlots={availableSlots}
-          totalSlots={totalSlots}
-          attendees={attendees}
-          onClose={() => setShowManageCard(false)}
-        />
-      )}
+      {showManageCard && <ManageEventCard event={event} onClose={() => setShowManageCard(false)} />}
     </>
   )
 }

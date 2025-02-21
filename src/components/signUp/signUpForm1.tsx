@@ -17,9 +17,9 @@ type SignUpForm1Props = {
 
 export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-[url('/bg2.jpg')] "> 
+    <div className="relative min-h-screen flex items-center justify-center bg-[url('/bg4.jpg')] bg-cover bg-center p-4"> 
       <div className="absolute inset-0 bg-black/60 mix-blend-multiply" />
-      <Card className="relative z-10 w-[360px] shadow-xl rounded-[24px] bg-[#f2f3f7]/80 backdrop-blur-sm flex flex-col border border-[#302F30]">
+      <Card className="relative z-10 w-[360px] shadow-xl rounded-[24px] bg-[#f2f3f7]/50 backdrop-blur-sm flex flex-col border border-[#302F30]">
         <CardHeader>
           <CardTitle className="text-2xl text-[#a41e1d]">Create your account</CardTitle>
           <CardDescription className={errorMsg ? "text-red-500" : "text-gray-600"}> 
