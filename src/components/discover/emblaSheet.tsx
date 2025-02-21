@@ -33,22 +33,24 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
         setIsLoadingUserData(false);
         return;
       }
-
+      
       setIsLoadingUserData(true);
-
+      
       try {
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
-
+        
         if (userSnap.exists()) {
           const userData = userSnap.data();
-          setRegistered(!!userData.registeredEvents?.[event.id]);
+          // Check if event.id exists in registeredEvents
+          setRegistered(userData.registeredEvents && event.id in userData.registeredEvents);
+          // Check if it's set to true specifically
           setTicketGenerated(userData.registeredEvents?.[event.id] === true);
         }
-
+        
         const eventRef = doc(db, "events", event.id);
         const eventSnap = await getDoc(eventRef);
-
+        
         if (eventSnap.exists()) {
           setIsEventCreator(eventSnap.data().createdBy === user.uid);
         }
@@ -59,7 +61,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
         setIsLoadingUserData(false);
       }
     };
-
+    
     checkUserStatus();
   }, [user, event?.id, isOpen, showErrorToast]);
 
@@ -68,40 +70,40 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
       router.push("/");
       return;
     }
-
+    
     setLoading(true);
-
+    
     try {
       if (!event?.id) {
         toast({ variant: "destructive", title: "Error", description: "Event information is missing." });
         return;
       }
-
+      
       const eventRef = doc(db, "events", event.id);
       const userRef = doc(db, "users", user.uid);
       const eventSnap = await getDoc(eventRef);
-
+      
       if (!eventSnap.exists()) {
         toast({ variant: "destructive", title: "Error", description: "Event not found." });
         return;
       }
-
+      
       const eventData = eventSnap.data();
-
+      
       if (eventData.registeredUsers?.includes(user.uid)) {
         toast({ variant: "default", title: "Info", description: "You are already registered." });
         setRegistered(true);
         return;
       }
-
+      
       if (eventData.capacityLimit && eventData.registeredUsers?.length >= parseInt(eventData.capacityLimit)) {
         toast({ variant: "destructive", title: "Full", description: "No more slots available." });
         return;
       }
-
+      
       await updateDoc(eventRef, { registeredUsers: arrayUnion(user.uid) });
       await updateDoc(userRef, { [`registeredEvents.${event.id}`]: false });
-
+      
       toast({ variant: "default", title: "Success", description: "Successfully registered!" });
       setRegistered(true);
       setTicketGenerated(false);
@@ -118,7 +120,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
       toast({ variant: "destructive", title: "Error", description: "Missing event or user info." });
       return;
     }
-
+    
     try {
       generateTicket(event.id, user.uid);
       await updateDoc(doc(db, "users", user.uid), { [`registeredEvents.${event.id}`]: true });
@@ -135,31 +137,26 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetTitle className="text-white mt-20">{event.title}</SheetTitle>
-      <SheetContent side="right" className="w-[400px] p-0 bg-[#a41e1d]/60 text-gray-200">
-        <div className="relative h-full p-6 z-50">
-          {isLoadingUserData ? (
-            <div className="flex flex-col justify-center items-center h-full space-y-4">
-              <Loader2 className="h-10 w-10 text-white animate-spin" />
-              <p className="text-white text-center">Loading event details...</p>
-            </div>
+        <SheetContent side="right" className="w-[400px] p-0 bg-[#a41e1d]/60 text-gray-200">
+          <div className="relative h-full p-6 z-50">
+            {isLoadingUserData ? (
+              <div className="flex flex-col justify-center items-center h-full space-y-4">
+                <Loader2 className="h-10 w-10 text-white animate-spin" />
+                <p className="text-white text-center">Loading event details...</p>
+              </div>
           ) : (
             <>
-               <SheetHeader>
-            <SheetTitle className="text-white mt-20">{event.title}</SheetTitle>
-            <SheetClose asChild>
-              <button className="absolute top-1 right-3 p-4 rounded-md bg-red-900 text-gray-200 hover:bg-[#8B1212] transition">
-                ✖
-              </button>
-            </SheetClose>
-          </SheetHeader>
-              <SheetClose asChild>
-                <button
-                  aria-label="Close"
-                  className="absolute top-1 right-3 p-4 rounded-md bg-red-900 text-gray-200 hover:bg-[#8B1212] transition"
-                >
-                  ✖
-                </button>
-              </SheetClose>
+              <SheetHeader>
+                <SheetTitle className="text-white mt-20">{event.title}</SheetTitle>
+                <SheetClose asChild>
+                  <button 
+                    aria-label="Close"
+                    className="absolute top-1 right-3 p-4 rounded-md bg-red-900 text-gray-200 hover:bg-[#8B1212] transition"
+                  >
+                    ✖
+                  </button>
+                </SheetClose>
+              </SheetHeader>
               <div className="mt-4 space-y-4">
                 <Image
                   src={event.image}
@@ -204,4 +201,4 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
       </SheetContent>
     </Sheet>
   );
-} 
+}
