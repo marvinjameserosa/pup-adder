@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "@/hooks/use-toast"
 import { doc, getDoc, updateDoc } from "firebase/firestore"
-import { Calendar, Camera, Compass, Menu, PlusCircle, X } from "lucide-react"
+import { Calendar, Camera, CheckCircle, Compass, Menu, PlusCircle, X } from "lucide-react"
 import Link from "next/link"
 import { useCallback, useEffect, useRef, useState } from "react"
 
@@ -237,7 +237,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
                 </Link>
                 <Link href="/dashboard">
                   <Button variant="ghost" size="default" className="text-[#722120] hover:bg-[#a41e1d] hover:text-white">
-                    <Calendar className="h-5 w-5 mr-2" />
+                    <CheckCircle className="h-5 w-5 mr-2" />
                     Dashboard
                   </Button>
                 </Link>
@@ -277,7 +277,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
                 </Link>
                 <Link href="/dashboard">
                   <Button variant="ghost" size="sm" className="w-full justify-start text-[#722120] hover:bg-[#a41e1d] hover:text-white">
-                    <Calendar className="h-5 w-5 mr-2" />
+                    <CheckCircle className="h-5 w-5 mr-2" />
                     Dashboard
                   </Button>
                 </Link>
