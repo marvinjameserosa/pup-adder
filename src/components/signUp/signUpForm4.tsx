@@ -186,6 +186,86 @@ export default function SignUpForm({ initialUserType = "Student", onSubmit }: Si
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="AlumniDepartment">Department</Label>
+                  <Select name="department" required>
+                    <SelectTrigger id="AlumniDepartment">
+                      <SelectValue placeholder="Select your Department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {/* Alumni department options */}
+                      <SelectItem value="BSCPE">BS Computer Engineering</SelectItem>
+                      <SelectItem value="BSCE">BS Civil Engineering</SelectItem>
+                      <SelectItem value="BSECE">BS Electronics Engineering</SelectItem>
+                      <SelectItem value="BSIE">BS Industrial Engineering</SelectItem>
+                      <SelectItem value="BSME">BS Mechanical Engineering</SelectItem>
+                      <SelectItem value="BSCS">BS Computer Science</SelectItem>
+                      <SelectItem value="BSA">BS Accountancy</SelectItem>
+                      <SelectItem value="BSM">BS Business Management</SelectItem>
+                      <SelectItem value="BSArch">BS Architecture</SelectItem>
+                      <SelectItem value="BSIT">BS Information Techonology</SelectItem>
+                      <SelectItem value="BSMA">BS Management Accounting</SelectItem>
+                      <SelectItem value="DBA-OU">Doctor in Business Administration (DBA)</SelectItem>
+                      <SelectItem value="D.ENG-OU">Doctor in Engineering Management (D.Eng)</SelectItem>
+                      <SelectItem value="PhDEM-OU">Doctor of Philsophy in Education Management (PhDEM)</SelectItem>
+                      <SelectItem value="DPA-OU">Doctor in Public Administration (DPA)</SelectItem>
+                      <SelectItem value="MC-OU">Master in Communication (MC)</SelectItem>
+                      <SelectItem value="MBA-OU">Master in Business Administration (MBA)</SelectItem>
+                      <SelectItem value="MAEM-OU">Master of Arts in Education Management (MAEM)</SelectItem>
+                      <SelectItem value="MIT-OU">Master in Information Technology (MIT)</SelectItem>
+                      <SelectItem value="MPA-OU">Master in Public Administration (MPA)</SelectItem>
+                      <SelectItem value="MSCM-OU">Master of Science in Construction Management (MSCM)</SelectItem>
+                      <SelectItem value="PDBIT-OU">
+                        Post Baccalaureate Diploma in Information Technology (PBDIT)
+                      </SelectItem>
+                      <SelectItem value="BSENTREP-OU">Bachelor of Science in Entrepreneurship (BSENTREP)V</SelectItem>
+                      <SelectItem value="BABR-OU">Bachelor of Arts in Broadcasting (BABR)</SelectItem>
+                      <SelectItem value="BSBAHRM-OU">
+                        Bachelor of Science in Business Administration major in Human Resource Management (BSBAHRM)
+                      </SelectItem>
+                      <SelectItem value="BSBAMM">
+                        Bachelor of Science in Business Administration major in Marketing Management (BSBAMM)
+                      </SelectItem>
+                      <SelectItem value="BSOA">BBachelor of Science in Office Administration (BSOA)</SelectItem>
+                      <SelectItem value="BSTM">Bachelor of Science in Tourism Management (BSTM)</SelectItem>
+                      <SelectItem value="BPA">Bachelor of Public Administration (BPA)</SelectItem>
+                      <SelectItem value="BSBAFM">
+                        Bachelor of Science in Business Administration Major in Financial Management
+                      </SelectItem>
+                      <SelectItem value="BSEP">Bachelor of Science in Environmental Planning (BSEP)</SelectItem>
+                      <SelectItem value="ABELS">Bachelor of Arts in English Language Studies (ABELS)</SelectItem>
+                      <SelectItem value="ABF">Bachelor of Arts in Filipinology (ABF)</SelectItem>
+                      <SelectItem value="ABLCS">Bachelor of Arts in Literary and Cultural Studies (ABLCS)</SelectItem>
+                      <SelectItem value="AB-PHILO">Bachelor of Arts in Philosophy (AB-PHILO)</SelectItem>
+                      <SelectItem value="BPEA">Bachelor of Performing Arts major in Theater Arts</SelectItem>
+                      <SelectItem value="DBA">Doctor in Business Administration (DBA)</SelectItem>
+                      <SelectItem value="MBA">Master in Business Administration (MBA)</SelectItem>
+                      <SelectItem value="BSBAHRM">
+                        Bachelor of Science in Business Administration major in Human Resource Management
+                      </SelectItem>
+                      <SelectItem value="BSBA-MM">
+                        Bachelor of Science in Business Administration major in Marketing Management
+                      </SelectItem>
+                      <SelectItem value="BSENTREP">Bachelor of Science in Entrepreneurship (BSENTREP)</SelectItem>
+                      <SelectItem value="BSOA">Bachelor of Science in Office Administration (BSOA)</SelectItem>
+                      <SelectItem value="BADPR">Bachelor in Advertising and Public Relations (BADPR)</SelectItem>
+                      <SelectItem value="BA BRODCASTING">Bachelor of Arts in Broadcasting (BA Broadcasting)</SelectItem>
+                      <SelectItem value="BACR">Bachelor of Arts in Communication Research (BACR)</SelectItem>
+                      <SelectItem value="BAJ">Bachelor of Arts in Journalism (BAJ)</SelectItem>
+                      <SelectItem value="BSCS">Bachelor of Science in Computer Science (BSCS)</SelectItem>
+                      <SelectItem value="BSIT">Bachelor of Science in Information Technology (BSIT)</SelectItem>
+                      <SelectItem value="PhDEM">Doctor of Philsophy in Education Management (PhDEM)</SelectItem>
+                      <SelectItem value="MAEM">Master of Arts in Education Management (MAEM)</SelectItem>
+                      <SelectItem value="MBE">Master in Business Education (MBE)</SelectItem>
+                      <SelectItem value="MLIS">Master in Library and Information Science (MLIS)</SelectItem>
+                      <SelectItem value="MAELT">Master of Arts in English Language Teaching (MAELT)</SelectItem>
+                      <SelectItem value="MAEd-ME">
+                        Master of Arts in Education major in Mathematics Education (MAEd-ME)
+                      </SelectItem>
+                      <SelectItem value="MAPES">Master of Arts in Physical Education and Sports (MAPES)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Button className="w-full mt-4" type="submit">
                   Sign Up
                 </Button>
