@@ -1,5 +1,4 @@
 "use client"
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,20 +10,35 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/app/firebase/config"
 import Link from 'next/link'
 import { useRouter } from 'next/navigation' 
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-
   const router = useRouter();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, redirect to discover page
+        router.push('/discover');
+      } else {
+        // No user is signed in, allow login form to display
+        setLoading(false);
+      }
+    });
+
+    // Clean up subscription
+    return () => unsubscribe();
+  }, [router]);
 
   async function loginEmailPassword(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); 
@@ -33,12 +47,14 @@ export function LoginForm({
     const email = formData.get("email") as string; 
     const password = formData.get("password") as string;
     try {
+      setLoading(true);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       console.log("User:", user);
       router.push('/discover');
     } catch (error: any) {
-        setError(formatFirebaseError(error.code));
+      setError(formatFirebaseError(error.code));
+      setLoading(false);
     }
   }
 
@@ -48,42 +64,48 @@ export function LoginForm({
       "auth/email-already-exists": "This email is already registered. Try logging in instead.",
       "auth/id-token-expired": "Your session has expired. Please log in again.",
       "auth/id-token-revoked": "Your session has been revoked. Please log in again.",
-      "auth/insufficient-permission": "You don’t have permission to do this action. Contact support if needed.",
+      "auth/insufficient-permission": "You don't have permission to do this action. Contact support if needed.",
       "auth/internal-error": "Oops! Something went wrong. Please try again later.",
       "auth/invalid-argument": "Invalid input. Please double-check your details and try again.",
       "auth/invalid-claims": "We couldn't process your request. Please contact support.",
-      "auth/invalid-continue-uri": "The link you provided isn’t valid. Please check and try again.",
-      "auth/invalid-credential": "We couldn’t sign you in. Make sure your email and password are correct.",
-      "auth/invalid-disabled-field": "There’s an issue with your account settings. Please contact support.",
+      "auth/invalid-continue-uri": "The link you provided isn't valid. Please check and try again.",
+      "auth/invalid-credential": "We couldn't sign you in. Make sure your email and password are correct.",
+      "auth/invalid-disabled-field": "There's an issue with your account settings. Please contact support.",
       "auth/invalid-display-name": "Your display name must contain at least one character.",
-      "auth/invalid-dynamic-link-domain": "The link provided isn’t allowed for this project.",
-      "auth/invalid-email": "Oops! That doesn’t look like a valid email. Please check and try again.",
+      "auth/invalid-dynamic-link-domain": "The link provided isn't allowed for this project.",
+      "auth/invalid-email": "Oops! That doesn't look like a valid email. Please check and try again.",
       "auth/invalid-email-verified": "Email verification value must be true or false.",
       "auth/invalid-id-token": "Your session is invalid. Please log in again.",
       "auth/invalid-password": "Your password must be at least 6 characters long.",
       "auth/invalid-phone-number": "The phone number format is incorrect. Please use the international format (e.g., +123456789).",
-      "auth/invalid-photo-url": "The photo URL isn’t valid. Please provide a valid image link.",
-      "auth/invalid-provider-data": "Something’s wrong with your authentication provider details.",
+      "auth/invalid-photo-url": "The photo URL isn't valid. Please provide a valid image link.",
+      "auth/invalid-provider-data": "Something's wrong with your authentication provider details.",
       "auth/invalid-provider-id": "Invalid authentication provider. Please check your setup.",
       "auth/missing-continue-uri": "A valid link is required to proceed.",
-      "auth/missing-oauth-client-secret": "Something’s missing in the authentication setup.",
+      "auth/missing-oauth-client-secret": "Something's missing in the authentication setup.",
       "auth/operation-not-allowed": "This sign-in method is disabled. Contact support for help.",
       "auth/phone-number-already-exists": "This phone number is already linked to an account.",
-      "auth/project-not-found": "We couldn’t find the project. Please check your configuration.",
-      "auth/reserved-claims": "There’s an issue with your account settings. Please contact support.",
+      "auth/project-not-found": "We couldn't find the project. Please check your configuration.",
+      "auth/reserved-claims": "There's an issue with your account settings. Please contact support.",
       "auth/session-cookie-expired": "Your session has expired. Please log in again.",
       "auth/session-cookie-revoked": "Your session has been revoked. Please log in again.",
       "auth/too-many-requests": "Too many failed attempts. Please wait a moment before trying again.",
       "auth/uid-already-exists": "This user ID is already in use. Try using a different one.",
-      "auth/user-not-found": "We couldn’t find an account with that email. Try signing up instead.",
+      "auth/user-not-found": "We couldn't find an account with that email. Try signing up instead.",
+      "auth/wrong-password": "Incorrect password. Please check and try again.",
     };
   
     return errorMessages[errorCode] || "Something went wrong. Please try again later.";
   };
   
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[300px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#a41e1d]"></div>
+      </div>
+    );
+  }
   
-  
-
   return (
     <div className={cn("flex flex-col gap-4", className)} {...props}>
       <Card className="shadow-xl rounded-[24px] bg-[#f2f3f7]/50 backdrop-blur-sm flex flex-col border border-[#302F30]">
