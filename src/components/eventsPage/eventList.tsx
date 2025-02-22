@@ -7,10 +7,11 @@ import { Calendar, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import EventCard from "./eventCard";
 import EventDrawer from "./eventDrawer";
-import Loading from "@/components/loading";
+
 
 interface EventData {
   id: string;
+  availableSlots: number;
   capacityLimit: string;
   createdAt: string;
   createdBy: string;
