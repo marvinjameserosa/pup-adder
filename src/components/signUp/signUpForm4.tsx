@@ -33,7 +33,15 @@ export default function SignUpForm({ initialUserType = "Student", onSubmit }: Si
           <CardDescription>Enter your details below to create your account</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-        <Tabs value={userType} onValueChange={(value) => setUserType(value as UserType)} className="w-full">
+        <Tabs 
+          value={userType} 
+          onValueChange={(value) => {
+            if (value === "Student" || value === "Alumni" || value === "Faculty") {
+              setUserType(value);
+            }
+          }} 
+          className="w-full"
+        >
             <TabsList>
               <TabsTrigger value="Student">Student</TabsTrigger>
               <TabsTrigger value="Alumni">Alumni</TabsTrigger>
