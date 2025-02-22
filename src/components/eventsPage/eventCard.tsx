@@ -13,6 +13,7 @@ import { generateTicket } from "@/utils/getTickets";
 interface EventData {
   id: string;
   capacityLimit: string;
+  availableSlots: number;
   createdAt: string;
   createdBy: string;
   description: string;
@@ -24,8 +25,7 @@ interface EventData {
   eventPoster: string;
   isVirtual: boolean;
   location: string;
-  participantApprovals: Array<any>;
-  availableSlots: number;
+  participantApprovals: Array<any>; // Added back for ManageEventCard
 }
 
 interface EventCardProps {
@@ -65,8 +65,8 @@ export default function EventCard({ event, onClick }: EventCardProps) {
     setShowManageCard(true);
   };
 
-  // Calculate filled slots by subtracting availableSlots from capacityLimit
-  const filledSlots = parseInt(event.capacityLimit) - event.availableSlots;
+  // Calculate number of attendees
+  const numberOfAttendees = parseInt(event.capacityLimit) - event.availableSlots;
 
   return (
     <>
@@ -98,7 +98,7 @@ export default function EventCard({ event, onClick }: EventCardProps) {
               <div className="flex items-center space-x-2 text-sm text-muted-foreground text-white">
                 <Users className="h-4 w-4 flex-shrink-0" />
                 <span className="line-clamp-1">
-                  {filledSlots} of {event.capacityLimit} slots filled
+                  {numberOfAttendees} attendees
                 </span>
               </div>
             </CardContent>

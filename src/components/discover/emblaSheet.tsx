@@ -52,7 +52,6 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
         if (eventSnap.exists()) {
           const eventData = eventSnap.data();
           setIsEventCreator(eventData.createdBy === user.uid);
-
           if (eventData.capacityLimit === null) {
             setAvailableSlots("unlimited");
           } else {
@@ -106,12 +105,24 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
         toast({ variant: "destructive", title: "Full", description: "No more slots available." });
         return;
       }
+
+      // Calculate new available slots count
+      let newAvailableSlots: number | null = null;
+      if (eventData.capacityLimit !== null) {
+        const capacityLimit = parseInt(eventData.capacityLimit);
+        const currentRegisteredCount = eventData.registeredUsers?.length || 0;
+        newAvailableSlots = Math.max(0, capacityLimit - (currentRegisteredCount + 1));
+      }
       
+      // Update both registeredUsers and availableSlots in the database
       await updateDoc(eventRef, { 
         registeredUsers: arrayUnion(user.uid),
+        availableSlots: newAvailableSlots
       });
       
       await updateDoc(userRef, { [`registeredEvents.${event.id}`]: false });
+
+      // Update local state
       if (typeof availableSlots === 'number') {
         setAvailableSlots(prev => typeof prev === 'number' ? Math.max(0, prev - 1) : prev);
       }
