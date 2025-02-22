@@ -49,6 +49,21 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                     <Label htmlFor="student-number">Student Number</Label>
                     <Input id="student-number" name="student-number" type="text" placeholder="2015-001..." required />
 
+                    <Label htmlFor="year-level">Year Level</Label>
+                    <Select name="year level" required >
+                      <SelectTrigger id="year-level">
+                        <SelectValue placeholder="Select your year level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="First Year">First Year</SelectItem>
+                        <SelectItem value="Second Year">Second Year</SelectItem>
+                        <SelectItem value="Third Year">Third Year</SelectItem>
+                        <SelectItem value="Fourth Year">Fourth Year</SelectItem>
+                        <SelectItem value="Ffth Year">Fifth Year</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+
                     <Label htmlFor="department">Department</Label>
                     <Select name="department" required>
                       <SelectTrigger id="studentDepartment">
@@ -237,6 +252,8 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                       </SelectTrigger>
                       <SelectContent>
                       <SelectItem value="BSCPE">BS Computer Engineering</SelectItem>
+                      <SelectItem value="ARCDO">Alumni Relations and Career Development Office</SelectItem>
+                      <SelectItem value="EDO">Executive Director's Office</SelectItem>
                         <SelectItem value="BSCE">BS Civil Engineering</SelectItem>
                         <SelectItem value="BSECE">BS Electronics Engineering</SelectItem>
                         <SelectItem value="BSIE">BS Industrial Engineering</SelectItem>
