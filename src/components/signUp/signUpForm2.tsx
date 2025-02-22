@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,23 +8,166 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+const departments = [
+  "BS Computer Engineering",
+  "BS Civil Engineering",
+  "BS Electronics Engineering",
+  "BS Industrial Engineering",
+  "BS Mechanical Engineering",
+  "BS Electrical Engineering",
+  "BS Railway Engineering",
+  "BS Accountancy",
+  "BS Interior Design",
+  "BS Environmental Planning",
+  "BS Business Management",
+  "BS Architecture",
+  "BS Information Technology",
+  "BS Management Accounting",
+  "BS Entrepreneurship",
+  "BS Business Administration major in Human Resource Management",
+  "BS Business Administration major in Marketing Management",
+  "BS Office Administration",
+  "BS Tourism Management",
+  "BS Public Administration",
+  "BA English Language Studies",
+  "BA Filipinology",
+  "BA Literary and Cultural Studies",
+  "BA Philosophy",
+  "BP Performing Arts major in Theater Arts",
+  "Bachelor in Advertising and Public Relations",
+  "BA Broadcasting",
+  "BA Communication Research",
+  "BA Journalism",
+  "BS Computer Science",
+  "Bachelor of Library and Information Science",
+  "Bachelor of Secondary Education major in English",
+  "Bachelor of Secondary Education major in Mathematics",
+  "Bachelor of Secondary Education major in Science",
+  "Bachelor of Secondary Education major in Filipino",
+  "Bachelor of Secondary Education major in Social Studies",
+  "Bachelor of Elementary Education",
+  "Bachelor of Early Childhood Education",
+  "Bachelor of Physical Education",
+  "BS Exercise and Sports",
+  "Juris Doctor",
+  "BA Political Science",
+  "BA Political Economy",
+  "BA International Studies",
+  "BA History",
+  "BA Sociology",
+  "BS Cooperatives",
+  "BS Economics",
+  "BS Psychology",
+  "BS Food Technology",
+  "BS Applied Mathematics",
+  "BS Biology",
+  "BS Mathematics",
+  "BS Nutrition Dietics",
+  "BS Physics",
+  "BS Statistics",
+  "BS Hospitality Management",
+  "BS Transportation Management",
+  "Diploma in Computer Engineering Technology",
+  "Diploma in Electrical Engineering Technology",
+  "Diploma in Electronics Engineering Technology",
+  "Diploma in Information Communication Technology",
+  "Diploma in Mechanical Engineering Technology",
+  "Diploma in Office Management"
+];
+
+const yearLevels = ["First Year", "Second Year", "Third Year", "Fourth Year", "Fifth Year"];
+
+const countryCodes = [
+  { code: "+639", country: "Philippines", maxDigits: 9 },
+  { code: "+1", country: "USA/Canada", maxDigits: 10 },
+  { code: "+44", country: "United Kingdom", maxDigits: 10 },
+  { code: "+91", country: "India", maxDigits: 10 },
+];
+
+const genderOptions = ["Male", "Female", "Prefer not to say"];
+
 type UserType = "Student" | "Alumni" | "Faculty";
 
 type SignUpForm2Props = {
   userType: UserType;
-  setUserType: (type: UserType) => void; 
+  setUserType: (type: UserType) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   errorMsg?: string;
 };
 
 export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg }: SignUpForm2Props) {
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
+  const [department, setDepartment] = useState("");
+  const [filteredDepartments, setFilteredDepartments] = useState(departments);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [yearLevel, setYearLevel] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [selectedCountryCode, setSelectedCountryCode] = useState(countryCodes[0]);
+  const [age, setAge] = useState("");
+  const [ageError, setAgeError] = useState("");
+  const [gender, setGender] = useState("");
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setDepartment(value);
+    
+    if (value.length > 0) {
+      const filtered = departments.filter((dept) =>
+        dept.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredDepartments(filtered);
+      setShowDropdown(true);
+    } else {
+      setFilteredDepartments(departments);
+      setShowDropdown(false);
+    }
+  };
+
+  const handleSelectDepartment = (dept: string) => {
+    setDepartment(dept);
+    setShowDropdown(false);
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+    if (value.length <= selectedCountryCode.maxDigits) {
+      setPhoneNumber(value);
+    }
+
+    if (value.length < selectedCountryCode.maxDigits) {
+      setPhoneError(`Phone number must be exactly ${selectedCountryCode.maxDigits} digits.`);
+    } else {
+      setPhoneError("");
+    }
+  };
+
+  const handleCountryCodeChange = (code: string) => {
+    const newCountry = countryCodes.find((c) => c.code === code);
+    if (newCountry) {
+      setSelectedCountryCode(newCountry);
+      setPhoneNumber(""); // Reset phone number when changing country
+      setPhoneError(""); // Reset error
+    }
+  };
+
+  const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+    setAge(value);
+
+    // Validate age range
+    const ageNum = parseInt(value, 10);
+    if (ageNum < 16 || ageNum > 100) {
+      setAgeError("Age must be between 16 and 100.");
+    } else {
+      setAgeError("");
+    }
+  };
+
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-[url('/bg3.jpg')] p-4">
       <div className="absolute inset-0 bg-black/80 mix-blend-multiply" />
-      <Card className="relative z-10 w-[360px] shadow-xl rounded-[24px] bg-[#f2f3f7]/60  backdrop-blur-sm flex flex-col border border-[#302F30]">
+      <Card className="relative z-10 w-[360px] shadow-xl rounded-[24px] bg-[#f2f3f7]/60 backdrop-blur-sm flex flex-col border border-[#302F30]">
         <CardHeader>
           <CardTitle className="text-2xl text-[#a41e1d]">Personal Information</CardTitle>
           <CardDescription className="text-gray-600">Finish creating your account.</CardDescription>
@@ -49,93 +193,113 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                     <Label htmlFor="student-number">Student Number</Label>
                     <Input id="student-number" name="student-number" type="text" placeholder="2015-001..." required />
 
+                    <Label htmlFor="phone-number">Phone Number</Label>
+                    <div className="flex items-center gap-2">
+                      {/* Country Code Dropdown */}
+                      <Select
+                        name="country-code"
+                        onValueChange={handleCountryCodeChange}
+                        defaultValue={selectedCountryCode.code}
+                      >
+                        <SelectTrigger id="country-code" className="w-24">
+                          <SelectValue>{selectedCountryCode.code}</SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countryCodes.map((country) => (
+                            <SelectItem key={country.code} value={country.code}>
+                              {country.code} ({country.country})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      {/* Phone Number Input */}
+                      <Input
+                        id="phone-number"
+                        name="phone-number"
+                        type="text"
+                        value={phoneNumber}
+                        onChange={handlePhoneChange}
+                        placeholder={`Enter ${selectedCountryCode.maxDigits}-digit number`}
+                        maxLength={selectedCountryCode.maxDigits}
+                        required
+                      />
+                    </div>
+                    {phoneError && <p className="text-red-500 text-sm">{phoneError}</p>}
+
+                    <div className="flex gap-3">
+                     <div className="flex-1">
+                        <Label htmlFor="age">Age</Label>
+                        <Input
+                          id="age"
+                          name="age"
+                          type="text"
+                          value={age}
+                          onChange={handleAgeChange}
+                          placeholder="Enter your age"
+                          maxLength={3}
+                          required
+                        />
+                        {ageError && <p className="text-red-500 text-sm">{ageError}</p>}
+                      </div>
+                      <div className="flex-1">
+                        <Label htmlFor="gender">Sex/Gender</Label>
+                        <Select name="gender" onValueChange={setGender} required>
+                          <SelectTrigger id="gender">
+                            <SelectValue placeholder="Select your gender" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {genderOptions.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                     <Label htmlFor="year-level">Year Level</Label>
-                    <Select name="year level" required >
+                    <Select name="year-level" onValueChange={(value) => setYearLevel(value)} required>
                       <SelectTrigger id="year-level">
                         <SelectValue placeholder="Select your year level" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="First Year">First Year</SelectItem>
-                        <SelectItem value="Second Year">Second Year</SelectItem>
-                        <SelectItem value="Third Year">Third Year</SelectItem>
-                        <SelectItem value="Fourth Year">Fourth Year</SelectItem>
-                        <SelectItem value="Ffth Year">Fifth Year</SelectItem>
+                        {yearLevels.map((level) => (
+                          <SelectItem key={level} value={level}>{level}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
-                    
+          
 
                     <Label htmlFor="department">Department</Label>
-                    <Select name="department" required>
-                      <SelectTrigger id="studentDepartment">
-                        <SelectValue placeholder="Select your department" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="BSCPE">BS Computer Engineering</SelectItem>
-                        <SelectItem value="BSCE">BS Civil Engineering</SelectItem>
-                        <SelectItem value="BSECE">BS Electronics Engineering</SelectItem>
-                        <SelectItem value="BSIE">BS Industrial Engineering</SelectItem>
-                        <SelectItem value="BSME">BS Mechanical Engineering</SelectItem>
-                        <SelectItem value="BSEE">BS Electrical Engineering</SelectItem>
-                        <SelectItem value="BSRE">BS Railway Engineering</SelectItem>
-                        <SelectItem value="BSA">BS Accountancy</SelectItem>
-                        <SelectItem value="BSID">BS Interior Design</SelectItem>
-                        <SelectItem value="BSEP">BS Environmental Planning</SelectItem>
-                        <SelectItem value="BSM">BS Business Management</SelectItem>
-                        <SelectItem value="BSArch">BS Architecture</SelectItem>
-                        <SelectItem value="BSIT">BS Information Techonology</SelectItem>
-                        <SelectItem value="BSMA">BS Management Accounting</SelectItem>
-                        <SelectItem value="BSENTREP">BS Entrepreneurship</SelectItem>
-                        <SelectItem value="BSBAHRM">BS Business Administration major in Human Resource Management</SelectItem>
-                        <SelectItem value="BSBAMM">BS Business Administration major in Marketing Management</SelectItem>
-                        <SelectItem value="BSOA">BS Office Administration</SelectItem>
-                        <SelectItem value="BSTM">BS Tourism Management</SelectItem>
-                        <SelectItem value="BPA">BS Public Administration</SelectItem>
-                        <SelectItem value="ABELS">BA English Language Studies</SelectItem>
-                        <SelectItem value="ABF">BA Filipinology</SelectItem>
-                        <SelectItem value="ABLCS">BA Literary and Cultural Studies</SelectItem>
-                        <SelectItem value="AB-PHILO">BA Philosophy</SelectItem>
-                        <SelectItem value="BPEA">BP Performing Arts major in Theater Arts</SelectItem>
-                        <SelectItem value="BADPR">Bachelor in Advertising and Public Relations</SelectItem>
-                        <SelectItem value="BABR">BA Broadcasting</SelectItem>
-                        <SelectItem value="BACR">BA Communication Research</SelectItem>
-                        <SelectItem value="BAJ">BA Journalism</SelectItem>
-                        <SelectItem value="BSCS">BS Computer Science</SelectItem>
-                        <SelectItem value="BLIS">Bachelor of Library and Information Science</SelectItem>
-                        <SelectItem value="BSEd-English">Bachelor of Secondary Education major in English</SelectItem>
-                        <SelectItem value="BSEd-Mathematics">Bachelor of Secondary Education major in Mathematics</SelectItem>
-                        <SelectItem value="BSEd-Science">Bachelor of Secondary Education major in Science</SelectItem>
-                        <SelectItem value="BSEd-Filipino">Bachelor of Secondary Education major in Filipino</SelectItem>
-                        <SelectItem value="BSEd-Social Studies">Bachelor of Secondary Education major in Social Studies</SelectItem>
-                        <SelectItem value="BEEd">Bachelor of Elementary Education</SelectItem>
-                        <SelectItem value="BECEd">Bachelor of Early Childhood Education</SelectItem>
-                        <SelectItem value="BPE">Bachelor of Physical Education</SelectItem>
-                        <SelectItem value="BSESS">BS Exercise and Sports</SelectItem>
-                        <SelectItem value="JD">Juris Doctor</SelectItem>
-                        <SelectItem value="BAPS">BA Political Science</SelectItem>
-                        <SelectItem value="BAPE">BA Political Economy</SelectItem>
-                        <SelectItem value="BAIS">BA International Studies</SelectItem>
-                        <SelectItem value="BAH">BA History</SelectItem>
-                        <SelectItem value="BAS">BA Sociology</SelectItem>
-                        <SelectItem value="BSC">BS Cooperatives</SelectItem>
-                        <SelectItem value="BSE">BS Economics</SelectItem>
-                        <SelectItem value="BSPSY">BS Psychology</SelectItem>
-                        <SelectItem value="BSFT">BS Food Technology</SelectItem>
-                        <SelectItem value="BSAPMATH">BS Applied Mathematics</SelectItem>
-                        <SelectItem value="BSBIO">BS Biology</SelectItem>
-                        <SelectItem value="BSMATH">BS Mathematics</SelectItem>
-                        <SelectItem value="BSND">BS Nutrition Dietics</SelectItem>
-                        <SelectItem value="BSPHY">BS Physics</SelectItem>
-                        <SelectItem value="BSSTAT">BS Statistics</SelectItem>
-                        <SelectItem value="BSHM">BS Hospitality Management</SelectItem>
-                        <SelectItem value="BSTRM">BS Transportation Management</SelectItem>
-                        <SelectItem value="DCET">Diploma in Computer Engineering Technology</SelectItem>
-                        <SelectItem value="DEET">Diploma in Electrical Engineering Technology</SelectItem>
-                        <SelectItem value="DECET">Diploma in Electronics Engineering Technology</SelectItem>
-                        <SelectItem value="DCIT">Diploma in Information Communication Technology</SelectItem>
-                        <SelectItem value="DMET">Diploma in Mechanical Engineering Technology</SelectItem>
-                        <SelectItem value="DOMT">Diploma in Office Management</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="relative">
+                      <Input
+                        id="department"
+                        name="department"
+                        type="text"
+                        value={department}
+                        onChange={handleInputChange}
+                        placeholder="Type or select your department"
+                        required
+                      />
+                      {showDropdown && (
+                        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-md max-h-40 overflow-y-auto">
+                          {filteredDepartments.length > 0 ? (
+                            filteredDepartments.map((dept) => (
+                              <li
+                                key={dept}
+                                className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                                onClick={() => handleSelectDepartment(dept)}
+                              >
+                                {dept}
+                              </li>
+                            ))
+                          ) : (
+                            <li className="px-4 py-2 text-gray-500">No matching departments</li>
+                          )}
+                        </ul>
+                      )}
+                    </div>
                   </div>
                 </TabsContent>
 
@@ -147,90 +311,101 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                     <Label htmlFor="last-name">Last Name</Label>
                     <Input id="last-name" name="last-name" type="text" placeholder="Dela Cruz" required />
 
-                    <Label htmlFor="department-graduated">Program Graduated</Label>
-                    <Select name="department" required>
-                      <SelectTrigger id="department-graduated">
-                        <SelectValue placeholder="Select your Department" />
-                      </SelectTrigger>
-                      <SelectContent>
-                      <SelectItem value="BSCPE">BS Computer Engineering</SelectItem>
-                        <SelectItem value="BSCE">BS Civil Engineering</SelectItem>
-                        <SelectItem value="BSECE">BS Electronics Engineering</SelectItem>
-                        <SelectItem value="BSIE">BS Industrial Engineering</SelectItem>
-                        <SelectItem value="BSME">BS Mechanical Engineering</SelectItem>
-                        <SelectItem value="BSEE">BS Electrical Engineering</SelectItem>
-                        <SelectItem value="BSRE">BS Railway Engineering</SelectItem>
-                        <SelectItem value="BSA">BS Accountancy</SelectItem>
-                        <SelectItem value="BSID">BS Interior Design</SelectItem>
-                        <SelectItem value="BSEP">BS Environmental Planning</SelectItem>
-                        <SelectItem value="BSM">BS Business Management</SelectItem>
-                        <SelectItem value="BSArch">BS Architecture</SelectItem>
-                        <SelectItem value="BSIT">BS Information Techonology</SelectItem>
-                        <SelectItem value="BSMA">BS Management Accounting</SelectItem>
-                        <SelectItem value="BSENTREP">BS Entrepreneurship</SelectItem>
-                        <SelectItem value="BSBAHRM">BS Business Administration major in Human Resource Management</SelectItem>
-                        <SelectItem value="BSBAMM">BS Business Administration major in Marketing Management</SelectItem>
-                        <SelectItem value="BSOA">BS Office Administration</SelectItem>
-                        <SelectItem value="BPA">BS Public Administration</SelectItem>
-                        <SelectItem value="ABELS">BA English Language Studies</SelectItem>
-                        <SelectItem value="ABF">BA Filipinology</SelectItem>
-                        <SelectItem value="ABLCS">BA Literary and Cultural Studies</SelectItem>
-                        <SelectItem value="AB-PHILO">BA Philosophy</SelectItem>
-                        <SelectItem value="BPEA">BP Performing Arts major in Theater Arts</SelectItem>
-                        <SelectItem value="BADPR">Bachelor in Advertising and Public Relations</SelectItem>
-                        <SelectItem value="BABR">BA Broadcasting</SelectItem>
-                        <SelectItem value="BACR">BA Communication Research</SelectItem>
-                        <SelectItem value="BAJ">BA Journalism</SelectItem>
-                        <SelectItem value="BSCS">BS Computer Science</SelectItem>
-                        <SelectItem value="BLIS">Bachelor of Library and Information Science</SelectItem>
-                        <SelectItem value="BSEd-English">Bachelor of Secondary Education major in English</SelectItem>
-                        <SelectItem value="BSEd-Mathematics">Bachelor of Secondary Education major in Mathematics</SelectItem>
-                        <SelectItem value="BSEd-Science">Bachelor of Secondary Education major in Science</SelectItem>
-                        <SelectItem value="BSEd-Filipino">Bachelor of Secondary Education major in Filipino</SelectItem>
-                        <SelectItem value="BSEd-Social Studies">Bachelor of Secondary Education major in Social Studies</SelectItem>
-                        <SelectItem value="BEEd">Bachelor of Elementary Education</SelectItem>
-                        <SelectItem value="BECEd">Bachelor of Early Childhood Education</SelectItem>
-                        <SelectItem value="BPE">Bachelor of Physical Education</SelectItem>
-                        <SelectItem value="BSESS">BS Exercise and Sports</SelectItem>
-                        <SelectItem value="JD">Juris Doctor</SelectItem>
-                        <SelectItem value="BAPS">BA Political Science</SelectItem>
-                        <SelectItem value="BAPE">BA Political Economy</SelectItem>
-                        <SelectItem value="BAIS">BA International Studies</SelectItem>
-                        <SelectItem value="BAH">BA History</SelectItem>
-                        <SelectItem value="BAS">BA Sociology</SelectItem>
-                        <SelectItem value="BSC">BS Cooperatives</SelectItem>
-                        <SelectItem value="BSE">BS Economics</SelectItem>
-                        <SelectItem value="BSPSY">BS Psychology</SelectItem>
-                        <SelectItem value="BSFT">BS Food Technology</SelectItem>
-                        <SelectItem value="BSAPMATH">BS Applied Mathematics</SelectItem>
-                        <SelectItem value="BSBIO">BS Biology</SelectItem>
-                        <SelectItem value="BSMATH">BS Mathematics</SelectItem>
-                        <SelectItem value="BSND">BS Nutrition Dietics</SelectItem>
-                        <SelectItem value="BSPHY">BS Physics</SelectItem>
-                        <SelectItem value="BSSTAT">BS Statistics</SelectItem>
-                        <SelectItem value="BSHM">BS Hospitality Management</SelectItem>
-                        <SelectItem value="BSTM">BS Tourism Management</SelectItem>
-                        <SelectItem value="BSTRM">BS Transportation Management</SelectItem>
-                        <SelectItem value="DCET">Diploma in Computer Engineering Technology</SelectItem>
-                        <SelectItem value="DEET">Diploma in Electrical Engineering Technology</SelectItem>
-                        <SelectItem value="DECET">Diploma in Electronics Engineering Technology</SelectItem>
-                        <SelectItem value="DCIT">Diploma in Information Communication Technology</SelectItem>
-                        <SelectItem value="DMET">Diploma in Mechanical Engineering Technology</SelectItem>
-                        <SelectItem value="DOMT">Diploma in Office Management</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="phone-number">Phone Number</Label>
+                    <div className="flex items-center gap-2">
+                      {/* Country Code Dropdown */}
+                      <Select
+                        name="country-code"
+                        onValueChange={handleCountryCodeChange}
+                        defaultValue={selectedCountryCode.code}
+                      >
+                        <SelectTrigger id="country-code" className="w-24">
+                          <SelectValue>{selectedCountryCode.code}</SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countryCodes.map((country) => (
+                            <SelectItem key={country.code} value={country.code}>
+                              {country.code} ({country.country})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
 
-                    <Label htmlFor="year-graduated">Year Graduated</Label>
-                    <Select name="year-graduated" required>
-                      <SelectTrigger id="year-graduated">
-                        <SelectValue placeholder="Select year" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {years.map((year) => (
-                          <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      {/* Phone Number Input */}
+                      <Input
+                        id="phone-number"
+                        name="phone-number"
+                        type="text"
+                        value={phoneNumber}
+                        onChange={handlePhoneChange}
+                        placeholder={`Enter ${selectedCountryCode.maxDigits}-digit number`}
+                        maxLength={selectedCountryCode.maxDigits}
+                        required
+                      />
+                    </div>
+                    {phoneError && <p className="text-red-500 text-sm">{phoneError}</p>}
+
+                    <div className="flex gap-3">
+                     <div className="flex-1">
+                        <Label htmlFor="age">Age</Label>
+                        <Input
+                          id="age"
+                          name="age"
+                          type="text"
+                          value={age}
+                          onChange={handleAgeChange}
+                          placeholder="Enter your age"
+                          maxLength={3}
+                          required
+                        />
+                        {ageError && <p className="text-red-500 text-sm">{ageError}</p>}
+                      </div>
+                      <div className="flex-1">
+                        <Label htmlFor="gender">Sex/Gender</Label>
+                        <Select name="gender" onValueChange={setGender} required>
+                          <SelectTrigger id="gender">
+                            <SelectValue placeholder="Select your gender" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {genderOptions.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <Label htmlFor="department-graduated">Program Graduated</Label>
+                    <div className="relative">
+                      <Input
+                        id="department-graduated"
+                        name="department-graduated"
+                        type="text"
+                        value={department}
+                        onChange={handleInputChange}
+                        placeholder="Type or select your department"
+                        required
+                      />
+                      {showDropdown && (
+                        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-md max-h-40 overflow-y-auto">
+                          {filteredDepartments.length > 0 ? (
+                            filteredDepartments.map((dept) => (
+                              <li
+                                key={dept}
+                                className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                                onClick={() => handleSelectDepartment(dept)}
+                              >
+                                {dept}
+                              </li>
+                            ))
+                          ) : (
+                            <li className="px-4 py-2 text-gray-500">No matching departments</li>
+                          )}
+                        </ul>
+                      )}
+                    </div>
                   </div>
                 </TabsContent>
 
@@ -245,87 +420,108 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                     <Label htmlFor="faculty-id">Faculty ID Number</Label>
                     <Input id="faculty-id" name="faculty-number" type="text" placeholder="2010-000..." required />
 
+                    <Label htmlFor="phone-number">Phone Number</Label>
+                    <div className="flex items-center gap-2">
+                      {/* Country Code Dropdown */}
+                      <Select
+                        name="country-code"
+                        onValueChange={handleCountryCodeChange}
+                        defaultValue={selectedCountryCode.code}
+                      >
+                        <SelectTrigger id="country-code" className="w-24">
+                          <SelectValue>{selectedCountryCode.code}</SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countryCodes.map((country) => (
+                            <SelectItem key={country.code} value={country.code}>
+                              {country.code} ({country.country})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      {/* Phone Number Input */}
+                      <Input
+                        id="phone-number"
+                        name="phone-number"
+                        type="text"
+                        value={phoneNumber}
+                        onChange={handlePhoneChange}
+                        placeholder={`Enter ${selectedCountryCode.maxDigits}-digit number`}
+                        maxLength={selectedCountryCode.maxDigits}
+                        required
+                      />
+                    </div>
+                    {phoneError && <p className="text-red-500 text-sm">{phoneError}</p>}
+
+                    <div className="flex gap-3">
+                     <div className="flex-1">
+                        <Label htmlFor="age">Age</Label>
+                        <Input
+                          id="age"
+                          name="age"
+                          type="text"
+                          value={age}
+                          onChange={handleAgeChange}
+                          placeholder="Enter your age"
+                          maxLength={3}
+                          required
+                        />
+                        {ageError && <p className="text-red-500 text-sm">{ageError}</p>}
+                      </div>
+                      <div className="flex-1">
+                        <Label htmlFor="gender">Sex/Gender</Label>
+                        <Select name="gender" onValueChange={setGender} required>
+                          <SelectTrigger id="gender">
+                            <SelectValue placeholder="Select your gender" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {genderOptions.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
                     <Label htmlFor="department">Department</Label>
-                    <Select name="department" required>
-                      <SelectTrigger id="facultyDepartment">
-                        <SelectValue placeholder="Select your department" />
-                      </SelectTrigger>
-                      <SelectContent>
-                      <SelectItem value="BSCPE">BS Computer Engineering</SelectItem>
-                      <SelectItem value="ARCDO">Alumni Relations and Career Development Office</SelectItem>
-                      <SelectItem value="EDO">Executive Director's Office</SelectItem>
-                        <SelectItem value="BSCE">BS Civil Engineering</SelectItem>
-                        <SelectItem value="BSECE">BS Electronics Engineering</SelectItem>
-                        <SelectItem value="BSIE">BS Industrial Engineering</SelectItem>
-                        <SelectItem value="BSME">BS Mechanical Engineering</SelectItem>
-                        <SelectItem value="BSEE">BS Electrical Engineering</SelectItem>
-                        <SelectItem value="BSRE">BS Railway Engineering</SelectItem>
-                        <SelectItem value="BSA">BS Accountancy</SelectItem>
-                        <SelectItem value="BSID">BS Interior Design</SelectItem>
-                        <SelectItem value="BSEP">BS Environmental Planning</SelectItem>
-                        <SelectItem value="BSM">BS Business Management</SelectItem>
-                        <SelectItem value="BSArch">BS Architecture</SelectItem>
-                        <SelectItem value="BSIT">BS Information Techonology</SelectItem>
-                        <SelectItem value="BSMA">BS Management Accounting</SelectItem>
-                        <SelectItem value="BSENTREP">BS Entrepreneurship</SelectItem>
-                        <SelectItem value="BSBAHRM">BS Business Administration major in Human Resource Management</SelectItem>
-                        <SelectItem value="BSBAMM">BS Business Administration major in Marketing Management</SelectItem>
-                        <SelectItem value="BSOA">BS Office Administration</SelectItem>
-                        <SelectItem value="BSTM">BS Tourism Management</SelectItem>
-                        <SelectItem value="BPA">BS Public Administration</SelectItem>
-                        <SelectItem value="ABELS">BA English Language Studies</SelectItem>
-                        <SelectItem value="ABF">BA Filipinology</SelectItem>
-                        <SelectItem value="ABLCS">BA Literary and Cultural Studies</SelectItem>
-                        <SelectItem value="AB-PHILO">BA Philosophy</SelectItem>
-                        <SelectItem value="BPEA">BP Performing Arts major in Theater Arts</SelectItem>
-                        <SelectItem value="BADPR">Bachelor in Advertising and Public Relations</SelectItem>
-                        <SelectItem value="BABR">BA Broadcasting</SelectItem>
-                        <SelectItem value="BACR">BA Communication Research</SelectItem>
-                        <SelectItem value="BAJ">BA Journalism</SelectItem>
-                        <SelectItem value="BSCS">BS Computer Science</SelectItem>
-                        <SelectItem value="BLIS">Bachelor of Library and Information Science</SelectItem>
-                        <SelectItem value="BSEd-English">Bachelor of Secondary Education major in English</SelectItem>
-                        <SelectItem value="BSEd-Mathematics">Bachelor of Secondary Education major in Mathematics</SelectItem>
-                        <SelectItem value="BSEd-Science">Bachelor of Secondary Education major in Science</SelectItem>
-                        <SelectItem value="BSEd-Filipino">Bachelor of Secondary Education major in Filipino</SelectItem>
-                        <SelectItem value="BSEd-Social Studies">Bachelor of Secondary Education major in Social Studies</SelectItem>
-                        <SelectItem value="BEEd">Bachelor of Elementary Education</SelectItem>
-                        <SelectItem value="BECEd">Bachelor of Early Childhood Education</SelectItem>
-                        <SelectItem value="BPE">Bachelor of Physical Education</SelectItem>
-                        <SelectItem value="BSESS">BS Exercise and Sports</SelectItem>
-                        <SelectItem value="JD">Juris Doctor</SelectItem>
-                        <SelectItem value="BAPS">BA Political Science</SelectItem>
-                        <SelectItem value="BAPE">BA Political Economy</SelectItem>
-                        <SelectItem value="BAIS">BA International Studies</SelectItem>
-                        <SelectItem value="BAH">BA History</SelectItem>
-                        <SelectItem value="BAS">BA Sociology</SelectItem>
-                        <SelectItem value="BSC">BS Cooperatives</SelectItem>
-                        <SelectItem value="BSE">BS Economics</SelectItem>
-                        <SelectItem value="BSPSY">BS Psychology</SelectItem>
-                        <SelectItem value="BSFT">BS Food Technology</SelectItem>
-                        <SelectItem value="BSAPMATH">BS Applied Mathematics</SelectItem>
-                        <SelectItem value="BSBIO">BS Biology</SelectItem>
-                        <SelectItem value="BSMATH">BS Mathematics</SelectItem>
-                        <SelectItem value="BSND">BS Nutrition Dietics</SelectItem>
-                        <SelectItem value="BSPHY">BS Physics</SelectItem>
-                        <SelectItem value="BSSTAT">BS Statistics</SelectItem>
-                        <SelectItem value="BSHM">BS Hospitality Management</SelectItem>
-                        <SelectItem value="BSTRM">BS Transportation Management</SelectItem>
-                        <SelectItem value="DCET">Diploma in Computer Engineering Technology</SelectItem>
-                        <SelectItem value="DEET">Diploma in Electrical Engineering Technology</SelectItem>
-                        <SelectItem value="DECET">Diploma in Electronics Engineering Technology</SelectItem>
-                        <SelectItem value="DCIT">Diploma in Information Communication Technology</SelectItem>
-                        <SelectItem value="DMET">Diploma in Mechanical Engineering Technology</SelectItem>
-                        <SelectItem value="DOMT">Diploma in Office Management</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="relative">
+                      <Input
+                        id="department"
+                        name="department"
+                        type="text"
+                        value={department}
+                        onChange={handleInputChange}
+                        placeholder="Type or select your department"
+                        required
+                      />
+                      {showDropdown && (
+                        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-md max-h-40 overflow-y-auto">
+                          {filteredDepartments.length > 0 ? (
+                            filteredDepartments.map((dept) => (
+                              <li
+                                key={dept}
+                                className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                                onClick={() => handleSelectDepartment(dept)}
+                              >
+                                {dept}
+                              </li>
+                            ))
+                          ) : (
+                            <li className="px-4 py-2 text-gray-500">No matching departments</li>
+                          )}
+                        </ul>
+                      )}
+                    </div>
                   </div>
                 </TabsContent>
 
                 <Button type="submit" className="w-full mt-6 bg-yellow-500 hover:bg-yellow-800 text-black">Sign up</Button>
               </form>
-            </div> 
-          </Tabs>     
+            </div>
+          </Tabs>
         </CardContent>
       </Card>
     </div>
