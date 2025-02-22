@@ -21,13 +21,6 @@ export default function SignUpForm({ initialUserType = "Student", onSubmit }: Si
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 50 }, (_, i) => currentYear - i)
   
-  // Fix type issue by creating a type-safe handler function
-  const handleValueChange = (value: string) => {
-    if (value === "Student" || value === "Alumni" || value === "Faculty") {
-      setUserType(value as UserType);
-    }
-  }
-  
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4">
       <Image src="/bg3.jpg" alt="Background" layout="fill" objectFit="cover" quality={100} />
@@ -40,7 +33,12 @@ export default function SignUpForm({ initialUserType = "Student", onSubmit }: Si
         <CardContent className="grid gap-4">
         <Tabs 
           value={userType} 
-          onValueChange={handleValueChange}
+          onValueChange={(value: string) => {
+            // Type checking before assignment
+            if (value === "Student" || value === "Alumni" || value === "Faculty") {
+              setUserType(value as UserType);
+            }
+          }}
           className="w-full"
         >
             <TabsList>
