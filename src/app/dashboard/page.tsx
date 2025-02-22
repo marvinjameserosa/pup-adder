@@ -336,14 +336,14 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-1 bg-[#a41e1d] overflow-hidden">
+          <Card className="lg:col-span-2 bg-[#a41e1d] text-white overflow-hidden">
               <CardHeader>
-                <CardTitle className="text-white">Current Events</CardTitle>
+                <CardTitle>Created Events</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="h-[calc(50vh-100px)] overflow-y-auto scrollbar-hide">
-                  {currentEvents.length > 0 ? (
-                    currentEvents.map((event) => (
+                  {upcomingEvents.length > 0 ? (
+                    upcomingEvents.map((event) => (
                       <div
                         key={event.id}
                         className={`flex items-center justify-between w-full px-4 py-3 border-b border-white/10 cursor-pointer hover:bg-[#722120] ${
@@ -352,20 +352,20 @@ export default function Dashboard() {
                         onClick={() => setSelectedEvent(event)}
                       >
                         <div className="flex items-center space-x-3">
-                          <Calendar className="h-5 w-5 text-white" />
+                          <Calendar className="h-5 w-5" />
                           <div className="text-left">
-                            <p className="font-medium text-white">{event.name}</p>
+                            <p className="font-medium">{event.name}</p>
                             <p className="text-sm text-gray-300">{event.date}</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-medium text-white">{event.participants?.length || 0}</p>
-                          <p className="text-xs text-gray-300">Participants</p>
+                          <p className="text-sm font-medium">{event.participants?.length || 0}</p>
+                          <p className="text-xs text-gray-300">Registered</p>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="p-4 text-gray-300">No current events</div>
+                    <div className="p-4 text-gray-300">No created events</div>
                   )}
                 </div>
               </CardContent>
@@ -451,39 +451,7 @@ export default function Dashboard() {
                       </Dialog>
                     </>
                   ) : (
-                    <p>Select an event from the Current Events list to view details.</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="lg:col-span-1 bg-[#a41e1d] text-white overflow-hidden">
-              <CardHeader>
-                <CardTitle>Upcoming Events</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="h-[calc(50vh-100px)] overflow-y-auto scrollbar-hide">
-                  {upcomingEvents.length > 0 ? (
-                    upcomingEvents.map((event) => (
-                      <div 
-                        key={event.id} 
-                        className="flex items-center justify-between w-full px-4 py-3 border-b border-white/10 cursor-pointer hover:bg-[#722120]"
-                        onClick={() => setSelectedEvent(event)}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <Calendar className="h-5 w-5" />
-                          <div className="text-left">
-                            <p className="font-medium">{event.name}</p>
-                            <p className="text-sm text-gray-300">{event.date}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium">{event.participants?.length || 0}</p>
-                          <p className="text-xs text-gray-300">Registered</p>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-4 text-gray-300">No upcoming events</div>
+                    <p>Select an event from the Created Events list to view details.</p>
                   )}
                 </div>
               </CardContent>
