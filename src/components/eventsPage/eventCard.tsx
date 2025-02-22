@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +25,7 @@ interface EventData {
   isVirtual: boolean;
   location: string;
   participantApprovals: Array<any>;
+  availableSlots: number;
 }
 
 interface EventCardProps {
@@ -50,20 +52,21 @@ export default function EventCard({ event, onClick }: EventCardProps) {
       }
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, [event.id]);
 
   const eventDate = new Date(event.startDate);
   const currentDate = new Date();
   const isUpcoming = eventDate >= currentDate;
+  const isCreator = event.createdBy === user?.uid;
 
   const handleManageClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowManageCard(true);
   };
 
-  const isCreator = event.createdBy === user?.uid;
+  // Calculate filled slots by subtracting availableSlots from capacityLimit
+  const filledSlots = parseInt(event.capacityLimit) - event.availableSlots;
 
   return (
     <>
@@ -95,7 +98,7 @@ export default function EventCard({ event, onClick }: EventCardProps) {
               <div className="flex items-center space-x-2 text-sm text-muted-foreground text-white">
                 <Users className="h-4 w-4 flex-shrink-0" />
                 <span className="line-clamp-1">
-                  {event.participantApprovals.length} of {event.capacityLimit} slots filled
+                  {filledSlots} of {event.capacityLimit} slots filled
                 </span>
               </div>
             </CardContent>
@@ -125,7 +128,7 @@ export default function EventCard({ event, onClick }: EventCardProps) {
                   ) : (
                     <Button
                       size="sm"
-                      className="h-7 px-2 bg-green-500 text-white hover:bg-green-600"
+                      className="h-7 px-2 bg-yellow-500 text-white hover:bg-yellow-600"
                       onClick={() => {
                         if (!user?.uid) {
                           console.error("User ID is missing!");
@@ -142,11 +145,12 @@ export default function EventCard({ event, onClick }: EventCardProps) {
             )}
           </CardFooter>
         </div>
-        <div className="flex-shrink-0 w-[193px] h-[193px]">
-          <img
+        <div className="flex-shrink-0 w-[193px] h-[193px] relative">
+          <Image
             src={event.eventPoster || "/placeholder.svg"}
             alt={event.eventName}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         </div>
       </Card>

@@ -105,6 +105,76 @@ export default function CreateEvent() {
     setIsCapacityDialogOpen(false)
   }
 
+  const handleCreateEvent = async () => {
+    const missingFields = validateForm()
+    if (missingFields.length > 0) {
+      toast({
+        title: "Missing Information",
+        description: `Please fill in the following fields: ${missingFields.join(", ")}`,
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to create an event.",
+        variant: "destructive",
+      })
+      router.push("/login")
+      return
+    }
+
+    try {
+      setLoading(true)
+      await addDoc(collection(db, "events"), {
+        eventName,
+        startDate,
+        startTime,
+        endDate,
+        endTime,
+        isVirtual,
+        description,
+        location,
+        capacityLimit,
+        availableSlots: capacityLimit, 
+        eventPoster,
+        participantApprovals,
+        createdBy: user.uid,
+        creatorEmail: user.email,
+        creatorDisplayName: user.displayName || "Anonymous User",
+        createdAt: serverTimestamp(),
+        status: "pending", 
+      })
+
+      toast({
+        title: "Event Created Successfully",
+        description: `${eventName} has been created and is awaiting approval.`,
+      })
+
+      setEventName("")
+      setStartDate("")
+      setStartTime("")
+      setEndDate("")
+      setEndTime("")
+      setIsVirtual(false)
+      setDescription("")
+      setLocation("")
+      setCapacityLimit(null)
+      setEventPoster(null)
+      setParticipantApprovals({ student: false, alumni: false, faculty: false })
+    } catch (error: any) {
+      toast({
+        title: "Error Creating Event",
+        description: error.message || "An unexpected error occurred",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -137,74 +207,6 @@ export default function CreateEvent() {
     return missingFields
   }
 
-  const handleCreateEvent = async () => {
-    const missingFields = validateForm()
-    if (missingFields.length > 0) {
-      toast({
-        title: "Missing Information",
-        description: `Please fill in the following fields: ${missingFields.join(", ")}`,
-        variant: "destructive",
-      })
-      return
-    }
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to create an event.",
-        variant: "destructive",
-      })
-      router.push("/login")
-      return
-    }
-
-    try {
-      setLoading(true)
-      await addDoc(collection(db, "events"), {
-        eventName,
-        startDate,
-        startTime,
-        endDate,
-        endTime,
-        isVirtual,
-        description,
-        location,
-        capacityLimit,
-        eventPoster,
-        participantApprovals,
-        createdBy: user.uid,
-        creatorEmail: user.email,
-        creatorDisplayName: user.displayName || "Anonymous User",
-        createdAt: serverTimestamp(),
-        status: "pending", 
-      })
-
-      toast({
-        title: "Event Created Successfully",
-        description: `${eventName} has been created and is awaiting approval.`,
-      })
-      setEventName("")
-      setStartDate("")
-      setStartTime("")
-      setEndDate("")
-      setEndTime("")
-      setIsVirtual(false)
-      setDescription("")
-      setLocation("")
-      setCapacityLimit(null)
-      setEventPoster(null)
-      setParticipantApprovals({ student: false, alumni: false, faculty: false })
-
-    } catch (error: any) {
-      toast({
-        title: "Error Creating Event",
-        description: error.message || "An unexpected error occurred",
-        variant: "destructive",
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleParticipantApprovalChange = (participant: keyof typeof participantApprovals) => {
     setParticipantApprovals((prev) => ({
       ...prev,
@@ -219,7 +221,6 @@ export default function CreateEvent() {
       .join(", ")
   }
 
-  // Show loading state while checking authentication
   if (loading) {
     return <Loading />
   }
