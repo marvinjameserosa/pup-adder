@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,9 +11,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/app/firebase/config"
-import Link from 'next/link'
-import { useRouter } from 'next/navigation' 
+import { auth } from "@/app/firebase/config";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export function LoginForm({
@@ -23,35 +23,45 @@ export function LoginForm({
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
-  // Check if user is already logged in
+  // Form validation state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isValidEmail, setIsValidEmail] = useState(false);
+  const [isValidPassword, setIsValidPassword] = useState(false);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // User is signed in, redirect to discover page
-        router.push('/discover');
+        router.push("/discover");
       } else {
-        // No user is signed in, allow login form to display
         setLoading(false);
       }
     });
 
-    // Clean up subscription
     return () => unsubscribe();
   }, [router]);
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    setIsValidEmail(emailRegex.test(email));
+    setEmail(email);
+  };
+
+  const validatePassword = (value: string) => {
+    setPassword(value);
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    setIsValidPassword(passwordRegex.test(value));
+  };
+
   async function loginEmailPassword(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault(); 
-    
-    const formData = new FormData(event.currentTarget); 
-    const email = formData.get("email") as string; 
-    const password = formData.get("password") as string;
+    event.preventDefault();
     try {
       setLoading(true);
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      console.log("User:", user);
-      router.push('/discover');
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/discover");
     } catch (error: any) {
       setError(formatFirebaseError(error.code));
       setLoading(false);
@@ -94,10 +104,11 @@ export function LoginForm({
       "auth/user-not-found": "We couldn't find an account with that email. Try signing up instead.",
       "auth/wrong-password": "Incorrect password. Please check and try again.",
     };
-  
-    return errorMessages[errorCode] || "Something went wrong. Please try again later.";
+    return errorMessages[errorCode] || "Something went wrong. Try again later.";
   };
-  
+
+  const isFormValid = isValidEmail && isValidPassword;
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[300px]">
@@ -105,15 +116,13 @@ export function LoginForm({
       </div>
     );
   }
-  
+
   return (
     <div className={cn("flex flex-col gap-4", className)} {...props}>
       <Card className="shadow-xl rounded-[24px] bg-[#f2f3f7]/50 backdrop-blur-sm flex flex-col border border-[#302F30]">
         <CardHeader>
-        <div className="flex items-center gap-4">
-      </div>
           <CardTitle className="text-2xl text-[#a41e1d]">Welcome to PUP Gather!</CardTitle>
-          <CardDescription className={`${error ? "text-red-500" : "text-gray-600"}`}> 
+          <CardDescription className={`${error ? "text-red-500" : "text-gray-600"}`}>
             {error ? error : "Enter your credentials to login."}
           </CardDescription>
         </CardHeader>
@@ -127,35 +136,61 @@ export function LoginForm({
                   name="email"
                   type="email"
                   placeholder="person@example.com"
+                  value={email}
+                  onChange={(e) => validateEmail(e.target.value)}
                   required
                   className="bg-white text-black placeholder-gray-400"
                 />
+                {!isValidEmail && email.length > 0 && (
+                  <p className="text-red-500 text-sm">Invalid email format</p>
+                )}
               </div>
+
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input 
-                  id="password" 
-                  name="password" 
-                  type="password" 
-                  placeholder="password"
-                  required 
-                  className="bg-white text-black placeholder-gray-400"/>
-              </div>
-              <Button type="submit" className="w-full bg-[#a41e1d] hover:bg-[#722120] text-white">
+  <div className="flex items-center">
+    <Label htmlFor="password">Password</Label>
+    <a
+      href="#"
+      className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+    >
+      Forgot your password?
+    </a>
+  </div>
+  <div className="relative">
+    <Input
+      id="password"
+      name="password"
+      type={showPassword ? "text" : "password"}
+      placeholder="password"
+      value={password}
+      onChange={(e) => validatePassword(e.target.value)}
+      required
+      className="bg-white text-black placeholder-gray-400 pr-10"
+    />
+    
+  </div>
+
+  {!isValidPassword && password.length > 0 && (
+    <p className="text-red-500 text-sm">
+      Password must be at least 8 characters, include uppercase, lowercase, number, and special character.
+    </p>
+  )}
+</div>
+
+
+              <Button
+                type="submit"
+                disabled={!isFormValid}
+                className={`w-full text-white ${
+                  isFormValid ? "bg-[#a41e1d] hover:bg-[#722120]" : "bg-gray-400 cursor-not-allowed"
+                }`}
+              >
                 Login
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
-              <Link href="/signUp" className="underline underline-offset-4">
+              <Link href="/signUp" className="underline underline-offset-4 text-yellow-800">
                 Sign up
               </Link>
             </div>
