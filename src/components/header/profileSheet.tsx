@@ -17,6 +17,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 import { EmailAuthProvider, onAuthStateChanged, reauthenticateWithCredential, signOut, updatePassword, User } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { Eye, LogOut } from "lucide-react";
@@ -36,6 +38,7 @@ interface UserData {
 }
 
 export default function ProfileSheet() {
+  const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -88,14 +91,20 @@ export default function ProfileSheet() {
       const credential = EmailAuthProvider.credential(user.email!, currentPassword);
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, newPassword);
-      alert("Password updated successfully!");
+      toast({
+        title: "Password Changed Successfully",
+        description: `Your password has been changed.`,
+      })
       setIsDialogOpen(false);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (error) {
-      console.error("Error updating password:", error);
-      alert("Failed to update password. Please try again.");
+      toast({
+        title: "Error Updating Password",
+        description: "Please try again.",
+        variant: "destructive",
+      })
     }
   };
 
@@ -172,6 +181,7 @@ export default function ProfileSheet() {
             <Eye className="mr-2 h-5 w-5" />
             Change Password
           </Button>
+          <Toaster></Toaster>
           <Button
             variant="outline"
             className="w-full px-4 py-2 rounded-lg text-white border-white bg-[#a41e1d] transition-all hover:bg-red-600 hover:border-red-600 flex items-center justify-center"
