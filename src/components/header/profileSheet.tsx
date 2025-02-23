@@ -1,6 +1,15 @@
 import { auth, db } from "@/app/firebase/config";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -8,9 +17,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { onAuthStateChanged, signOut, User } from "firebase/auth";
+import { EmailAuthProvider, onAuthStateChanged, reauthenticateWithCredential, signOut, updatePassword, User } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { LogOut } from "lucide-react";
+import { Eye, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -30,6 +39,10 @@ export default function ProfileSheet() {
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -64,6 +77,28 @@ export default function ProfileSheet() {
       console.error("Logout failed:", error);
     }
   };
+
+  // Change Password Handling
+  const handleChangePassword = async () => {
+    if (!user || !currentPassword || !newPassword || newPassword !== confirmPassword) {
+      alert("Please fill out all fields correctly.");
+      return;
+    }
+    try {
+      const credential = EmailAuthProvider.credential(user.email!, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, newPassword);
+      alert("Password updated successfully!");
+      setIsDialogOpen(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      console.error("Error updating password:", error);
+      alert("Failed to update password. Please try again.");
+    }
+  };
+
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || event.target.files.length === 0 || !user) return;
@@ -130,6 +165,13 @@ export default function ProfileSheet() {
             <p className="text-sm">{userData?.department}</p>
             <p className="text-sm font-bold">Student No: {userData?.studentNumber}</p>
           </div>
+          <Button 
+            onClick={() => setIsDialogOpen(true)} 
+            variant="outline" 
+            className="w-full px-4 py-2 rounded-lg text-white border-white bg-[#a41e1d] transition-all hover:bg-red-600 hover:border-red-600 flex items-center justify-center">
+            <Eye className="mr-2 h-5 w-5" />
+            Change Password
+          </Button>
           <Button
             variant="outline"
             className="w-full px-4 py-2 rounded-lg text-white border-white bg-[#a41e1d] transition-all hover:bg-red-600 hover:border-red-600 flex items-center justify-center"
@@ -140,6 +182,20 @@ export default function ProfileSheet() {
           </Button>
         </div>
       </SheetContent>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="bg-[#a41e1d]">
+          <DialogHeader>
+            <DialogTitle className="text-white">Change Password</DialogTitle>
+            <DialogDescription className="text-white">Update your account password securely.</DialogDescription>
+          </DialogHeader>
+          <Input className="text-white" placeholder="Enter current password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+          <Input className="text-white" placeholder="Enter new password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <Input className="text-white" placeholder="Confirm new password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+          <DialogFooter>
+            <Button onClick={handleChangePassword} variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white">Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Sheet>
   );
 }

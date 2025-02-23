@@ -1,6 +1,7 @@
 "use client"
 import { auth, db } from "@/app/firebase/config"
 import Header from "@/components/header/header"
+import Loading from "@/components/loading"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
@@ -26,7 +27,6 @@ import { Building, ChevronDown, Clock, FileText, GraduationCap, Image, MapPin, T
 import NextImage from "next/image"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import Loading from "@/components/loading"
 
 export default function CreateEvent() {
   const { toast } = useToast()
@@ -471,6 +471,7 @@ export default function CreateEvent() {
                             <div className="space-y-2">
                               <Label htmlFor="capacity" className="text-white">Number of Attendees</Label>
                               <Input
+                                className="text-white"
                                 id="capacity"
                                 placeholder="Enter capacity limit"
                                 value={tempCapacity}
