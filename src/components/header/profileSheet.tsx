@@ -21,7 +21,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { EmailAuthProvider, onAuthStateChanged, reauthenticateWithCredential, signOut, updatePassword, User } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { Eye, LogOut } from "lucide-react";
+import { Building, Eye, LogOut, Mail, PersonStanding, School, UserCircle } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -167,12 +167,13 @@ export default function ProfileSheet() {
             )}
             <p className="text-xs text-gray-600 mt-2">Tap the icon to upload/change your profile pic</p>
           </label>
-          <div className="text-center text-[#a41e1d]">
-            <h3 className="text-lg font-semibold">{userData?.firstName} {userData?.lastName}</h3>
-            <p className="text-sm">{userData?.email}</p>
-            <p className="text-sm">{userData?.userType}</p>
-            <p className="text-sm">{userData?.department}</p>
-            <p className="text-sm font-bold">Student No: {userData?.studentNumber}</p>
+          <div className="space-y-2 text-sm text-[#a41e1d]">
+            <div className="flex text-lg font-semibold space-x-2"><UserCircle className="h-6 w-6 text-[#a41e1d]" /><span>{userData?.firstName} {userData?.lastName}</span></div>
+            <div className="flex items-center space-x-2"><Mail className="h-4 w-4 text-[#a41e1d]" /><span>{userData?.email}</span></div>
+            <div className="flex items-center space-x-2"><PersonStanding className="h-4 w-4 text-[#a41e1d]" /><span>{userData?.userType}</span></div>
+            <div className="flex items-center space-x-2"><Building className="h-4 w-4 text-[#a41e1d]" /><span>{userData?.department}</span></div>
+            <p className="text-sm"></p>
+            <div className="flex items-center font-bold space-x-2"><School className="h-4 w-4 text-[#a41e1d]" /><span>ID No: {userData?.studentNumber}</span></div>
           </div>
           <Button 
             onClick={() => setIsDialogOpen(true)} 
