@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 type SignUpForm1Props = {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -22,6 +23,7 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
   const [passwordError, setPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [isChecked, setIsChecked] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Email validation
   const validateEmail = (value: string) => {
@@ -47,14 +49,10 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-[url('/bg4.jpg')] bg-cover bg-center p-4">
       <div className="absolute inset-0 bg-black/60 mix-blend-multiply" />
-      <Card className="relative z-10 w-[360px] shadow-xl rounded-[24px] bg-[#f2f3f7]/60 backdrop-blur-sm flex flex-col border border-[#302F30]">
+      <Card className="relative z-10 w-[360px] shadow-xl rounded-[24px] bg-[#f2f3f7]/50 backdrop-blur-sm flex flex-col border border-[#302F30]">
         <CardHeader>
-          <CardTitle className="text-2xl text-[#a41e1d]">
-            Create your account
-          </CardTitle>
-          <CardDescription
-            className={errorMsg ? "text-red-500" : "text-gray-600"}
-          >
+          <CardTitle className="text-2xl text-[#a41e1d]">Create your account</CardTitle>
+          <CardDescription className={errorMsg ? "text-red-500" : "text-gray-600"}>
             {errorMsg ? errorMsg : "Complete the form to get started."}
           </CardDescription>
         </CardHeader>
@@ -74,27 +72,25 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
                   onChange={(e) => validateEmail(e.target.value)}
                   className="bg-white text-black placeholder-gray-400"
                 />
-                {emailError && (
-                  <p className="text-red-500 text-xs">{emailError}</p>
-                )}
+                {emailError && <p className="text-red-500 text-xs">{emailError}</p>}
               </div>
 
               {/* Password Input */}
-              <div className="grid gap-2">
+              <div className="grid gap-2 ">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="password"
-                  required
-                  value={password}
-                  onChange={(e) => validatePassword(e.target.value)}
-                  className="bg-white text-black placeholder-gray-400"
-                />
-                {passwordError && (
-                  <p className="text-red-500 text-xs">{passwordError}</p>
-                )}
+                <div >
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="password"
+                    required
+                    value={password}
+                    onChange={(e) => validatePassword(e.target.value)}
+                    className="bg-white text-black placeholder-gray-400 pr-10"
+                  />
+                </div>
+                {passwordError && <p className="text-red-500 text-xs">{passwordError}</p>}
               </div>
 
               {/* Data Privacy Agreement */}
@@ -108,29 +104,29 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
                   className="w-4 h-4 mt-1"
                 />
                 <Label htmlFor="privacy" className="text-sm">
-                  I agree to the{" "}
-                  <Link href="/privacy-policy" className="underline text-blue-600">
-                    Data Privacy Policy
-                  </Link>
+                  I agree to the {" "}
+                  <Dialog>
+                    <DialogTrigger className="underline text-blue-600">Data Privacy Policy</DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle className="text-[#a41e1d]">Data Privacy Policy</DialogTitle>
+                      </DialogHeader>
+                      <p>By providing your information, you agree to share your personal data with PUP for processing in accordance with our data privacy policy.</p>
+                    </DialogContent>
+                  </Dialog>
                 </Label>
               </div>
 
               {/* Sign Up Button */}
-              <Button
-                type="submit"
-                className="w-full bg-yellow-500 hover:bg-yellow-800 text-black"
-                disabled={!isFormValid}
-              >
+              <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-800 text-black" disabled={!isFormValid}>
                 Sign up
               </Button>
             </div>
 
             {/* Login Redirect */}
             <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
-              <Link href="/" className="underline underline-offset-4 text-yellow-800">
-                Login
-              </Link>
+              Already have an account? {" "}
+              <Link href="/" className="underline underline-offset-4 text-yellow-800">Login</Link>
             </div>
           </form>
         </CardContent>
