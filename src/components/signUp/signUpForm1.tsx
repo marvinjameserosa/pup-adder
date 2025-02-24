@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Eye, EyeOff } from "lucide-react";
 
 type SignUpForm1Props = {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -20,10 +21,13 @@ type SignUpForm1Props = {
 export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [isChecked, setIsChecked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Email validation
   const validateEmail = (value: string) => {
@@ -42,9 +46,28 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
         ? ""
         : "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
     );
+    // Validate confirm password when password changes
+    if (confirmPassword) {
+      validateConfirmPassword(confirmPassword, value);
+    }
   };
 
-  const isFormValid = email && password && !emailError && !passwordError && isChecked;
+  // Confirm password validation
+  const validateConfirmPassword = (confirmValue: string, passwordValue: string = password) => {
+    setConfirmPassword(confirmValue);
+    setConfirmPasswordError(
+      confirmValue === passwordValue ? "" : "Passwords do not match"
+    );
+  };
+
+  const isFormValid = 
+    email && 
+    password && 
+    confirmPassword && 
+    !emailError && 
+    !passwordError && 
+    !confirmPasswordError && 
+    isChecked;
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-[url('/bg4.jpg')] bg-cover bg-center p-4">
@@ -74,25 +97,54 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
                 />
                 {emailError && <p className="text-red-500 text-xs">{emailError}</p>}
               </div>
-
               {/* Password Input */}
-              <div className="grid gap-2 ">
+              <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-                <div >
+                <div className="relative">
                   <Input
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="password"
+                    placeholder="Password"
                     required
                     value={password}
                     onChange={(e) => validatePassword(e.target.value)}
                     className="bg-white text-black placeholder-gray-400 pr-10"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
                 </div>
                 {passwordError && <p className="text-red-500 text-xs">{passwordError}</p>}
               </div>
-
+              {/* Confirm Password Input */}
+              <div className="grid gap-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => validateConfirmPassword(e.target.value)}
+                    className="bg-white text-black placeholder-gray-400 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+                {confirmPasswordError && <p className="text-red-500 text-xs">{confirmPasswordError}</p>}
+              </div>
               {/* Data Privacy Agreement */}
               <div className="flex items-start gap-2">
                 <input
@@ -116,13 +168,11 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
                   </Dialog>
                 </Label>
               </div>
-
               {/* Sign Up Button */}
               <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-800 text-black" disabled={!isFormValid}>
                 Sign up
               </Button>
             </div>
-
             {/* Login Redirect */}
             <div className="mt-4 text-center text-sm">
               Already have an account? {" "}
