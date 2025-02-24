@@ -1,10 +1,10 @@
 "use client"
 import { auth, db } from "@/app/firebase/config"
 import Header from "@/components/header/header"
+import Loading from "@/components/loading"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import {
   Dialog,
   DialogContent,
@@ -26,7 +26,6 @@ import { Building, ChevronDown, Clock, FileText, GraduationCap, Image, MapPin, T
 import NextImage from "next/image"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import Loading from "@/components/loading"
 
 export default function CreateEvent() {
   const { toast } = useToast()
@@ -326,32 +325,29 @@ export default function CreateEvent() {
                   </div>
                   <Dialog open={isLocationDialogOpen} onOpenChange={setIsLocationDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button variant="outline" className="w-full h-[45px] text-black">
-                        {location ? <span className="truncate">{location}</span> : "Select Location"}
+                      <Button variant="outline" className="w-full h-auto min-h-[45px] py-2 px-3 text-left text-black">
+                        <span className="block truncate">{location ? location : "Add Location"}</span>
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="bg-[#a41e1d]">
                       <DialogHeader>
                         <DialogTitle className="text-white">Event Location</DialogTitle>
                         <DialogDescription className="text-white">
-                          Enter the location for your event or provide a virtual meeting link.
+                          Enter the location of your event. Click save when you&apos;re done.
                         </DialogDescription>
                       </DialogHeader>
-                      <Command className="w-full border rounded-md text-black">
-                        <CommandInput
-                          placeholder={isVirtual ? "Enter meeting link" : "Enter physical location"}
-                          onValueChange={setLocation}
+                      <div className="space-y-2 py-4 text-gray-800">
+                        <Label className="text-white" htmlFor="location-content">Location</Label>
+                        <textarea
+                          id="location-content"
+                          className="w-full h-20 p-2 border rounded-md"
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
+                          placeholder="Enter event lcoation"
                         />
-                        <CommandList>
-                          <CommandEmpty>No results found.</CommandEmpty>
-                          <CommandGroup>
-                            <CommandItem onSelect={() => setIsVirtual(false)}>Physical Location</CommandItem>
-                            <CommandItem onSelect={() => setIsVirtual(true)}>Virtual Meeting</CommandItem>
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
+                      </div>
                       <DialogFooter>
-                        <Button onClick={() => setIsLocationDialogOpen(false)} variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white">Done</Button>
+                        <Button onClick={() => setIsLocationDialogOpen(false)} variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white">Save</Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
@@ -369,13 +365,13 @@ export default function CreateEvent() {
                     </DialogTrigger>
                     <DialogContent className="bg-[#a41e1d]">
                       <DialogHeader>
-                        <DialogTitle>Event Description</DialogTitle>
-                        <DialogDescription>
+                        <DialogTitle className="text-white">Event Description</DialogTitle>
+                        <DialogDescription className="text-white">
                           Write a description for your event. Click save when you&apos;re done.
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-2 py-4 text-gray-800">
-                        <Label htmlFor="description-content">Description</Label>
+                        <Label className="text-white" htmlFor="description-content">Description</Label>
                         <textarea
                           id="description-content"
                           className="w-full h-40 p-2 border rounded-md"
@@ -471,6 +467,7 @@ export default function CreateEvent() {
                             <div className="space-y-2">
                               <Label htmlFor="capacity" className="text-white">Number of Attendees</Label>
                               <Input
+                                className="text-white"
                                 id="capacity"
                                 placeholder="Enter capacity limit"
                                 value={tempCapacity}

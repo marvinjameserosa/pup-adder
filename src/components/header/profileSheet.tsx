@@ -1,6 +1,15 @@
 import { auth, db } from "@/app/firebase/config";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -8,9 +17,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { onAuthStateChanged, signOut, User } from "firebase/auth";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
+import { EmailAuthProvider, onAuthStateChanged, reauthenticateWithCredential, signOut, updatePassword, User } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { LogOut } from "lucide-react";
+import { Building, Eye, LogOut, Mail, PersonStanding, School, UserCircle } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -27,9 +38,14 @@ interface UserData {
 }
 
 export default function ProfileSheet() {
+  const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -64,6 +80,34 @@ export default function ProfileSheet() {
       console.error("Logout failed:", error);
     }
   };
+
+  // Change Password Handling
+  const handleChangePassword = async () => {
+    if (!user || !currentPassword || !newPassword || newPassword !== confirmPassword) {
+      alert("Please fill out all fields correctly.");
+      return;
+    }
+    try {
+      const credential = EmailAuthProvider.credential(user.email!, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, newPassword);
+      toast({
+        title: "Password Changed Successfully",
+        description: `Your password has been changed.`,
+      })
+      setIsDialogOpen(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      toast({
+        title: "Error Updating Password",
+        description: "Please try again.",
+        variant: "destructive",
+      })
+    }
+  };
+
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || event.target.files.length === 0 || !user) return;
@@ -123,13 +167,22 @@ export default function ProfileSheet() {
             )}
             <p className="text-xs text-gray-600 mt-2">Tap the icon to upload/change your profile pic</p>
           </label>
-          <div className="text-center text-[#a41e1d]">
-            <h3 className="text-lg font-semibold">{userData?.firstName} {userData?.lastName}</h3>
-            <p className="text-sm">{userData?.email}</p>
-            <p className="text-sm">{userData?.userType}</p>
-            <p className="text-sm">{userData?.department}</p>
-            <p className="text-sm font-bold">Student No: {userData?.studentNumber}</p>
+          <div className="space-y-2 text-sm text-[#a41e1d]">
+            <div className="flex text-lg font-semibold space-x-2"><UserCircle className="h-6 w-6 text-[#a41e1d]" /><span>{userData?.firstName} {userData?.lastName}</span></div>
+            <div className="flex items-center space-x-2"><Mail className="h-4 w-4 text-[#a41e1d]" /><span>{userData?.email}</span></div>
+            <div className="flex items-center space-x-2"><PersonStanding className="h-4 w-4 text-[#a41e1d]" /><span>{userData?.userType}</span></div>
+            <div className="flex items-center space-x-2"><Building className="h-4 w-4 text-[#a41e1d]" /><span>{userData?.department}</span></div>
+            <p className="text-sm"></p>
+            <div className="flex items-center font-bold space-x-2"><School className="h-4 w-4 text-[#a41e1d]" /><span>ID No: {userData?.studentNumber}</span></div>
           </div>
+          <Button 
+            onClick={() => setIsDialogOpen(true)} 
+            variant="outline" 
+            className="w-full px-4 py-2 rounded-lg text-white border-white bg-[#a41e1d] transition-all hover:bg-red-600 hover:border-red-600 flex items-center justify-center">
+            <Eye className="mr-2 h-5 w-5" />
+            Change Password
+          </Button>
+          <Toaster></Toaster>
           <Button
             variant="outline"
             className="w-full px-4 py-2 rounded-lg text-white border-white bg-[#a41e1d] transition-all hover:bg-red-600 hover:border-red-600 flex items-center justify-center"
@@ -140,6 +193,20 @@ export default function ProfileSheet() {
           </Button>
         </div>
       </SheetContent>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="bg-[#a41e1d]">
+          <DialogHeader>
+            <DialogTitle className="text-white">Change Password</DialogTitle>
+            <DialogDescription className="text-white">Update your account password securely.</DialogDescription>
+          </DialogHeader>
+          <Input className="text-white" placeholder="Enter current password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+          <Input className="text-white" placeholder="Enter new password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <Input className="text-white" placeholder="Confirm new password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+          <DialogFooter>
+            <Button onClick={handleChangePassword} variant="outline" className="text-[#a41e1d] hover:bg-[#722120] hover:text-white">Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Sheet>
   );
 }
