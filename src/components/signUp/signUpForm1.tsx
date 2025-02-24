@@ -29,14 +29,12 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Email validation
   const validateEmail = (value: string) => {
     setEmail(value);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     setEmailError(emailRegex.test(value) ? "" : "Invalid email format");
   };
 
-  // Password validation
   const validatePassword = (value: string) => {
     setPassword(value);
     const passwordRegex =
@@ -46,13 +44,11 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
         ? ""
         : "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
     );
-    // Validate confirm password when password changes
     if (confirmPassword) {
       validateConfirmPassword(confirmPassword, value);
     }
   };
 
-  // Confirm password validation
   const validateConfirmPassword = (confirmValue: string, passwordValue: string = password) => {
     setConfirmPassword(confirmValue);
     setConfirmPasswordError(
