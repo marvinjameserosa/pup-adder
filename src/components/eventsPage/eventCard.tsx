@@ -13,7 +13,6 @@ import { generateTicket } from "@/utils/getTickets";
 interface EventData {
   id: string;
   capacityLimit: string;
-  availableSlots: number;
   createdAt: string;
   createdBy: string;
   description: string;
@@ -66,7 +65,6 @@ export default function EventCard({ event, onClick }: EventCardProps) {
     setShowManageCard(true);
   };
 
-  // Calculate number of attendees
   const numberOfAttendees = event.noOfAttendees;
 
   return (

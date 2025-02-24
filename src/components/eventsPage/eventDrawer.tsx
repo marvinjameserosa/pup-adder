@@ -18,8 +18,8 @@ interface EventData {
   eventPoster: string
   isVirtual: boolean
   location: string
+  noOfAttendees: number
   participantApprovals: Array<any>
-  availableSlots: number
 }
 
 interface EventDrawerProps {
@@ -31,8 +31,7 @@ interface EventDrawerProps {
 export default function EventDrawer({ event, isOpen, onClose }: EventDrawerProps) {
   if (!event) return null
 
-  // Calculate number of attendees
-  const numberOfAttendees = parseInt(event.capacityLimit) - event.availableSlots
+  const numberOfAttendees = event.noOfAttendees;
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
