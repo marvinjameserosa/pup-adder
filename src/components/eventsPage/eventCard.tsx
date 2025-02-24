@@ -13,7 +13,6 @@ import { generateTicket } from "@/utils/getTickets";
 interface EventData {
   id: string;
   capacityLimit: string;
-  availableSlots: number;
   createdAt: string;
   createdBy: string;
   description: string;
@@ -25,7 +24,8 @@ interface EventData {
   eventPoster: string;
   isVirtual: boolean;
   location: string;
-  participantApprovals: Array<any>; // Added back for ManageEventCard
+  noOfAttendees: number;
+  participantApprovals: Array<any>; 
 }
 
 interface EventCardProps {
@@ -65,8 +65,7 @@ export default function EventCard({ event, onClick }: EventCardProps) {
     setShowManageCard(true);
   };
 
-  // Calculate number of attendees
-  const numberOfAttendees = parseInt(event.capacityLimit) - event.availableSlots;
+  const numberOfAttendees = event.noOfAttendees;
 
   return (
     <>

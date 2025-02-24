@@ -11,7 +11,6 @@ import EventDrawer from "./eventDrawer";
 
 interface EventData {
   id: string;
-  availableSlots: number;
   capacityLimit: string;
   createdAt: string;
   createdBy: string;
@@ -24,6 +23,7 @@ interface EventData {
   eventPoster: string;
   isVirtual: boolean;
   location: string;
+  noOfAttendees: number;
   participantApprovals: Array<any>;
 }
 
