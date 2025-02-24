@@ -1,4 +1,3 @@
-// src/components/header/QRScanner.tsx
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
@@ -19,11 +18,11 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
   const [cameraError, setCameraError] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [scanResult, setScanResult] = useState<string | null>(null)
-  const [videoAspectRatio, setVideoAspectRatio] = useState(1.333) // Default 4:3
+  const [videoAspectRatio, setVideoAspectRatio] = useState<number>(16 / 9)
 
   const scannerRef = useRef<any>(null)
   const streamRef = useRef<MediaStream | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
   const handleQRCodeDetected = useCallback(async (decodedText: string) => {
     setIsScanning(false)
@@ -44,9 +43,7 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
       const { eventId, userId } = JSON.parse(decodedText)
       const userDoc = await getDoc(doc(db, "users", userId))
 
-      if (!userDoc.exists()) {
-        throw new Error("User not found")
-      }
+      if (!userDoc.exists()) throw new Error("User not found")
 
       const userData = userDoc.data()
       const events = userData.registeredEvents || {}
@@ -78,6 +75,7 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
     try {
       if (scannerRef.current) {
         await scannerRef.current.stop()
+        scannerRef.current.clear()
         scannerRef.current = null
       }
     } catch (error) {
@@ -90,7 +88,7 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
     }
 
     if (containerRef.current) {
-      containerRef.current.innerHTML = ''
+      containerRef.current.innerHTML = '' // Clear DOM elements
     }
 
     setIsScanning(false)
@@ -101,52 +99,62 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
 
     try {
       const { Html5Qrcode } = await import('html5-qrcode')
-      if (containerRef.current) {
-        const scannerId = "qr-scanner-" + Date.now() 
-        containerRef.current.innerHTML = `<div id="${scannerId}" style="width: 100%; height: 100%;"></div>`
-        
-        scannerRef.current = new Html5Qrcode(scannerId)
-        const cameras = await Html5Qrcode.getCameras()
-        
-        if (!cameras.length) {
-          throw new Error("No cameras found")
-        }
 
+      if (!containerRef.current) throw new Error("Scanner container not found")
 
-        const cameraId = cameras.find(cam => /back|rear/i.test(cam.label))?.id || cameras[0].id
+      const scannerId = "qr-scanner-" + Date.now()
+      containerRef.current.innerHTML = `<div id="${scannerId}" style="width: 100%; height: 100%;"></div>`
 
-        scannerRef.current.htmlVideoElementCallback = (videoElement: HTMLVideoElement) => {
-          videoElement.addEventListener('loadedmetadata', () => {
-            if (videoElement.videoWidth && videoElement.videoHeight) {
-              setVideoAspectRatio(videoElement.videoWidth / videoElement.videoHeight)
-            }
-          })
+      scannerRef.current = new Html5Qrcode(scannerId)
 
-          if (videoElement.srcObject instanceof MediaStream) {
-            streamRef.current = videoElement.srcObject
+      const cameras = await Html5Qrcode.getCameras()
+      if (!cameras.length) throw new Error("No cameras found")
+
+      const cameraId = cameras.find(cam => /back|rear|environment/i.test(cam.label))?.id || cameras[0].id
+
+      await scannerRef.current.start(
+        { deviceId: cameraId },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: videoAspectRatio,
+          disableFlip: true,
+        },
+        handleQRCodeDetected
+      )
+
+      // Access and style video element
+      const videoElement = containerRef.current.querySelector("video") as HTMLVideoElement | null
+      if (videoElement) {
+        videoElement.playsInline = true
+        videoElement.style.objectFit = "cover"
+        videoElement.style.width = "100%"
+        videoElement.style.height = "100%"
+
+        videoElement.addEventListener("loadedmetadata", () => {
+          if (videoElement.videoWidth && videoElement.videoHeight) {
+            setVideoAspectRatio(videoElement.videoWidth / videoElement.videoHeight)
           }
+        })
+
+        // Store stream for cleanup
+        if (videoElement.srcObject instanceof MediaStream) {
+          streamRef.current = videoElement.srcObject
         }
-
-        await scannerRef.current.start(
-          { deviceId: cameraId },
-          {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1.333,
-          },
-          handleQRCodeDetected,
-          () => {} 
-        )
-
-        setIsScanning(true)
-        setCameraError(null)
       }
+
+      // Remove unwanted overlays
+      const overlays = containerRef.current.querySelectorAll(".qr-code-full-region, canvas")
+      overlays.forEach(el => el.remove())
+
+      setIsScanning(true)
+      setCameraError(null)
     } catch (error) {
       console.error("Scanner Error:", error)
       setCameraError(error instanceof Error ? error.message : "Failed to start scanner")
       stopScanner()
     }
-  }, [handleQRCodeDetected, stopScanner])
+  }, [handleQRCodeDetected, stopScanner, videoAspectRatio])
 
   useEffect(() => {
     if (isOpen) {
@@ -156,14 +164,11 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
       setScanResult(null)
       setCameraError(null)
     }
-  }, [isOpen, startScanner, stopScanner])
 
-  // Cleanup on unmount
-  useEffect(() => {
     return () => {
-      stopScanner()
+      stopScanner() // Cleanup on unmount
     }
-  }, [stopScanner])
+  }, [isOpen, startScanner, stopScanner])
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -174,53 +179,39 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
 
         <div className="flex flex-col items-center space-y-4">
           {/* Scanner Container */}
-          <div 
-            className="relative w-full max-w-[300px] bg-white rounded-lg overflow-hidden"
+          <div
+            ref={containerRef}
+            className="relative w-full max-w-[300px] bg-black rounded-lg overflow-hidden"
             style={{ aspectRatio: videoAspectRatio }}
-          >
-            <div 
-              ref={containerRef}
-              className="absolute inset-0"
-            />
+          />
 
-            {/* Scanner Overlay */}
-            {isScanning && (
-              <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-48 h-48 border-2 border-white border-dashed rounded-lg" />
-                </div>
-              </div>
-            )}
+          {/* Loading State */}
+          {!isScanning && !cameraError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+              <Loader2 className="w-8 h-8 animate-spin text-white" />
+            </div>
+          )}
 
-            {/* Loading State */}
-            {!isScanning && !cameraError && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                <Loader2 className="w-8 h-8 animate-spin text-white" />
+          {/* Error State */}
+          {cameraError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 p-4">
+              <div className="text-center text-white">
+                <X className="w-8 h-8 mx-auto mb-2 text-red-500" />
+                <p className="text-sm">{cameraError}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => {
+                    setCameraError(null)
+                    startScanner()
+                  }}
+                >
+                  Retry
+                </Button>
               </div>
-            )}
-
-            {/* Error State */}
-            {cameraError && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50 p-4">
-                <div className="text-center text-white">
-                  <X className="w-8 h-8 mx-auto mb-2 text-red-500" />
-                  <p className="text-sm">{cameraError}</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-2"
-                    onClick={() => {
-                      setCameraError(null)
-                      startScanner()
-                    }}
-                    
-                  >
-                    Retry
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Result Display */}
           {scanResult && (
