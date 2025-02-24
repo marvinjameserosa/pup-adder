@@ -7,6 +7,12 @@ import { toast } from "@/hooks/use-toast"
 import { auth, db } from "@/app/firebase/config"
 import { doc, getDoc, updateDoc } from "firebase/firestore"
 
+// Define the Camera interface
+interface Camera {
+  id: string;
+  label: string;
+}
+
 interface QRScannerProps {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
@@ -38,7 +44,7 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
     // Stop the scanner
     if (scannerRef.current) {
       try {
-        scannerRef.current.stop().catch(e => console.warn("Error stopping scanner:", e))
+        scannerRef.current.stop().catch((e: Error) => console.warn("Error stopping scanner:", e))
         scannerRef.current.clear()
       } catch (e) {
         console.warn("Error cleaning up scanner:", e)
@@ -215,11 +221,7 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
       }
       
       containerRef.current.appendChild(scannerDiv)
-      
-      // Create scanner instance
       scannerRef.current = new Html5Qrcode(scannerId)
-      
-      // Get cameras
       const cameras = await Html5Qrcode.getCameras()
       if (!cameras.length) {
         if (mountedRef.current) {
@@ -230,12 +232,9 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
       }
       
       if (!mountedRef.current) return
-      
-      // Use back camera if available
-      const cameraId = cameras.find(cam => /back|rear|environment/i.test(cam.label))?.id || cameras[0].id
+      const cameraId = cameras.find((cam: Camera) => /back|rear|environment/i.test(cam.label))?.id || cameras[0].id
       
       try {
-        // Start scanner with simpler config
         await scannerRef.current.start(
           { deviceId: cameraId },
           {
@@ -245,15 +244,13 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
             disableFlip: true
           },
           handleQRCodeDetected,
-          () => {} // Silent error handler
+          () => {} 
         )
         
         if (!mountedRef.current) {
           cleanupScanner()
           return
         }
-        
-        // Get video element
         const videoElement = document.getElementById(scannerId)?.querySelector("video") as HTMLVideoElement | null
         
         if (videoElement) {
@@ -261,7 +258,6 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
           videoElement.muted = true
           videoElement.style.objectFit = "cover"
           
-          // Store stream for cleanup
           if (videoElement.srcObject instanceof MediaStream) {
             streamRef.current = videoElement.srcObject
           }
@@ -291,19 +287,13 @@ export function QRScanner({ isOpen, onOpenChange }: QRScannerProps) {
       cleanupScanner()
     }
   }, [handleQRCodeDetected, cleanupScanner, isInitializing, initializeQrScanner])
-  
-  // Setup effect - runs once on mount
   useEffect(() => {
     mountedRef.current = true
-    
-    // Cleanup on unmount
     return () => {
       mountedRef.current = false
       cleanupScanner()
     }
   }, [cleanupScanner])
-  
-  // Handle dialog open/close
   useEffect(() => {
     if (isOpen && !isScanning && !isInitializing && !cameraError && !scanResult) {
       const timeout = setTimeout(() => {
