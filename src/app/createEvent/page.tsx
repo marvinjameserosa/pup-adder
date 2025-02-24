@@ -136,8 +136,7 @@ export default function CreateEvent() {
         isVirtual,
         description,
         location,
-        capacityLimit,
-        availableSlots: capacityLimit, 
+        capacityLimit, 
         eventPoster,
         participantApprovals,
         createdBy: user.uid,
@@ -149,7 +148,7 @@ export default function CreateEvent() {
 
       toast({
         title: "Event Created Successfully",
-        description: `${eventName} has been created and is awaiting approval.`,
+        description: `${eventName} has been created.`,
       })
 
       setEventName("")
