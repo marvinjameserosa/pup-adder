@@ -164,15 +164,21 @@ export default function DiscoverPage() {
           </div>
         </div>
 
-        <Suspense
-          fallback={
-            <div className="flex justify-center items-center h-64">
-              <Loading message="Loading carousel..." />
-            </div>
-          }
-        >
-          <EmblaCarousel slides={filteredSlides} onCardClick={handleCardClick} />
-        </Suspense>
+        {filteredSlides.length > 0 ? (
+          <Suspense
+            fallback={
+              <div className="flex justify-center items-center h-64">
+                <Loading message="Loading carousel..." />
+              </div>
+            }
+          >
+            <EmblaCarousel slides={filteredSlides} onCardClick={handleCardClick} />
+          </Suspense>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-64 text-gray-600">
+            <p className="text-xl font-semibold">No events are available at this moment, please check back later.</p>
+          </div>
+        )}
       </div>
       <EmblaSheet isOpen={isSheetOpen} onClose={() => setSheetOpen(false)} event={selectedEvent} />
     </div>

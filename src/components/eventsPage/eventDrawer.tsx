@@ -1,4 +1,5 @@
 "use client"
+import Image from "next/image"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { CalendarDays, MapPin, Users } from "lucide-react"
@@ -18,6 +19,7 @@ interface EventData {
   isVirtual: boolean
   location: string
   participantApprovals: Array<any>
+  availableSlots: number
 }
 
 interface EventDrawerProps {
@@ -29,6 +31,9 @@ interface EventDrawerProps {
 export default function EventDrawer({ event, isOpen, onClose }: EventDrawerProps) {
   if (!event) return null
 
+  // Calculate number of attendees
+  const numberOfAttendees = parseInt(event.capacityLimit) - event.availableSlots
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="sm:max-w-[425px] bg-[#f2f3f7]/60 text-white">
@@ -36,11 +41,15 @@ export default function EventDrawer({ event, isOpen, onClose }: EventDrawerProps
           <SheetTitle className="text-2xl text-[#a41e1d] font-bold">{event.eventName}</SheetTitle>
         </SheetHeader>
         <ScrollArea className="h-[calc(100vh-120px)] pr-4">
-          <img
-            src={event.eventPoster || "/placeholder.svg"}
-            alt={event.eventName}
-            className="w-full h-48 object-cover rounded-lg mb-4"
-          />
+          <div className="w-full h-48 relative rounded-lg mb-4 overflow-hidden">
+            <Image
+              src={event.eventPoster || "/placeholder.svg"}
+              alt={event.eventName}
+              layout="fill"
+              objectFit="cover"
+              className="rounded-lg"
+            />
+          </div>
           <div className="space-y-4">
             <div className="flex items-center space-x-2 text-[#a41e1d]">
               <CalendarDays className="h-5 w-5 text-[#a41e1d]" />
@@ -54,7 +63,7 @@ export default function EventDrawer({ event, isOpen, onClose }: EventDrawerProps
             </div>
             <div className="flex items-center space-x-2 text-[#a41e1d]">
               <Users className="h-5 w-5 text-[#a41e1d]" />
-              <span>{event.participantApprovals.length} attendees</span>
+              <span>{numberOfAttendees} attendees</span>
             </div>
             <SheetDescription className="text-[#a41e1d]">{event.description}</SheetDescription>
           </div>
@@ -63,4 +72,3 @@ export default function EventDrawer({ event, isOpen, onClose }: EventDrawerProps
     </Sheet>
   )
 }
-

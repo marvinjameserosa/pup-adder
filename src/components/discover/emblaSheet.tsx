@@ -18,6 +18,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
   const [isEventCreator, setIsEventCreator] = useState(false);
   const [ticketGenerated, setTicketGenerated] = useState(false);
   const [isLoadingUserData, setIsLoadingUserData] = useState(true);
+  const [availableSlots, setAvailableSlots] = useState<number | "unlimited">("unlimited");
   const { toast } = useToast();
   const router = useRouter();
   const user = auth.currentUser;
@@ -41,9 +42,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
         
         if (userSnap.exists()) {
           const userData = userSnap.data();
-          // Check if event.id exists in registeredEvents
           setRegistered(userData.registeredEvents && event.id in userData.registeredEvents);
-          // Check if it's set to true specifically
           setTicketGenerated(userData.registeredEvents?.[event.id] === true);
         }
         
@@ -51,10 +50,17 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
         const eventSnap = await getDoc(eventRef);
         
         if (eventSnap.exists()) {
-          setIsEventCreator(eventSnap.data().createdBy === user.uid);
+          const eventData = eventSnap.data();
+          setIsEventCreator(eventData.createdBy === user.uid);
+          if (eventData.capacityLimit === null) {
+            setAvailableSlots("unlimited");
+          } else {
+            const capacityLimit = parseInt(eventData.capacityLimit);
+            const registeredCount = eventData.registeredUsers?.length || 0;
+            setAvailableSlots(Math.max(0, capacityLimit - registeredCount));
+          }
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
         showErrorToast("Failed to check user status.");
       } finally {
         setIsLoadingUserData(false);
@@ -94,20 +100,37 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
         setRegistered(true);
         return;
       }
-      
-      if (eventData.capacityLimit && eventData.registeredUsers?.length >= parseInt(eventData.capacityLimit)) {
+
+      if (typeof availableSlots === 'number' && availableSlots <= 0) {
         toast({ variant: "destructive", title: "Full", description: "No more slots available." });
         return;
       }
+
+      // Calculate new available slots count
+      let newAvailableSlots: number | null = null;
+      if (eventData.capacityLimit !== null) {
+        const capacityLimit = parseInt(eventData.capacityLimit);
+        const currentRegisteredCount = eventData.registeredUsers?.length || 0;
+        newAvailableSlots = Math.max(0, capacityLimit - (currentRegisteredCount + 1));
+      }
       
-      await updateDoc(eventRef, { registeredUsers: arrayUnion(user.uid) });
+      // Update both registeredUsers and availableSlots in the database
+      await updateDoc(eventRef, { 
+        registeredUsers: arrayUnion(user.uid),
+        availableSlots: newAvailableSlots
+      });
+      
       await updateDoc(userRef, { [`registeredEvents.${event.id}`]: false });
+
+      // Update local state
+      if (typeof availableSlots === 'number') {
+        setAvailableSlots(prev => typeof prev === 'number' ? Math.max(0, prev - 1) : prev);
+      }
       
       toast({ variant: "default", title: "Success", description: "Successfully registered!" });
       setRegistered(true);
       setTicketGenerated(false);
     } catch (error) {
-      console.error("Registration error:", error);
       toast({ variant: "destructive", title: "Error", description: "Registration failed. Try again." });
     } finally {
       setLoading(false);
@@ -126,7 +149,6 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
       setTicketGenerated(true);
       toast({ variant: "default", title: "Ticket", description: "Ticket downloaded! 🎟️" });
     } catch (error) {
-      console.error("Error generating ticket:", error);
       toast({ variant: "destructive", title: "Error", description: "Failed to generate ticket. Please try again." });
     }
   };
@@ -161,7 +183,12 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
                   <div className="flex items-center space-x-2"><Calendar className="h-4 w-4 text-[#a41e1d]" /><span>{event.date}</span></div>
                   <div className="flex items-center space-x-2"><Clock className="h-4 w-4 text-[#a41e1d]" /><span>{event.time}</span></div>
                   <div className="flex items-center space-x-2"><MapPin className="h-4 w-4 text-[#a41e1d]" /><span>{event.location}</span></div>
-                  <div className="flex items-center space-x-2"><Users className="h-4 w-4 text-[#a41e1d]" /><span>{event.availableSlots} of {event.totalSlots} slots available</span></div>
+                  <div className="flex items-center space-x-2">
+                    <Users className="h-4 w-4 text-[#a41e1d]" />
+                    <span>
+                      {availableSlots === "unlimited" ? "Unlimited slots available" : `${availableSlots} slots available`}
+                    </span>
+                  </div>
                 </div>
                 <div className="mt-6">
                   {isEventCreator ? (
@@ -179,8 +206,14 @@ export default function EmblaSheet({ isOpen, onClose, event }: { isOpen: boolean
                       </Button>
                     )
                   ) : (
-                    <Button onClick={handleRegister} className="w-full bg-green-500 hover:bg-green-600 text-white" disabled={loading}>
-                      {loading ? "Registering..." : "Click to Register"}
+                    <Button 
+                      onClick={handleRegister} 
+                      className="w-full bg-green-500 hover:bg-green-600 text-white" 
+                      disabled={loading || (typeof availableSlots === 'number' && availableSlots <= 0)}
+                    >
+                      {loading ? "Registering..." : 
+                       (typeof availableSlots === 'number' && availableSlots <= 0) ? "Event Full" : 
+                       "Click to Register"}
                     </Button>
                   )}
                 </div>
