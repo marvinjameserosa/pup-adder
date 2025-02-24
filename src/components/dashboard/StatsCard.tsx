@@ -1,13 +1,15 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils"; 
 
 interface StatsCardProps {
   title: string;
   value: number;
   Icon: LucideIcon;
+  className?: string
 }
 
-export function StatsCard({ title, value, Icon }: StatsCardProps) {
+export function StatsCard({ title, value, Icon, className }: StatsCardProps) {
   return (
     <Card className="bg-[#722120] text-white p-4">
       <CardHeader className="flex flex-row items-center justify-between pb-2">

@@ -21,6 +21,11 @@ export interface EventData {
       [eventId: string]: boolean;
     };
   }
+
+  export interface CancelStatus {
+    loading: boolean;
+    error: string | null;
+  }
   
   export interface Participant extends User {
     registrationDate: string;
