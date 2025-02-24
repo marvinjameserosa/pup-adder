@@ -25,7 +25,8 @@ interface EventData {
   eventPoster: string;
   isVirtual: boolean;
   location: string;
-  participantApprovals: Array<any>; // Added back for ManageEventCard
+  noOfAttendees: number;
+  participantApprovals: Array<any>; 
 }
 
 interface EventCardProps {
@@ -66,7 +67,7 @@ export default function EventCard({ event, onClick }: EventCardProps) {
   };
 
   // Calculate number of attendees
-  const numberOfAttendees = parseInt(event.capacityLimit) - event.availableSlots;
+  const numberOfAttendees = event.noOfAttendees;
 
   return (
     <>

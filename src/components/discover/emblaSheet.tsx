@@ -56,14 +56,11 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
           const eventData = eventSnap.data();
           setIsEventCreator(eventData.createdBy === user.uid);
           
-          // Store the actual capacity limit
           setCapacityLimit(eventData.capacityLimit);
-          
-          // Get registered users count
+
           const registeredUsersCount = eventData.registeredUsers?.length || 0;
           setCurrentRegisteredCount(registeredUsersCount);
-          
-          // Calculate available spots
+
           if (eventData.capacityLimit === null) {
             setNoOfAttendees("unlimited");
           } else {
@@ -91,8 +88,7 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
     try {
       const eventRef = doc(db, "events", event.id);
       const userRef = doc(db, "users", user.uid);
-      
-      // Get fresh event data
+
       const eventSnap = await getDoc(eventRef);
       if (!eventSnap.exists()) {
         toast({ variant: "destructive", title: "Error", description: "Event not found." });
@@ -100,35 +96,30 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
       }
   
       const eventData = eventSnap.data();
-      
-      // Check if already registered
+
       if (eventData.registeredUsers?.includes(user.uid)) {
         toast({ variant: "default", title: "Info", description: "You are already registered." });
         setRegistered(true);
         return;
       }
-  
-      // Check capacity limit
+
       const currentCount = eventData.registeredUsers?.length || 0;
       
       if (capacityLimit !== null && currentCount >= capacityLimit) {
         toast({ variant: "destructive", title: "Full", description: "Event is at capacity." });
         return;
       }
-  
-      // Calculate new registered count
+
       const newRegisteredCount = currentCount + 1;
-      
-      // Update both documents and noOfAttendees
+
       await Promise.all([
         updateDoc(eventRef, { 
           registeredUsers: arrayUnion(user.uid),
-          noOfAttendees: newRegisteredCount  // Update attendee count in database
+          noOfAttendees: newRegisteredCount  
         }),
         updateDoc(userRef, { [`registeredEvents.${event.id}`]: false })
       ]);
   
-      // Update local state
       setCurrentRegisteredCount(newRegisteredCount);
       
       if (capacityLimit !== null) {
@@ -156,7 +147,6 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
       const eventRef = doc(db, "events", event.id);
       const userRef = doc(db, "users", user.uid);
       
-      // Get fresh event data
       const eventSnap = await getDoc(eventRef);
       if (!eventSnap.exists()) {
         toast({ variant: "destructive", title: "Error", description: "Event not found." });
@@ -169,21 +159,18 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
         return;
       }
       
-      // Calculate new registered count
       const newRegisteredCount = Math.max(0, currentRegisteredCount - 1);
   
-      // Update both documents atomically with noOfAttendees
       await Promise.all([
         updateDoc(eventRef, { 
           registeredUsers: arrayRemove(user.uid),
-          noOfAttendees: newRegisteredCount  // Update attendee count in database
+          noOfAttendees: newRegisteredCount  
         }),
         updateDoc(userRef, {
           [`registeredEvents.${event.id}`]: deleteField()
         })
       ]);
-  
-      // Update local state
+
       setCurrentRegisteredCount(newRegisteredCount);
       
       if (capacityLimit !== null) {

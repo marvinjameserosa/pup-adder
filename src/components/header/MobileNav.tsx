@@ -13,7 +13,6 @@ interface MobileNavProps {
 export function MobileNav({ isOpen, onToggle, onScannerOpen }: MobileNavProps) {
   return (
     <div className="md:hidden">
-      {/* Header with Sticky Position */}
       <div className="fixed top-0 left-0 right-0 z-20 bg-white shadow-sm border-b border-gray-200 flex items-center justify-between px-4 py-3">
         <div className="text-lg font-semibold text-[#722120]">PUP Gather</div>
         <Button variant="ghost" size="icon" onClick={onToggle} className="text-[#722120]">
@@ -21,7 +20,6 @@ export function MobileNav({ isOpen, onToggle, onScannerOpen }: MobileNavProps) {
         </Button>
       </div>
 
-      {/* Mobile Menu (slides below the header) */}
       {isOpen && (
         <div className="fixed top-[56px] left-0 right-0 bg-white shadow-lg z-10 border-t border-gray-200">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
