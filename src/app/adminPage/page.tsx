@@ -297,10 +297,10 @@ export default function AdminPage() {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                  <DialogTitle>User Permission Management</DialogTitle>
+                  <DialogTitle className="text-red-900">User Permission Management</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
-                  <div className="space-y-2">
+                  <div className="space-y-2 text-grey-100">
                     <Label htmlFor="email">Find User</Label>
                     <div className="flex gap-2">
                       <Input 
@@ -310,7 +310,7 @@ export default function AdminPage() {
                         className="flex-grow"
                         placeholder="Enter user email address"
                       />
-                      <Button onClick={searchUserByEmail}>
+                      <Button className="bg-red-900" onClick={searchUserByEmail}>
                         {isSearching ? "Searching..." : "Search"}
                       </Button>
                     </div>
@@ -354,7 +354,7 @@ export default function AdminPage() {
                           </Select>
                         </div>
                       </div>
-                      <Button onClick={updateUserType} className="w-full text-white bg-green-600 font-bold">
+                      <Button onClick={updateUserType} className="w-full text-white bg-green-700 font-bold">
                         {searchResult.userType === "admin" && selectedUserType !== "admin" 
                           ? "Remove Admin Privileges" 
                           : selectedUserType === "admin" 
