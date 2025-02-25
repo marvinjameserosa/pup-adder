@@ -170,7 +170,7 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
       <Card className="relative z-10 w-[360px] shadow-xl rounded-[24px] bg-[#f2f3f7]/60 backdrop-blur-sm flex flex-col border border-[#302F30]">
         <CardHeader>
           <CardTitle className="text-2xl text-[#a41e1d]">Personal Information</CardTitle>
-          <CardDescription className="text-gray-600">Finish creating your account.</CardDescription>
+          <CardDescription className="text-gray-600">Complete the form to get started</CardDescription>
         </CardHeader>
         <CardContent className="text-gray-800">
           <Tabs defaultValue={userType} onValueChange={(value) => setUserType(value as UserType)}>
