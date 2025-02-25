@@ -1,8 +1,8 @@
 "use client"
-import { Button } from "@/components/ui/button"
-import { Calendar, Camera, CheckCircle, Compass, Menu, PlusCircle, X } from "lucide-react"
-import Link from "next/link"
 import ProfileSheet from "@/components/header/profileSheet"
+import { Button } from "@/components/ui/button"
+import { Calendar, Camera, CheckCircle, Compass, Menu, PlusCircle, User, X } from "lucide-react"
+import Link from "next/link"
 
 interface MobileNavProps {
   isOpen: boolean
@@ -57,6 +57,14 @@ export function MobileNav({ isOpen, onToggle, onScannerOpen }: MobileNavProps) {
               >
                 <CheckCircle className="h-5 w-5 mr-2" />
                 Dashboard
+              </Button>
+            </Link>
+
+
+            <Link href="/adminPage">
+              <Button variant="ghost" size="default" className="text-[#722120] hover:bg-[#a41e1d] hover:text-white">
+                <User className="h-5 w-5 mr-2" />
+                Admin
               </Button>
             </Link>
 
