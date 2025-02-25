@@ -313,7 +313,6 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
 
                     <Label htmlFor="phone-number">Phone Number</Label>
                     <div className="flex items-center gap-2">
-                      {/* Country Code Dropdown */}
                       <Select
                         name="country-code"
                         onValueChange={handleCountryCodeChange}
@@ -331,7 +330,7 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         </SelectContent>
                       </Select>
 
-                      {/* Phone Number Input */}
+                      
                       <Input
                         id="phone-number"
                         name="phone-number"
@@ -422,7 +421,6 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
 
                     <Label htmlFor="phone-number">Phone Number</Label>
                     <div className="flex items-center gap-2">
-                      {/* Country Code Dropdown */}
                       <Select
                         name="country-code"
                         onValueChange={handleCountryCodeChange}
@@ -439,8 +437,6 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                           ))}
                         </SelectContent>
                       </Select>
-
-                      {/* Phone Number Input */}
                       <Input
                         id="phone-number"
                         name="phone-number"

@@ -49,7 +49,7 @@ export default function SignUpForm() {
       userData.department = formData.get("department") as string;
       userData.yearlevel = formData.get("year-level") as string;
     } else if (selectedUserType === "Alumni") {
-      userData.department = formData.get("department") as string;
+      userData.department = formData.get("department-graduated") as string;
       userData.yearGraduated = formData.get("year-graduated") as string;
     } else if (selectedUserType === "Faculty") {
       userData.department = formData.get("department") as string;

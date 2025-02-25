@@ -21,7 +21,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { EmailAuthProvider, onAuthStateChanged, reauthenticateWithCredential, signOut, updatePassword, User } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { Building, Eye, LogOut, Mail, PersonStanding, School, UserCircle } from "lucide-react";
+import { Building, Cake, Eye, LogOut, Mail, PersonStanding, Phone, School, UserCircle } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -30,11 +30,16 @@ interface UserData {
   firstName: string;
   lastName: string;
   studentNumber: string;
+  facultyNumber: string;
   email: string;
   department: string;
   userId: string;
   userType: string;
   profilePic?: string;
+  age: string;
+  sex: string;
+  yearlevel: string;
+  phoneNumber: string;
 }
 
 export default function ProfileSheet() {
@@ -172,8 +177,23 @@ export default function ProfileSheet() {
             <div className="flex items-center space-x-2"><Mail className="h-4 w-4 text-[#a41e1d]" /><span>{userData?.email}</span></div>
             <div className="flex items-center space-x-2"><PersonStanding className="h-4 w-4 text-[#a41e1d]" /><span>{userData?.userType}</span></div>
             <div className="flex items-center space-x-2"><Building className="h-4 w-4 text-[#a41e1d]" /><span>{userData?.department}</span></div>
+            <div className="flex items-center space-x-2"><Phone className="h-4 w-4 text-[#a41e1d]" /><span>{userData?.phoneNumber}</span></div>
+            <div className="flex items-center space-x-2"><Cake className="h-4 w-4 text-[#a41e1d]" /><span>{userData?.age}</span></div>
+            <div className="flex items-center space-x-2"><UserCircle className="h-4 w-4 text-[#a41e1d]"/><span>{userData?.sex}</span></div>
             <p className="text-sm"></p>
-            <div className="flex items-center font-bold space-x-2"><School className="h-4 w-4 text-[#a41e1d]" /><span>ID No: {userData?.studentNumber}</span></div>
+            {userData?.userType === "Student" && (
+              <div className="flex items-center font-bold space-x-2">
+                <School className="h-4 w-4 text-[#a41e1d]" />
+                <span>ID No: {userData?.studentNumber}</span>
+              </div>
+            )}
+          <p className="text-sm"></p>
+            {userData?.userType === "Faculty" && (
+              <div className="flex items-center font-bold space-x-2">
+                <School className="h-4 w-4 text-[#a41e1d]" />
+                <span>Faculty ID No: {userData?.facultyNumber}</span>
+              </div>
+            )}
           </div>
           <Button 
             onClick={() => setIsDialogOpen(true)} 
