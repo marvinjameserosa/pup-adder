@@ -220,13 +220,15 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
                 <SheetTitle className="text-2xl text-[#a41e1d] font-bold">{event.title}</SheetTitle>
               </SheetHeader>
               <div className="mt-4 space-y-4">
-                <Image
-                  src={event.image}
-                  alt={event.title}
-                  width={400}
-                  height={200}
-                  className="w-full h-[200px] object-cover rounded-lg shadow-md"
-                />
+                <Link href={event.image} target="_blank" rel="noopener noreferrer">
+                  <Image
+                    src={event.image}
+                    alt={event.title}
+                    width={400}
+                    height={200}
+                    className="w-full h-[200px] object-cover rounded-lg shadow-md cursor-pointer"
+                  />
+                </Link>
                 <p className="text-[#a41e1d]">{event.details}</p>
                 <div className="space-y-2 text-sm text-[#a41e1d]">
                   <div className="flex items-center space-x-2">
