@@ -1,8 +1,8 @@
 "use client"
-import Image from "next/image"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { CalendarDays, MapPin, Users } from "lucide-react"
+import Image from "next/image"
 
 interface EventData {
   id: string
@@ -41,13 +41,15 @@ export default function EventDrawer({ event, isOpen, onClose }: EventDrawerProps
         </SheetHeader>
         <ScrollArea className="h-[calc(100vh-120px)] pr-4">
           <div className="w-full h-48 relative rounded-lg mb-4 overflow-hidden">
-            <Image
-              src={event.eventPoster || "/placeholder.svg"}
-              alt={event.eventName}
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
+            <a href={event.eventPoster || "/placeholder.svg"} target="_blank" rel="noopener noreferrer">
+              <Image
+                src={event.eventPoster || "/placeholder.svg"}
+                alt={event.eventName}
+                layout="fill"
+                objectFit="cover"
+                className="rounded-lg cursor-pointer"
+              />
+            </a>
           </div>
           <div className="space-y-4">
             <div className="flex items-center space-x-2 text-[#a41e1d]">
