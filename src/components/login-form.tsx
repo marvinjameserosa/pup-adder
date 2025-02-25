@@ -228,7 +228,7 @@ export function LoginForm({ className }: { className?: string }) {
             </Button>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
-              <Link href="/signUp" className="underline text-yellow-400">
+              <Link href="/signUp" className="underline text-yellow-800">
                 Sign up
               </Link>
             </div>

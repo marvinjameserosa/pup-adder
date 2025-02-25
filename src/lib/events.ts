@@ -19,6 +19,9 @@ export async function fetchParticipants(eventId: string, eventData: EventData): 
             firstName: userData.firstName || "Unknown",
             lastName: userData.lastName || "",
             email: userData.email || "Not provided",
+            phoneNumber: userData.phoneNumber || "Not provided",
+            age: userData.age || "Not provided",
+            sex: userData.sex || "Not provided",
             userType: userData.userType || "Not specified",
             department: userData.department || "Not specified",
             registrationDate: new Date(

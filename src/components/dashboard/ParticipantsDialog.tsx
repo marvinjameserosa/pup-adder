@@ -38,8 +38,11 @@ import {
                 <TableHeader>
                   <TableRow className="border-b border-white/20">
                     <TableHead className="text-white">Name</TableHead>
-                    <TableHead className="text-white">Email</TableHead>
                     <TableHead className="text-white">Type</TableHead>
+                    <TableHead className="text-white">Email</TableHead>
+                    <TableHead className="text-white">Phone Number</TableHead>
+                    <TableHead className="text-white">Age</TableHead>
+                    <TableHead className="text-white">Sex/Gender</TableHead>
                     <TableHead className="text-white">Department/College</TableHead>
                     <TableHead className="text-white">Registration Date</TableHead>
                     <TableHead className="text-white">Admission Status</TableHead>
@@ -52,10 +55,13 @@ import {
                         <TableCell className="text-white">
                           {`${participant.firstName || ''} ${participant.lastName || ''}`}
                         </TableCell>
-                        <TableCell className="text-white">{participant.email}</TableCell>
                         <TableCell className="text-white">
                           {participant.userType || "Not specified"}
                         </TableCell>
+                        <TableCell className="text-white">{participant.email}</TableCell>
+                        <TableCell className="text-white">{participant.phoneNumber}</TableCell>
+                        <TableCell className="text-white">{participant.age}</TableCell>
+                        <TableCell className="text-white">{participant.sex}</TableCell>
                         <TableCell className="text-white">
                           {participant.department || "Not specified"}
                         </TableCell>

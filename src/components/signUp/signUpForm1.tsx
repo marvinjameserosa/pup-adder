@@ -72,7 +72,7 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
         <CardHeader>
           <CardTitle className="text-2xl text-[#a41e1d]">Create your account</CardTitle>
           <CardDescription className={errorMsg ? "text-red-500" : "text-gray-600"}>
-            {errorMsg ? errorMsg : "Complete the form to get started."}
+            {errorMsg ? errorMsg : "Finish setting up your account."}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-gray-800">
