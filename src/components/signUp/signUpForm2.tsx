@@ -78,7 +78,7 @@ const departments = [
 const yearLevels = ["First Year", "Second Year", "Third Year", "Fourth Year", "Fifth Year"];
 
 const countryCodes = [
-  { code: "+639", country: "Philippines", maxDigits: 9 },
+  { code: "+63", country: "Philippines", maxDigits: 10 },
   { code: "+1", country: "USA/Canada", maxDigits: 10 },
   { code: "+44", country: "United Kingdom", maxDigits: 10 },
   { code: "+91", country: "India", maxDigits: 10 },
