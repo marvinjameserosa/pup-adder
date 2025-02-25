@@ -14,8 +14,11 @@ export interface EventData {
     id: string;
     firstName?: string;
     lastName?: string;
-    email?: string;
     userType?: string;
+    email?: string;
+    phoneNumber?: string;
+    age?: string;
+    sex?: string;
     department?: string;
     registeredEvents?: {
       [eventId: string]: boolean;
