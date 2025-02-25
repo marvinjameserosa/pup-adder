@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SignUpForm1 from "@/components/signUp/signUpForm1";
 import SignUpForm2 from "@/components/signUp/signUpForm2";
+import { onAuthStateChanged } from "firebase/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "@/app/firebase/config";
 import { doc, setDoc } from "firebase/firestore";
@@ -10,10 +11,24 @@ import { useRouter } from "next/navigation";
 
 export default function SignUpForm() {
   const router = useRouter();
+  const [user, setUser] = useState<any>(null);
   const [showSignUpForm1, setShowSignUpForm1] = useState(false);
   const [error, setError] = useState("");
   const [userType, setUserType] = useState<"Student" | "Alumni" | "Faculty">("Student");
   const [userDetails, setUserDetails] = useState<any>(null); // Store form 2 data
+
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        router.push("/discover");
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
 
   // Step 1: Collect User Details (SignUpForm2)
   async function handleSignUpForm2(event: React.FormEvent<HTMLFormElement>, selectedUserType: "Student" | "Alumni" | "Faculty") {
