@@ -21,9 +21,9 @@ import { Switch } from "@/components/ui/switch"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import { onAuthStateChanged } from "firebase/auth"
-import { addDoc, collection, serverTimestamp } from "firebase/firestore"
+import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore"
 import { Building, ChevronDown, Clock, FileText, GraduationCap, Image, MapPin, Ticket, User, UserCheck, Users } from "lucide-react"
-import NextImage from "next/image"
+import Images from "next/image" 
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -52,11 +52,20 @@ export default function CreateEvent() {
     alumni: false,
     faculty: false,
   })
-
+  const [isAdmin, setIsAdmin] = useState(false)
+  
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser)
+        try {
+          const userDoc = await getDoc(doc(db, "users", currentUser.uid))
+          const userData = userDoc.data()
+          setIsAdmin(userData?.userType === "admin")
+        } catch (error) {
+          console.error("Error fetching user data:", error)
+          setIsAdmin(false)
+        }
       } else {
         toast({
           title: "Authentication Required",
@@ -67,7 +76,6 @@ export default function CreateEvent() {
       }
       setLoading(false)
     })
-
     return () => unsubscribe()
   }, [router, toast])
 
@@ -105,6 +113,15 @@ export default function CreateEvent() {
   }
 
   const handleCreateEvent = async () => {
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "Only administrators can create events.",
+        variant: "destructive",
+      })
+      return
+    }
+
     const missingFields = validateForm()
     if (missingFields.length > 0) {
       toast({
@@ -145,23 +162,13 @@ export default function CreateEvent() {
         createdAt: serverTimestamp(),
         status: "pending", 
       })
-
+      
       toast({
         title: "Event Created Successfully",
-        description: `${eventName} has been created.`,
+        description: `${eventName} has been created and is pending approval.`,
       })
-
-      setEventName("")
-      setStartDate("")
-      setStartTime("")
-      setEndDate("")
-      setEndTime("")
-      setIsVirtual(false)
-      setDescription("")
-      setLocation("")
-      setCapacityLimit(null)
-      setEventPoster(null)
-      setParticipantApprovals({ student: false, alumni: false, faculty: false })
+      
+      resetForm()
     } catch (error: any) {
       toast({
         title: "Error Creating Event",
@@ -171,6 +178,20 @@ export default function CreateEvent() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const resetForm = () => {
+    setEventName("")
+    setStartDate("")
+    setStartTime("")
+    setEndDate("")
+    setEndTime("")
+    setIsVirtual(false)
+    setDescription("")
+    setLocation("")
+    setCapacityLimit(null)
+    setEventPoster(null)
+    setParticipantApprovals({ student: false, alumni: false, faculty: false })
   }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,6 +244,29 @@ export default function CreateEvent() {
     return <Loading />
   }
 
+  if (!isAdmin) {
+    return (
+      <div className="relative min-h-screen bg-[#f2f3f7] bg-fixed">
+        <div className="relative z-10 min-h-screen">
+          <Header />
+          <div className="pt-4 pb-10 sm:pt-8 sm:pb-20 flex items-center justify-center">
+            <Card className="bg-white w-full max-w-[600px] p-6 mx-4 sm:mx-auto text-center">
+              <h2 className="text-2xl font-bold text-[#a41e1d] mb-4">Access Denied</h2>
+              <p className="text-gray-700 mb-6">Only administrators can create events. Please contact an administrator if you need to create an event.</p>
+              <Button 
+                onClick={() => router.push("/discover")}
+                className="bg-[#a41e1d] hover:bg-[#722120] text-white"
+              >
+                Return to Home
+              </Button>
+            </Card>
+          </div>
+        </div>
+        <Toaster />
+      </div>
+    )
+  }
+
   return (
     <div className="relative min-h-screen bg-[#f2f3f7] bg-fixed">
       <div className="relative z-10 min-h-screen">
@@ -233,7 +277,7 @@ export default function CreateEvent() {
               <div className="w-full md:w-[325px] flex-shrink-0">
                 <div className="h-[325px] w-full bg-gray-200 rounded-md flex items-center justify-center text-gray-500 relative overflow-hidden">
                   {eventPoster ? (
-                    <NextImage
+                    <Images
                       src={eventPoster || "/placeholder.svg"}
                       alt="Event Poster"
                       width={500}
@@ -257,7 +301,13 @@ export default function CreateEvent() {
                       className="cursor-pointer"
                       onClick={() => document.getElementById("poster-upload")?.click()}
                     >
-                      <Image className="h-4 w-4" />
+                      <Images
+                        src="/path-to-your-image.jpg" 
+                        alt="Event Poster" 
+                        width={16} 
+                        height={16} 
+                        className="h-4 w-4" 
+                      />
                     </Button>
                   </label>
                 </div>
@@ -342,7 +392,7 @@ export default function CreateEvent() {
                           className="w-full h-20 p-2 border rounded-md"
                           value={location}
                           onChange={(e) => setLocation(e.target.value)}
-                          placeholder="Enter event lcoation"
+                          placeholder="Enter event location"
                         />
                       </div>
                       <DialogFooter>
@@ -359,7 +409,7 @@ export default function CreateEvent() {
                   <Dialog open={isDescriptionDialogOpen} onOpenChange={setIsDescriptionDialogOpen}>
                     <DialogTrigger asChild>
                       <Button variant="outline" className="w-full h-auto min-h-[45px] py-2 px-3 text-left text-black">
-                        <span className="block truncate">{description ? description : "Add Description"}</span>
+                        <span className="block truncate">{description ? description.substring(0, 50) + (description.length > 50 ? "..." : "") : "Add Description"}</span>
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="bg-[#a41e1d]">
@@ -485,7 +535,12 @@ export default function CreateEvent() {
                     </div>
                   </div>
                 </div>
-                <Button variant="outline" className="w-full bg-white/10 text-white hover:bg-[#722120]" onClick={handleCreateEvent} disabled={validateForm().length > 0}>
+                <Button 
+                  variant="outline" 
+                  className="w-full bg-white/10 text-white hover:bg-[#722120]" 
+                  onClick={handleCreateEvent} 
+                  disabled={validateForm().length > 0}
+                >
                   Create Event
                 </Button>
               </div>

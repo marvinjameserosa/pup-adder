@@ -57,10 +57,8 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
           setIsEventCreator(eventData.createdBy === user.uid);
           
           setCapacityLimit(eventData.capacityLimit);
-
           const registeredUsersCount = eventData.registeredUsers?.length || 0;
           setCurrentRegisteredCount(registeredUsersCount);
-
           if (eventData.capacityLimit === null) {
             setNoOfAttendees("unlimited");
           } else {
@@ -88,7 +86,6 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
     try {
       const eventRef = doc(db, "events", event.id);
       const userRef = doc(db, "users", user.uid);
-
       const eventSnap = await getDoc(eventRef);
       if (!eventSnap.exists()) {
         toast({ variant: "destructive", title: "Error", description: "Event not found." });
@@ -96,22 +93,18 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
       }
   
       const eventData = eventSnap.data();
-
       if (eventData.registeredUsers?.includes(user.uid)) {
         toast({ variant: "default", title: "Info", description: "You are already registered." });
         setRegistered(true);
         return;
       }
-
       const currentCount = eventData.registeredUsers?.length || 0;
       
       if (capacityLimit !== null && currentCount >= capacityLimit) {
         toast({ variant: "destructive", title: "Full", description: "Event is at capacity." });
         return;
       }
-
       const newRegisteredCount = currentCount + 1;
-
       await Promise.all([
         updateDoc(eventRef, { 
           registeredUsers: arrayUnion(user.uid),
@@ -170,7 +163,6 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
           [`registeredEvents.${event.id}`]: deleteField()
         })
       ]);
-
       setCurrentRegisteredCount(newRegisteredCount);
       
       if (capacityLimit !== null) {
@@ -273,18 +265,20 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
                           Get Ticket
                         </Button>
                       )}
-                      <Button 
-                        onClick={handleUnregister}
-                        className="w-full bg-red-500 hover:bg-red-600 text-white"
-                        disabled={loading}
-                      >
-                        {loading ? (
-                          <div className="flex items-center gap-2">
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            Processing...
-                          </div>
-                        ) : "Unregister"}
-                      </Button>
+                      {!ticketGenerated && (
+                        <Button 
+                          onClick={handleUnregister}
+                          className="w-full bg-red-500 hover:bg-red-600 text-white"
+                          disabled={loading}
+                        >
+                          {loading ? (
+                            <div className="flex items-center gap-2">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Processing...
+                            </div>
+                          ) : "Unregister"}
+                        </Button>
+                      )}
                     </div>
                   ) : (
                     <Button 

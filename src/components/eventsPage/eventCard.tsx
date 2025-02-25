@@ -2,13 +2,15 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Users } from "lucide-react";
+import { MapPin, Users, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import ManageEventCard from "./manageEvent";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/app/firebase/config";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayRemove, deleteField } from "firebase/firestore";
 import { generateTicket } from "@/utils/getTickets";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface EventData {
   id: string;
@@ -26,6 +28,7 @@ interface EventData {
   location: string;
   noOfAttendees: number;
   participantApprovals: Array<any>; 
+  registeredUsers?: string[];
 }
 
 interface EventCardProps {
@@ -37,7 +40,11 @@ export default function EventCard({ event, onClick }: EventCardProps) {
   const [showManageCard, setShowManageCard] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [checkedIn, setCheckedIn] = useState(false);
+  const [registered, setRegistered] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -47,6 +54,8 @@ export default function EventCard({ event, onClick }: EventCardProps) {
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const userData = userSnap.data();
+          const isRegistered = userData.registeredEvents?.[event.id] !== undefined;
+          setRegistered(isRegistered);
           setCheckedIn(userData.registeredEvents?.[event.id] === true);
         }
       }
@@ -63,6 +72,110 @@ export default function EventCard({ event, onClick }: EventCardProps) {
   const handleManageClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowManageCard(true);
+  };
+
+  const handleUnregister = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user?.uid) {
+      toast({ 
+        variant: "destructive", 
+        title: "Error", 
+        description: "You must be logged in to unregister." 
+      });
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const eventRef = doc(db, "events", event.id);
+      const userRef = doc(db, "users", user.uid);
+      
+      const eventSnap = await getDoc(eventRef);
+      if (!eventSnap.exists()) {
+        toast({ 
+          variant: "destructive", 
+          title: "Error", 
+          description: "Event not found." 
+        });
+        return;
+      }
+
+      const eventData = eventSnap.data();
+      if (!eventData.registeredUsers?.includes(user.uid)) {
+        toast({ 
+          variant: "destructive", 
+          title: "Error", 
+          description: "You are not registered for this event." 
+        });
+        return;
+      }
+      
+      const newRegisteredCount = Math.max(0, event.noOfAttendees - 1);
+
+      await Promise.all([
+        updateDoc(eventRef, { 
+          registeredUsers: arrayRemove(user.uid),
+          noOfAttendees: newRegisteredCount  
+        }),
+        updateDoc(userRef, {
+          [`registeredEvents.${event.id}`]: deleteField()
+        })
+      ]);
+
+      setRegistered(false);
+      setCheckedIn(false);
+      toast({ 
+        variant: "default", 
+        title: "Success", 
+        description: "Successfully unregistered from event." 
+      });
+      
+      // Reload the page after successful unregistration
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      
+    } catch (error) {
+      toast({ 
+        variant: "destructive", 
+        title: "Error", 
+        description: "Failed to unregister. Please try again." 
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleGetTicket = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user?.uid) {
+      toast({ 
+        variant: "destructive", 
+        title: "Error", 
+        description: "You must be logged in to get a ticket." 
+      });
+      return;
+    }
+    
+    try {
+      generateTicket(event.id, user.uid);
+      // Update user document to mark ticket as used
+      updateDoc(doc(db, "users", user.uid), { 
+        [`registeredEvents.${event.id}`]: true 
+      });
+      setCheckedIn(true);
+      toast({ 
+        variant: "default", 
+        title: "Ticket", 
+        description: "Ticket downloaded! 🎟️" 
+      });
+    } catch (error) {
+      toast({ 
+        variant: "destructive", 
+        title: "Error", 
+        description: "Failed to generate ticket. Please try again." 
+      });
+    }
   };
 
   const numberOfAttendees = event.noOfAttendees;
@@ -122,23 +235,36 @@ export default function EventCard({ event, onClick }: EventCardProps) {
                 {loading ? (
                   <Badge variant="secondary" className="h-7 px-2 text-xs">Loading...</Badge>
                 ) : isUpcoming ? (
-                  checkedIn ? (
-                    <Badge variant="secondary" className="h-7 px-2 text-xs">Checked In</Badge>
-                  ) : (
-                    <Button
-                      size="sm"
-                      className="h-7 px-2 bg-yellow-500 text-white hover:bg-yellow-600"
-                      onClick={() => {
-                        if (!user?.uid) {
-                          console.error("User ID is missing!");
-                          return;
-                        }
-                        generateTicket(event.id, user.uid);
-                      }}
-                    >
-                      Get Ticket
-                    </Button>
-                  )
+                  registered ? (
+                    <div className="flex space-x-2">
+                      {checkedIn ? (
+                        <Badge variant="secondary" className="h-7 px-2 text-xs">Checked In</Badge>
+                      ) : (
+                        <Button
+                          size="sm"
+                          className="h-7 px-2 bg-yellow-500 text-white hover:bg-yellow-600"
+                          onClick={handleGetTicket}
+                        >
+                          Get Ticket
+                        </Button>
+                      )}
+                      {/* Only show Unregister button if not checked in yet */}
+                      {!checkedIn && (
+                        <Button
+                          size="sm"
+                          className="h-7 px-2 bg-red-500 text-white hover:bg-red-600"
+                          onClick={handleUnregister}
+                          disabled={actionLoading}
+                        >
+                          {actionLoading ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            "Unregister"
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                  ) : null
                 ) : null}
               </div>
             )}
