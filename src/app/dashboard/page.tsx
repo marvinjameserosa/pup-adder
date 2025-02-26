@@ -12,6 +12,9 @@ import { EventsList } from "@/components/dashboard/EventsList";
 import { EventDetails } from "@/components/dashboard/EventDetails";
 import { Event, EventData, CancelStatus } from "@/types/eventTypes";
 import { fetchParticipants, formatEventData, categorizeEvents } from "@/lib/events";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function Dashboard() {
   // State management
@@ -22,23 +25,36 @@ export default function Dashboard() {
   const [totalRegistrations, setTotalRegistrations] = useState<number>(0);
   const [authChecking, setAuthChecking] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [cancelStatus, setCancelStatus] = useState<CancelStatus>({
     loading: false,
     error: null
   });
   const router = useRouter();
 
-  // Authentication check
+  // Authentication and admin check
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setAuthChecking(false);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setIsAuthenticated(true);
+        
+        // Check if user is admin by checking userType field
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          const userData = userDoc.data();
+          // Check specifically for "admin" userType
+          setIsAdmin(userData?.userType === "admin");
+        } catch (error) {
+          console.error("Error checking admin status:", error);
+          setIsAdmin(false);
+        }
       } else {
         setIsAuthenticated(false);
+        setIsAdmin(false);
         router.push('/');
       }
+      setAuthChecking(false);
     });
     return () => unsubscribe();
   }, [router]);
@@ -46,7 +62,7 @@ export default function Dashboard() {
   // Event fetching
   useEffect(() => {
     const fetchEvents = async () => {
-      if (!isAuthenticated) return;
+      if (!isAuthenticated || !isAdmin) return;
       setLoading(true);
       try {
         const eventsSnapshot = await getDocs(collection(db, "events"));
@@ -75,10 +91,10 @@ export default function Dashboard() {
         setLoading(false);
       }
     };
-    if (isAuthenticated) {
+    if (isAuthenticated && isAdmin) {
       fetchEvents();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isAdmin]);
 
   // Event handlers
   const handleEventSelect = (event: Event) => {
@@ -126,11 +142,40 @@ export default function Dashboard() {
     }
   };
 
-  // Loading states
+  // Loading state during authentication check
   if (authChecking) return <Loading />;
+  
+  // Not authenticated
   if (!isAuthenticated) return null;
+  
+  // Not admin
+  if (!isAdmin) {
+    return (
+      <div className="relative min-h-screen bg-[#f2f3f7] bg-fixed">
+        <div className="relative z-10 min-h-screen">
+          <Header />
+          <div className="pt-4 pb-10 sm:pt-8 sm:pb-20 flex items-center justify-center">
+            <Card className="bg-white w-full max-w-[600px] p-6 mx-4 sm:mx-auto text-center">
+              <h2 className="text-2xl font-bold text-[#a41e1d] mb-4">Access Denied</h2>
+              <p className="text-gray-700 mb-6">Only administrators can access the dashboard. Please contact an administrator if you need access.</p>
+              <Button 
+                onClick={() => router.push("/discover")}
+                className="bg-[#a41e1d] hover:bg-[#722120] text-white"
+              >
+                Return to Home
+              </Button>
+            </Card>
+          </div>
+        </div>
+        <Toaster />
+      </div>
+    );
+  }
+  
+  // Loading events after authentication is confirmed
   if (loading) return <Loading />;
-
+  
+  // Main dashboard (only for admin users)
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -171,7 +216,7 @@ export default function Dashboard() {
           {/* Event Details */}
           <div className="lg:col-span-8">
             {selectedEvent ? (
-              <div >
+              <div>
                 <EventDetails
                   event={selectedEvent}
                   onCancelEvent={handleCancelEvent}
@@ -190,6 +235,7 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+      <Toaster />
     </div>
   );
 }

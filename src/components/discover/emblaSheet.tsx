@@ -1,12 +1,12 @@
 import { auth, db } from "@/app/firebase/config";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetClose, SheetTitle } from "@/components/ui/sheet";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { SlideType } from '@/types/slideTypes';
 import { generateTicket } from "@/utils/getTickets";
 import { arrayRemove, arrayUnion, deleteField, doc, getDoc, updateDoc } from "firebase/firestore";
-import { Calendar, Check, Clock, Loader2, MapPin, Users } from "lucide-react";
+import { Loader2, Calendar, Clock, MapPin, Users, Check, X } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -57,10 +57,8 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
           setIsEventCreator(eventData.createdBy === user.uid);
           
           setCapacityLimit(eventData.capacityLimit);
-
           const registeredUsersCount = eventData.registeredUsers?.length || 0;
           setCurrentRegisteredCount(registeredUsersCount);
-
           if (eventData.capacityLimit === null) {
             setNoOfAttendees("unlimited");
           } else {
@@ -88,7 +86,6 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
     try {
       const eventRef = doc(db, "events", event.id);
       const userRef = doc(db, "users", user.uid);
-
       const eventSnap = await getDoc(eventRef);
       if (!eventSnap.exists()) {
         toast({ variant: "destructive", title: "Error", description: "Event not found." });
@@ -96,22 +93,18 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
       }
   
       const eventData = eventSnap.data();
-
       if (eventData.registeredUsers?.includes(user.uid)) {
         toast({ variant: "default", title: "Info", description: "You are already registered." });
         setRegistered(true);
         return;
       }
-
       const currentCount = eventData.registeredUsers?.length || 0;
       
       if (capacityLimit !== null && currentCount >= capacityLimit) {
         toast({ variant: "destructive", title: "Full", description: "Event is at capacity." });
         return;
       }
-
       const newRegisteredCount = currentCount + 1;
-
       await Promise.all([
         updateDoc(eventRef, { 
           registeredUsers: arrayUnion(user.uid),
@@ -170,7 +163,6 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
           [`registeredEvents.${event.id}`]: deleteField()
         })
       ]);
-
       setCurrentRegisteredCount(newRegisteredCount);
       
       if (capacityLimit !== null) {
@@ -207,105 +199,156 @@ export default function EmblaSheet({ isOpen, onClose, event }: EmblaSheetProps) 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetTitle></SheetTitle>
-      <SheetContent className="sm:max-w-[425px] bg-[#f2f3f7]/60 text-white">
-        <div className="relative h-full p-6 z-50">
+      <SheetContent className="sm:max-w-md p-0 bg-white dark:bg-gray-900 border-l border-gray-100 dark:border-gray-800 shadow-lg">
+        <div className="relative h-full">
           {isLoadingUserData ? (
             <div className="flex flex-col justify-center items-center h-full space-y-4">
-              <Loader2 className="h-10 w-10 text-white animate-spin" />
-              <p className="text-white text-center">Loading event details...</p>
+              <Loader2 className="h-10 w-10 text-red-600 animate-spin" />
+              <p className="text-gray-700 dark:text-gray-300 text-center">Loading event details...</p>
             </div>
           ) : (
-            <>
-              <SheetHeader>
-                <SheetTitle className="text-2xl text-[#a41e1d] font-bold">{event.title}</SheetTitle>
-              </SheetHeader>
-              <div className="mt-4 space-y-4">
+            <div className="flex flex-col h-full">
+              {/* Close button */}
+              <SheetClose className="absolute right-4 top-4 z-10 rounded-full bg-white/20 backdrop-blur-md p-1.5 text-white hover:bg-white/30 transition-all">
+                <X className="h-5 w-5" />
+              </SheetClose>
+              
+              {/* Larger Event Image Header */}
+              <div className="relative w-full h-72">
                 <Image
                   src={event.image}
                   alt={event.title}
-                  width={400}
-                  height={200}
-                  className="w-full h-[200px] object-cover rounded-lg shadow-md"
+                  layout="fill"
+                  objectFit="cover"
+                  className="w-full"
                 />
-                <p className="text-[#a41e1d]">{event.details}</p>
-                <div className="space-y-2 text-sm text-[#a41e1d]">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-4 w-4 text-[#a41e1d]" />
-                    <span>{event.date}</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                
+                {/* Title overlay on image */}
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h2 className="text-2xl font-bold text-white drop-shadow-md">
+                    {event.title}
+                  </h2>
+                </div>
+              </div>
+              
+              {/* Content with padding */}
+              <div className="flex-1 p-4 overflow-y-auto">
+                <div className="space-y-4">
+                  {/* Event details/description */}
+                  <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-base">
+                      {event.details}
+                    </p>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-[#a41e1d]" />
-                    <span>{event.time}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <MapPin className="h-4 w-4 text-[#a41e1d]" />
-                    <span>{event.location}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-4 w-4 text-[#a41e1d]" />
-                    <span>
-                      {noOfAttendees === "unlimited" ? 
-                        "Unlimited spots available" : 
-                        `${noOfAttendees} spots available`}
-                    </span>
+                  
+                  {/* Event metadata in rows with full width */}
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-red-50 dark:bg-red-900/20 p-2.5 rounded-lg">
+                        <Calendar className="h-5 w-5 text-red-600" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Date</span>
+                        <span className="text-gray-800 dark:text-gray-200">{event.date}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <div className="bg-red-50 dark:bg-red-900/20 p-2.5 rounded-lg">
+                        <Clock className="h-5 w-5 text-red-600" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Time</span>
+                        <span className="text-gray-800 dark:text-gray-200">{event.time}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <div className="bg-red-50 dark:bg-red-900/20 p-2.5 rounded-lg">
+                        <MapPin className="h-5 w-5 text-red-600" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Location</span>
+                        <span className="text-gray-800 dark:text-gray-200">{event.location}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <div className="bg-red-50 dark:bg-red-900/20 p-2.5 rounded-lg">
+                        <Users className="h-5 w-5 text-red-600" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Capacity</span>
+                        <span className="text-gray-800 dark:text-gray-200">
+                          {noOfAttendees === "unlimited" ? 
+                            "Unlimited spots" : 
+                            `${noOfAttendees} spots`}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="mt-6">
-                  {isEventCreator ? (
-                    <Link href="/dashboard">
-                      <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">
-                        Go to Dashboard
+              </div>
+              
+              {/* Fixed action bar at bottom */}
+              <div className="sticky bottom-0 p-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
+                {isEventCreator ? (
+                  <Link href="/dashboard">
+                    <Button className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-xl transition-all shadow-sm">
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                ) : registered ? (
+                  <div className="space-y-3">
+                    {ticketGenerated ? (
+                      <Button disabled className="w-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-medium py-3 rounded-xl flex items-center justify-center gap-2">
+                        <Check className="h-5 w-5" /> Ticket Used
                       </Button>
-                    </Link>
-                  ) : registered ? (
-                    <div className="space-y-2">
-                      {ticketGenerated ? (
-                        <Button disabled className="w-full bg-gray-500 text-white flex items-center justify-center gap-2">
-                          <Check className="h-4 w-4" /> Ticket Used
-                        </Button>
-                      ) : (
-                        <Button 
-                          onClick={handleGetTicket} 
-                          className="w-full bg-yellow-500 hover:bg-yellow-800 text-white"
-                        >
-                          Get Ticket
-                        </Button>
-                      )}
+                    ) : (
+                      <Button 
+                        onClick={handleGetTicket} 
+                        className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-xl transition-all shadow-sm"
+                      >
+                        Get Ticket
+                      </Button>
+                    )}
+                    {!ticketGenerated && (
                       <Button 
                         onClick={handleUnregister}
-                        className="w-full bg-red-500 hover:bg-red-600 text-white"
+                        className="w-full bg-white dark:bg-gray-800 border border-red-600 text-red-600 font-medium py-3 rounded-xl hover:bg-red-50 dark:hover:bg-gray-700 transition-all"
                         disabled={loading}
                       >
                         {loading ? (
                           <div className="flex items-center gap-2">
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <Loader2 className="h-5 w-5 animate-spin" />
                             Processing...
                           </div>
                         ) : "Unregister"}
                       </Button>
-                    </div>
-                  ) : (
-                    <Button 
-                      onClick={handleRegister} 
-                      className="w-full bg-green-500 hover:bg-green-600 text-white" 
-                      disabled={loading || (typeof noOfAttendees === 'number' && noOfAttendees <= 0)}
-                    >
-                      {loading ? (
-                        <div className="flex items-center gap-2">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Registering...
-                        </div>
-                      ) : (typeof noOfAttendees === 'number' && noOfAttendees <= 0) ? 
-                        "Event Full" : "Click to Register"}
-                    </Button>
-                  )}
-                </div>
+                    )}
+                  </div>
+                ) : (
+                  <Button 
+                    onClick={handleRegister} 
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-xl transition-all shadow-sm" 
+                    disabled={loading || (typeof noOfAttendees === 'number' && noOfAttendees <= 0)}
+                  >
+                    {loading ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Registering...
+                      </div>
+                    ) : (typeof noOfAttendees === 'number' && noOfAttendees <= 0) ? 
+                      "Event Full" : "Register for Event"}
+                  </Button>
+                )}
               </div>
-              <Toaster />
-            </>
+            </div>
           )}
         </div>
       </SheetContent>
+      <Toaster />
     </Sheet>
   );
 }

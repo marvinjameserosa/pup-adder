@@ -78,7 +78,7 @@ const departments = [
 const yearLevels = ["First Year", "Second Year", "Third Year", "Fourth Year", "Fifth Year"];
 
 const countryCodes = [
-  { code: "+639", country: "Philippines", maxDigits: 9 },
+  { code: "+63", country: "Philippines", maxDigits: 10 },
   { code: "+1", country: "USA/Canada", maxDigits: 10 },
   { code: "+44", country: "United Kingdom", maxDigits: 10 },
   { code: "+91", country: "India", maxDigits: 10 },
@@ -170,7 +170,7 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
       <Card className="relative z-10 w-[360px] shadow-xl rounded-[24px] bg-[#f2f3f7]/60 backdrop-blur-sm flex flex-col border border-[#302F30]">
         <CardHeader>
           <CardTitle className="text-2xl text-[#a41e1d]">Personal Information</CardTitle>
-          <CardDescription className="text-gray-600">Finish creating your account.</CardDescription>
+          <CardDescription className="text-gray-600">Complete the form to get started</CardDescription>
         </CardHeader>
         <CardContent className="text-gray-800">
           <Tabs defaultValue={userType} onValueChange={(value) => setUserType(value as UserType)}>
@@ -313,7 +313,6 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
 
                     <Label htmlFor="phone-number">Phone Number</Label>
                     <div className="flex items-center gap-2">
-                      {/* Country Code Dropdown */}
                       <Select
                         name="country-code"
                         onValueChange={handleCountryCodeChange}
@@ -331,7 +330,7 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         </SelectContent>
                       </Select>
 
-                      {/* Phone Number Input */}
+                      
                       <Input
                         id="phone-number"
                         name="phone-number"
@@ -422,7 +421,6 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
 
                     <Label htmlFor="phone-number">Phone Number</Label>
                     <div className="flex items-center gap-2">
-                      {/* Country Code Dropdown */}
                       <Select
                         name="country-code"
                         onValueChange={handleCountryCodeChange}
@@ -439,8 +437,6 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                           ))}
                         </SelectContent>
                       </Select>
-
-                      {/* Phone Number Input */}
                       <Input
                         id="phone-number"
                         name="phone-number"
