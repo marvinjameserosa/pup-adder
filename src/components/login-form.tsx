@@ -226,8 +226,8 @@ export function LoginForm({ className }: { className?: string }) {
             >
               Login
             </Button>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
+            <div className="mt-3 text-center text-sm">
+              Don't have an account?{" "}
               <Link href="/signUp" className="underline text-yellow-800">
                 Sign up
               </Link>

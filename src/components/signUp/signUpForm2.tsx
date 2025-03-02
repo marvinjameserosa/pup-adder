@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Link from "next/link";
 
 const departments = [
   "BS Computer Engineering",
@@ -515,6 +516,12 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                 </TabsContent>
 
                 <Button type="submit" className="w-full mt-6 bg-yellow-500 hover:bg-yellow-800 text-black">Sign up</Button>
+                <div className="mt-3 text-center text-sm">
+              Already have an account?{" "}
+              <Link href="/" className="underline text-blue-800">
+                Login
+              </Link>
+            </div>
               </form>
             </div>
           </Tabs>
