@@ -1,12 +1,12 @@
 "use client"
-import { useEffect, useState } from "react"
+import { db } from "@/app/firebase/config"
 import ProfileSheet from "@/components/header/profileSheet"
 import { Button } from "@/components/ui/button"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { doc, getDoc } from "firebase/firestore"
 import { Calendar, Camera, CheckCircle, Compass, Menu, PlusCircle, User, X } from "lucide-react"
 import Link from "next/link"
-import { db } from "@/app/firebase/config"
-import { onAuthStateChanged, getAuth } from "firebase/auth"
-import { doc, getDoc } from "firebase/firestore"
+import { useEffect, useState } from "react"
 
 interface MobileNavProps {
   isOpen: boolean
@@ -44,7 +44,7 @@ export function MobileNav({ isOpen, onToggle, onScannerOpen }: MobileNavProps) {
   return (
     <div className="md:hidden">
       <div className="fixed top-0 left-0 right-0 z-20 bg-white shadow-sm border-b border-gray-200 flex items-center justify-between px-4 py-3">
-        <div className="text-lg font-semibold text-[#722120]">PUP Gather</div>
+        <div className="text-lg font-semibold text-[#722120]">PUP Adder</div>
         <Button variant="ghost" size="icon" onClick={onToggle} className="text-[#722120]">
           {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
