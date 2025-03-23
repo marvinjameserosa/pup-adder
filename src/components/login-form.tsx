@@ -1,5 +1,5 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { auth } from "@/app/firebase/config";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,16 +10,16 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import {
-  signInWithEmailAndPassword,
   onAuthStateChanged,
   sendPasswordResetEmail,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
-import { auth } from "@/app/firebase/config";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function LoginForm({ className }: { className?: string }) {
   const router = useRouter();
@@ -149,7 +149,7 @@ export function LoginForm({ className }: { className?: string }) {
     <div className={cn("flex flex-col gap-4", className)}>
       <Card className="shadow-xl rounded-[24px] bg-[#f2f3f7]/50 backdrop-blur-sm border border-[#302F30]">
         <CardHeader>
-          <CardTitle className="text-2xl text-[#a41e1d]">Welcome to PUP Gather!</CardTitle>
+          <CardTitle className="text-2xl text-[#a41e1d]">Welcome to PUP Adder!</CardTitle>
           <CardDescription
             className={cn(
               error || resetError ? "text-red-500" :

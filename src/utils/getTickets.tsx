@@ -1,8 +1,8 @@
-import { collection, doc, getDoc } from "firebase/firestore";
 import { db } from "@/app/firebase/config";
+import { saveAs } from "file-saver";
+import { collection, doc, getDoc } from "firebase/firestore";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import QRCode from "qrcode";
-import { saveAs } from "file-saver";
 
 export const generateTicket = async (eventId: string, userId: string) => {
   try {
@@ -38,7 +38,7 @@ export const generateTicket = async (eventId: string, userId: string) => {
       color: rgb(0.65, 0.16, 0.16), 
     });
 
-    page.drawText("PUP GATHER", {
+    page.drawText("PUP Adder", {
       x: width / 2 - 60,
       y: height - 30,
       size: 16,
