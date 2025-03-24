@@ -1,10 +1,10 @@
 "use client"
 
+import { QRScanner } from "@/components/header/QRscanner"
 import Link from "next/link"
 import { useState } from "react"
 import { DesktopNav } from "./DesktopNav"
 import { MobileNav } from "./MobileNav"
-import { QRScanner } from "@/components/header/QRscanner"
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -15,7 +15,7 @@ export default function Header() {
       <div className="max-w-[1360px] mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/discover" className="font-bold text-2xl text-[#722120]">
-            PUP Gather
+            PUP Adder
           </Link>
           
           {/* Desktop Navigation */}

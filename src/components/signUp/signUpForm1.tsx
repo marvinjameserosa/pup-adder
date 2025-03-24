@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Eye, EyeOff, Check, X } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 type SignUpForm1Props = {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -22,23 +22,12 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordValidation, setPasswordValidation] = useState({
-    minLength: false,
-    hasUppercase: false,
-    hasLowercase: false,
-    hasNumber: false,
-    hasSpecial: false
-  });
+  const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [isChecked, setIsChecked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [touched, setTouched] = useState({
-    email: false,
-    password: false,
-    confirmPassword: false
-  });
 
   const validateEmail = (value: string) => {
     setEmail(value);
@@ -48,16 +37,13 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
 
   const validatePassword = (value: string) => {
     setPassword(value);
-    
-    // Check each validation criteria separately
-    setPasswordValidation({
-      minLength: value.length >= 8,
-      hasUppercase: /[A-Z]/.test(value),
-      hasLowercase: /[a-z]/.test(value),
-      hasNumber: /\d/.test(value),
-      hasSpecial: /[@$!%*?&]/.test(value)
-    });
-
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    setPasswordError(
+      passwordRegex.test(value)
+        ? ""
+        : "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
+    );
     if (confirmPassword) {
       validateConfirmPassword(confirmPassword, value);
     }
@@ -70,23 +56,12 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
     );
   };
 
-  const handleBlur = (field: 'email' | 'password' | 'confirmPassword') => {
-    setTouched(prev => ({ ...prev, [field]: true }));
-  };
-
-  const isPasswordValid = 
-    passwordValidation.minLength && 
-    passwordValidation.hasUppercase && 
-    passwordValidation.hasLowercase && 
-    passwordValidation.hasNumber && 
-    passwordValidation.hasSpecial;
-
   const isFormValid = 
     email && 
     password && 
     confirmPassword && 
     !emailError && 
-    isPasswordValid && 
+    !passwordError && 
     !confirmPasswordError && 
     isChecked;
 
@@ -114,12 +89,10 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
                   required
                   value={email}
                   onChange={(e) => validateEmail(e.target.value)}
-                  onBlur={() => handleBlur('email')}
                   className="bg-white text-black placeholder-gray-400"
                 />
-                {touched.email && emailError && <p className="text-red-500 text-xs">{emailError}</p>}
+                {emailError && <p className="text-red-500 text-xs">{emailError}</p>}
               </div>
-              
               {/* Password Input */}
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
@@ -132,7 +105,6 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
                     required
                     value={password}
                     onChange={(e) => validatePassword(e.target.value)}
-                    onBlur={() => handleBlur('password')}
                     className="bg-white text-black placeholder-gray-400 pr-10"
                   />
                   <button
@@ -143,57 +115,8 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
-                
-                {/* Password requirements list */}
-                {(touched.password || password.length > 0) && (
-                  <div className="text-xs mt-1 space-y-1">
-                    <p className="font-medium">Password must contain:</p>
-                    <div className="grid grid-cols-2 gap-x-2 gap-y-1">
-                      <div className="flex items-center">
-                        {passwordValidation.minLength ? 
-                          <Check size={14} className="text-green-500 mr-1" /> : 
-                          <X size={14} className="text-red-500 mr-1" />}
-                        <span className={passwordValidation.minLength ? "text-green-700" : "text-red-500"}>
-                          8+ characters
-                        </span>
-                      </div>
-                      <div className="flex items-center">
-                        {passwordValidation.hasUppercase ? 
-                          <Check size={14} className="text-green-500 mr-1" /> : 
-                          <X size={14} className="text-red-500 mr-1" />}
-                        <span className={passwordValidation.hasUppercase ? "text-green-700" : "text-red-500"}>
-                          Uppercase letter
-                        </span>
-                      </div>
-                      <div className="flex items-center">
-                        {passwordValidation.hasLowercase ? 
-                          <Check size={14} className="text-green-500 mr-1" /> : 
-                          <X size={14} className="text-red-500 mr-1" />}
-                        <span className={passwordValidation.hasLowercase ? "text-green-700" : "text-red-500"}>
-                          Lowercase letter
-                        </span>
-                      </div>
-                      <div className="flex items-center">
-                        {passwordValidation.hasNumber ? 
-                          <Check size={14} className="text-green-500 mr-1" /> : 
-                          <X size={14} className="text-red-500 mr-1" />}
-                        <span className={passwordValidation.hasNumber ? "text-green-700" : "text-red-500"}>
-                          Number
-                        </span>
-                      </div>
-                      <div className="flex items-center">
-                        {passwordValidation.hasSpecial ? 
-                          <Check size={14} className="text-green-500 mr-1" /> : 
-                          <X size={14} className="text-red-500 mr-1" />}
-                        <span className={passwordValidation.hasSpecial ? "text-green-700" : "text-red-500"}>
-                          Special character (@$!%*?&)
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {passwordError && <p className="text-red-500 text-xs">{passwordError}</p>}
               </div>
-              
               {/* Confirm Password Input */}
               <div className="grid gap-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -206,7 +129,6 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
                     required
                     value={confirmPassword}
                     onChange={(e) => validateConfirmPassword(e.target.value)}
-                    onBlur={() => handleBlur('confirmPassword')}
                     className="bg-white text-black placeholder-gray-400 pr-10"
                   />
                   <button
@@ -217,11 +139,8 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
                     {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
-                {touched.confirmPassword && confirmPasswordError && (
-                  <p className="text-red-500 text-xs">{confirmPasswordError}</p>
-                )}
+                {confirmPasswordError && <p className="text-red-500 text-xs">{confirmPasswordError}</p>}
               </div>
-              
               {/* Data Privacy Agreement */}
               <div className="flex items-start gap-2">
                 <input
@@ -245,17 +164,11 @@ export default function SignUpForm1({ onSubmit, errorMsg }: SignUpForm1Props) {
                   </Dialog>
                 </Label>
               </div>
-              
               {/* Sign Up Button */}
-              <Button 
-                type="submit" 
-                className="w-full bg-yellow-500 hover:bg-yellow-800 text-black" 
-                disabled={!isFormValid}
-              >
+              <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-800 text-black" disabled={!isFormValid}>
                 Sign up
               </Button>
             </div>
-            
             {/* Login Redirect */}
             <div className="mt-4 text-center text-sm">
               Already have an account? {" "}

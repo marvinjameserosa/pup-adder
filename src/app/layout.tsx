@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PUP Gather",
-  description: "PUP Gather is a streamlined platform that simplifies event planning in the university.",
+  title: "PUP Adder",
+  description: "PUP Adder is a streamlined platform that simplifies event planning in the university.",
 };
 
 export default function RootLayout({
