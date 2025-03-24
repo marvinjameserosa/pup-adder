@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Calendar, Clock, MapPin, Users, X } from "lucide-react"
 import { useState } from "react"
+import Image from "next/image"
 
 interface EventData {
   id: string
@@ -64,7 +65,7 @@ export default function ManageEventCard({ event, onClose }: ManageEventCardProps
           </TabsList>
           <TabsContent value="overview">
             <div className="space-y-4 mt-4">
-              <img
+              <Image
                 src={event.eventPoster || "/placeholder.svg"}
                 alt={event.eventName}
                 className="w-full h-32 sm:h-48 object-cover rounded-lg"
