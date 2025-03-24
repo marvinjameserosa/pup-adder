@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Header from "@/components/header/header"
@@ -9,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Search, ShieldCheck, UserCog } from "lucide-react"
+import { Search, ShieldCheck, UserCog, User, Filter } from "lucide-react"
 import { db } from "@/app/firebase/config"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { collection, query, where, getDocs, doc, updateDoc, onSnapshot, getDoc } from "firebase/firestore"
@@ -24,11 +23,14 @@ interface User {
   lastName: string
   email: string
   userType: string
+  createdAt?: any
 }
 
 export default function AdminPage() {
   const [adminUsers, setAdminUsers] = useState<User[]>([])
+  const [allUsers, setAllUsers] = useState<User[]>([])
   const [searchQuery, setSearchQuery] = useState("")
+  const [userSearchQuery, setUserSearchQuery] = useState("")
   const [isUserModalOpen, setIsUserModalOpen] = useState(false)
   const [emailSearch, setEmailSearch] = useState("")
   const [selectedUserType, setSelectedUserType] = useState("admin")
@@ -37,6 +39,7 @@ export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [authChecking, setAuthChecking] = useState(true)
+  const [userTypeFilter, setUserTypeFilter] = useState("all")
   const { toast } = useToast()
   const router = useRouter()
 
@@ -99,10 +102,44 @@ export default function AdminPage() {
           firstName: userData.firstName || "",
           lastName: userData.lastName || "",
           email: userData.email || "",
-          userType: userData.userType || "admin"
+          userType: userData.userType || "admin",
+          createdAt: userData.createdAt
         })
       })
       setAdminUsers(adminList)
+    })
+    
+    return () => unsubscribe()
+  }, [isAuthenticated, isAdmin, authChecking])
+
+  // Fetch all users
+  useEffect(() => {
+    if (!isAuthenticated || !isAdmin || authChecking) return;
+    
+    const usersRef = collection(db, "users")
+    
+    const unsubscribe = onSnapshot(usersRef, (querySnapshot) => {
+      const usersList: User[] = []
+      querySnapshot.forEach((doc) => {
+        const userData = doc.data()
+        usersList.push({
+          id: doc.id,
+          firstName: userData.firstName || "",
+          lastName: userData.lastName || "",
+          email: userData.email || "",
+          userType: userData.userType || "user",
+          createdAt: userData.createdAt
+        })
+      })
+      
+      // Sort users by creation date (newest first)
+      usersList.sort((a, b) => {
+        const dateA = a.createdAt ? a.createdAt.toDate() : new Date(0);
+        const dateB = b.createdAt ? b.createdAt.toDate() : new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      });
+      
+      setAllUsers(usersList)
     })
     
     return () => unsubscribe()
@@ -141,6 +178,18 @@ export default function AdminPage() {
     `${admin.firstName} ${admin.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
     admin.email.toLowerCase().includes(searchQuery.toLowerCase())
   )
+
+  const filteredUsers = allUsers.filter((user) => {
+    // Apply text search
+    const matchesSearch = 
+      `${user.firstName} ${user.lastName}`.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(userSearchQuery.toLowerCase());
+    
+    // Apply user type filter
+    const matchesType = userTypeFilter === "all" || user.userType === userTypeFilter;
+    
+    return matchesSearch && matchesType;
+  });
 
   const searchUserByEmail = async () => {
     if (!emailSearch.trim()) {
@@ -249,6 +298,29 @@ export default function AdminPage() {
     }
   }
 
+  const changeUserRole = async (id: string, firstName: string, lastName: string, newRole: string) => {
+    try {
+      const userRef = doc(db, "users", id)
+      await updateDoc(userRef, {
+        userType: newRole
+      })
+      
+      const fullName = `${firstName} ${lastName}`.trim() || "User"
+      
+      toast({
+        title: "User Role Updated",
+        description: `${fullName} is now a ${getUserTypeName(newRole)}`,
+      })
+    } catch (error) {
+      console.error("Error updating user role:", error)
+      toast({
+        title: "Action Failed",
+        description: "Unable to change user role. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
   const getInitials = (firstName: string = "", lastName: string = "") => {
     if (!firstName && !lastName) return "UN";
     
@@ -268,7 +340,8 @@ export default function AdminPage() {
       "student": "Student",
       "alumni": "Alumni",
       "faculty": "Faculty",
-      "admin": "Administrator"
+      "admin": "Administrator",
+      "user": "Standard User"
     }
     return types[type as keyof typeof types] || type
   }
@@ -276,6 +349,30 @@ export default function AdminPage() {
   const getUserTypeIcon = (type: string) => {
     if (type === "admin") return <ShieldCheck className="h-4 w-4 mr-1" />;
     return <UserCog className="h-4 w-4 mr-1" />;
+  }
+
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "Unknown";
+    
+    try {
+      const date = timestamp.toDate();
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (e) {
+      return "Invalid date";
+    }
+  }
+
+  // Calculate stats for the dashboard
+  const userStats = {
+    total: allUsers.length,
+    admin: allUsers.filter(u => u.userType === "admin").length,
+    faculty: allUsers.filter(u => u.userType === "faculty").length,
+    student: allUsers.filter(u => u.userType === "student").length,
+    alumni: allUsers.filter(u => u.userType === "alumni").length,
   }
 
   return (
@@ -368,50 +465,145 @@ export default function AdminPage() {
             </Dialog>
           </CardContent>
         </Card>
+
+        {/* User Statistics Dashboard */}
         <Card>
           <CardHeader>
-            <CardTitle>Administrator List</CardTitle>
+            <CardTitle>User Statistics</CardTitle>
+          </CardHeader>
+          <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 text-center">
+              <div className="text-3xl font-bold text-gray-800">{userStats.total}</div>
+              <div className="text-sm font-medium text-gray-500">Total Users</div>
+            </div>
+            <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 text-center border-t-4 border-red-500">
+              <div className="text-3xl font-bold text-red-600">{userStats.admin}</div>
+              <div className="text-sm font-medium text-gray-600">Administrators</div>
+            </div>
+            <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 text-center border-t-4 border-blue-500">
+              <div className="text-3xl font-bold text-blue-600">{userStats.faculty}</div>
+              <div className="text-sm font-medium text-gray-600">Faculty</div>
+            </div>
+            <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 text-center border-t-4 border-green-500">
+              <div className="text-3xl font-bold text-green-600">{userStats.student}</div>
+              <div className="text-sm font-medium text-gray-600">Students</div>
+            </div>
+            <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 text-center border-t-4 border-purple-500">
+              <div className="text-3xl font-bold text-purple-600">{userStats.alumni}</div>
+              <div className="text-sm font-medium text-gray-600">Alumni</div>
+            </div>
+          </div>
+          </CardContent>
+        </Card>
+        
+        {/* All Users List */}
+        <Card>
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <CardTitle>All Registered Users</CardTitle>
+            <div className="flex items-center mt-4 sm:mt-0">
+              <Filter className="h-4 w-4 mr-2 text-gray-500" />
+              <Select value={userTypeFilter} onValueChange={setUserTypeFilter}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Filter by type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="admin">Administrators</SelectItem>
+                  <SelectItem value="faculty">Faculty</SelectItem>
+                  <SelectItem value="student">Students</SelectItem>
+                  <SelectItem value="alumni">Alumni</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="relative mb-4">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
               <Input 
-                placeholder="Search administrators..." 
-                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search users by name or email..." 
+                onChange={(e) => setUserSearchQuery(e.target.value)}
                 className="pl-8"
               />
             </div>
-            {filteredAdmins.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">No administrators found.</p>
+            
+            {filteredUsers.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">No users found matching your search criteria.</p>
             ) : (
-              <div className="space-y-2">
-                {filteredAdmins.map((admin) => (
-                  <div key={admin.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarFallback>
-                          {getInitials(admin.firstName, admin.lastName)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">
-                          {`${admin.firstName} ${admin.lastName}`.trim() || "Unknown User"}
-                        </p>
-                        <p className="text-sm text-gray-500">{admin.email}</p>
-                      </div>
-                    </div>
-                    <Button 
-                      onClick={() => changeAdminToFaculty(admin.id, admin.firstName, admin.lastName)}
-                      size="default" 
-                      className="bg-red-700 hover:bg-[#a41e1d] text-white font-bold hover:text-white"
-                      title="Change to Faculty Role"
-                    >
-                      Remove Admin
-                    </Button>
-                  </div>
-                ))}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3">User</th>
+                      <th className="px-4 py-3">Email</th>
+                      <th className="px-4 py-3">Role</th>
+                      <th className="px-4 py-3">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredUsers.map((user) => (
+                      <tr key={user.id} className="bg-white border-b hover:bg-gray-50">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center">
+                            <Avatar className="mr-3">
+                              <AvatarFallback>
+                                {getInitials(user.firstName, user.lastName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="font-medium">
+                                {`${user.firstName} ${user.lastName}`.trim() || "Unknown User"}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="text-gray-500">{user.email}</span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center">
+                            {getUserTypeIcon(user.userType)}
+                            <span className={
+                              user.userType === "admin" 
+                                ? "text-red-600 font-medium" 
+                                : user.userType === "faculty"
+                                  ? "text-blue-600"
+                                  : "text-gray-600"
+                            }>
+                              {getUserTypeName(user.userType)}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Select 
+                            defaultValue={user.userType}
+                            onValueChange={(value) => {
+                              if (value !== user.userType) {
+                                changeUserRole(user.id, user.firstName, user.lastName, value)
+                              }
+                            }}
+                          >
+                            <SelectTrigger className="w-[140px]">
+                              <SelectValue placeholder="Change role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="student">Student</SelectItem>
+                              <SelectItem value="alumni">Alumni</SelectItem>
+                              <SelectItem value="faculty">Faculty</SelectItem>
+                              <SelectItem value="admin">Administrator</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
+            
+            <div className="mt-4 text-gray-500 text-sm">
+              Showing {filteredUsers.length} of {allUsers.length} total users
+            </div>
           </CardContent>
         </Card>
       </div>
