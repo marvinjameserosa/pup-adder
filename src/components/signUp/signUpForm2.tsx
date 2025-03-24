@@ -1,6 +1,5 @@
 "use client";
-
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -75,38 +74,55 @@ const departments = [
   "Diploma in Mechanical Engineering Technology",
   "Diploma in Office Management"
 ];
-
 const yearLevels = ["First Year", "Second Year", "Third Year", "Fourth Year", "Fifth Year"];
-
 const countryCodes = [
   { code: "+63", country: "Philippines", maxDigits: 10 },
   { code: "+1", country: "USA/Canada", maxDigits: 10 },
   { code: "+44", country: "United Kingdom", maxDigits: 10 },
   { code: "+91", country: "India", maxDigits: 10 },
 ];
-
 const genderOptions = ["Male", "Female", "Prefer not to say"];
 
 type UserType = "Student" | "Alumni" | "Faculty";
 
 type SignUpForm2Props = {
-  userType: UserType;
-  setUserType: (type: UserType) => void;
+  userType: "Student" | "Alumni" | "Faculty";
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   errorMsg?: string;
+  setUserType: React.Dispatch<React.SetStateAction<"Student" | "Alumni" | "Faculty">>;
+  onBack: () => void; 
+};
+
+type FormErrors = {
+  firstName?: string;
+  lastName?: string;
+  studentNumber?: string;
+  facultyId?: string;
+  phoneNumber?: string;
+  age?: string;
+  gender?: string;
+  yearLevel?: string;
+  department?: string;
 };
 
 export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg }: SignUpForm2Props) {
+  // Form fields
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [studentNumber, setStudentNumber] = useState("");
+  const [facultyId, setFacultyId] = useState("");
   const [department, setDepartment] = useState("");
   const [filteredDepartments, setFilteredDepartments] = useState(departments);
   const [showDropdown, setShowDropdown] = useState(false);
   const [yearLevel, setYearLevel] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [phoneError, setPhoneError] = useState("");
   const [selectedCountryCode, setSelectedCountryCode] = useState(countryCodes[0]);
   const [age, setAge] = useState("");
-  const [ageError, setAgeError] = useState("");
   const [gender, setGender] = useState("");
+  
+  // Form validation errors
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -122,11 +138,18 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
       setFilteredDepartments(departments);
       setShowDropdown(false);
     }
+    
+    if (errors.department) {
+      setErrors({ ...errors, department: undefined });
+    }
   };
 
   const handleSelectDepartment = (dept: string) => {
     setDepartment(dept);
     setShowDropdown(false);
+    if (errors.department) {
+      setErrors({ ...errors, department: undefined });
+    }
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,11 +157,10 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
     if (value.length <= selectedCountryCode.maxDigits) {
       setPhoneNumber(value);
     }
-
-    if (value.length < selectedCountryCode.maxDigits) {
-      setPhoneError(`Phone number must be exactly ${selectedCountryCode.maxDigits} digits.`);
-    } else {
-      setPhoneError("");
+    
+    // Clear error when user is typing
+    if (errors.phoneNumber) {
+      setErrors({ ...errors, phoneNumber: undefined });
     }
   };
 
@@ -147,23 +169,129 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
     if (newCountry) {
       setSelectedCountryCode(newCountry);
       setPhoneNumber(""); // Reset phone number when changing country
-      setPhoneError(""); // Reset error
+      // Clear phone error
+      if (errors.phoneNumber) {
+        setErrors({ ...errors, phoneNumber: undefined });
+      }
     }
   };
 
   const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
     setAge(value);
-
-    // Validate age range
-    const ageNum = parseInt(value, 10);
-    if (ageNum < 16 || ageNum > 100) {
-      setAgeError("Age must be between 16 and 100.");
-    } else {
-      setAgeError("");
+    
+    // Clear error when user is typing
+    if (errors.age) {
+      setErrors({ ...errors, age: undefined });
+    }
+  };
+  
+  const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFirstName(e.target.value);
+    if (errors.firstName) {
+      setErrors({ ...errors, firstName: undefined });
+    }
+  };
+  
+  const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLastName(e.target.value);
+    if (errors.lastName) {
+      setErrors({ ...errors, lastName: undefined });
+    }
+  };
+  
+  const handleStudentNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStudentNumber(e.target.value);
+    if (errors.studentNumber) {
+      setErrors({ ...errors, studentNumber: undefined });
+    }
+  };
+  
+  const handleFacultyIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFacultyId(e.target.value);
+    if (errors.facultyId) {
+      setErrors({ ...errors, facultyId: undefined });
+    }
+  };
+  
+  const handleGenderChange = (value: string) => {
+    setGender(value);
+    if (errors.gender) {
+      setErrors({ ...errors, gender: undefined });
+    }
+  };
+  
+  const handleYearLevelChange = (value: string) => {
+    setYearLevel(value);
+    if (errors.yearLevel) {
+      setErrors({ ...errors, yearLevel: undefined });
     }
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+    
+    // Common validations
+    if (!firstName.trim()) {
+      newErrors.firstName = "First name is required";
+    }
+    
+    if (!lastName.trim()) {
+      newErrors.lastName = "Last name is required";
+    }
+    
+    if (!phoneNumber) {
+      newErrors.phoneNumber = "Phone number is required";
+    } else if (phoneNumber.length !== selectedCountryCode.maxDigits) {
+      newErrors.phoneNumber = `Phone number must be exactly ${selectedCountryCode.maxDigits} digits`;
+    }
+    
+    if (!age) {
+      newErrors.age = "Age is required";
+    } else {
+      const ageNum = parseInt(age, 10);
+      if (isNaN(ageNum) || ageNum < 16 || ageNum > 100) {
+        newErrors.age = "Age must be between 16 and 100";
+      }
+    }
+    
+    if (!gender) {
+      newErrors.gender = "Please select your gender";
+    }
+    
+    if (!department.trim()) {
+      newErrors.department = "Department is required";
+    } else if (!departments.includes(department)) {
+      newErrors.department = "Please select a valid department from the list";
+    }
+    
+    // User type specific validations
+    if (userType === "Student") {
+      if (!studentNumber.trim()) {
+        newErrors.studentNumber = "Student number is required";
+      }
+      
+      if (!yearLevel) {
+        newErrors.yearLevel = "Please select your year level";
+      }
+    } else if (userType === "Faculty") {
+      if (!facultyId.trim()) {
+        newErrors.facultyId = "Faculty ID is required";
+      }
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormSubmitted(true);
+    
+    if (validateForm()) {
+      onSubmit(e);
+    }
+  };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-[url('/bg3.jpg')] p-4">
@@ -181,19 +309,45 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                 <TabsTrigger value="Alumni" className={`flex-1 ${userType === "Alumni" ? "bg-yellow-500" : "hover:bg-yellow-400"}`}>Alumni</TabsTrigger>
                 <TabsTrigger value="Faculty" className={`flex-1 ${userType === "Faculty" ? "bg-yellow-500" : "hover:bg-yellow-400"}`}>Faculty</TabsTrigger>
               </TabsList>
-
-              <form onSubmit={onSubmit}>
+              <form onSubmit={handleSubmit}>
                 <TabsContent value="Student">
                   <div className="flex flex-col gap-3">
                     <Label htmlFor="first-name">First Name</Label>
-                    <Input id="first-name" name="first-name" type="text" placeholder="Juan" required />
-
+                    <Input 
+                      id="first-name" 
+                      name="first-name" 
+                      type="text" 
+                      placeholder="Juan" 
+                      value={firstName}
+                      onChange={handleFirstNameChange}
+                      className={errors.firstName ? "border-red-500" : ""}
+                    />
+                    {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
+                    
                     <Label htmlFor="last-name">Last Name</Label>
-                    <Input id="last-name" name="last-name" type="text" placeholder="Dela Cruz" required />
-
+                    <Input 
+                      id="last-name" 
+                      name="last-name" 
+                      type="text" 
+                      placeholder="Dela Cruz" 
+                      value={lastName}
+                      onChange={handleLastNameChange}
+                      className={errors.lastName ? "border-red-500" : ""}
+                    />
+                    {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
+                    
                     <Label htmlFor="student-number">Student Number</Label>
-                    <Input id="student-number" name="student-number" type="text" placeholder="2015-001..." required />
-
+                    <Input 
+                      id="student-number" 
+                      name="student-number" 
+                      type="text" 
+                      placeholder="2015-001..." 
+                      value={studentNumber}
+                      onChange={handleStudentNumberChange}
+                      className={errors.studentNumber ? "border-red-500" : ""}
+                    />
+                    {errors.studentNumber && <p className="text-red-500 text-sm">{errors.studentNumber}</p>}
+                    
                     <Label htmlFor="phone-number">Phone Number</Label>
                     <div className="flex items-center gap-2">
                       {/* Country Code Dropdown */}
@@ -213,7 +367,6 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                           ))}
                         </SelectContent>
                       </Select>
-
                       {/* Phone Number Input */}
                       <Input
                         id="phone-number"
@@ -223,13 +376,13 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         onChange={handlePhoneChange}
                         placeholder={`Enter ${selectedCountryCode.maxDigits}-digit number`}
                         maxLength={selectedCountryCode.maxDigits}
-                        required
+                        className={errors.phoneNumber ? "border-red-500" : ""}
                       />
                     </div>
-                    {phoneError && <p className="text-red-500 text-sm">{phoneError}</p>}
-
+                    {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber}</p>}
+                    
                     <div className="flex gap-3">
-                     <div className="flex-1">
+                      <div className="flex-1">
                         <Label htmlFor="age">Age</Label>
                         <Input
                           id="age"
@@ -239,15 +392,15 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                           onChange={handleAgeChange}
                           placeholder="Enter your age"
                           maxLength={3}
-                          required
+                          className={errors.age ? "border-red-500" : ""}
                         />
-                        {ageError && <p className="text-red-500 text-sm">{ageError}</p>}
+                        {errors.age && <p className="text-red-500 text-sm">{errors.age}</p>}
                       </div>
                       <div className="flex-1">
                         <Label htmlFor="gender">Sex/Gender</Label>
-                        <Select name="gender" onValueChange={setGender} required>
-                          <SelectTrigger id="gender">
-                            <SelectValue placeholder="Select your gender" />
+                        <Select name="gender" onValueChange={handleGenderChange} value={gender}>
+                          <SelectTrigger id="gender" className={errors.gender ? "border-red-500" : ""}>
+                            <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
                             {genderOptions.map((option) => (
@@ -257,11 +410,13 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                             ))}
                           </SelectContent>
                         </Select>
+                        {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
                       </div>
                     </div>
+                    
                     <Label htmlFor="year-level">Year Level</Label>
-                    <Select name="year-level" onValueChange={(value) => setYearLevel(value)} required>
-                      <SelectTrigger id="year-level">
+                    <Select name="year-level" onValueChange={handleYearLevelChange} value={yearLevel}>
+                      <SelectTrigger id="year-level" className={errors.yearLevel ? "border-red-500" : ""}>
                         <SelectValue placeholder="Select your year level" />
                       </SelectTrigger>
                       <SelectContent>
@@ -270,8 +425,8 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         ))}
                       </SelectContent>
                     </Select>
+                    {errors.yearLevel && <p className="text-red-500 text-sm">{errors.yearLevel}</p>}
           
-
                     <Label htmlFor="department">Department</Label>
                     <div className="relative">
                       <Input
@@ -281,7 +436,7 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         value={department}
                         onChange={handleInputChange}
                         placeholder="Type or select your department"
-                        required
+                        className={errors.department ? "border-red-500" : ""}
                       />
                       {showDropdown && (
                         <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-md max-h-40 overflow-y-auto">
@@ -301,18 +456,37 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         </ul>
                       )}
                     </div>
+                    {errors.department && <p className="text-red-500 text-sm">{errors.department}</p>}
                   </div>
                 </TabsContent>
-
+                
                 <TabsContent value="Alumni">
                   <div className="flex flex-col gap-3">
-                    <Label htmlFor="first-name">First Name</Label>
-                    <Input id="first-name" name="first-name" type="text" placeholder="Juan" required />
-
-                    <Label htmlFor="last-name">Last Name</Label>
-                    <Input id="last-name" name="last-name" type="text" placeholder="Dela Cruz" required />
-
-                    <Label htmlFor="phone-number">Phone Number</Label>
+                    <Label htmlFor="first-name-alumni">First Name</Label>
+                    <Input 
+                      id="first-name-alumni" 
+                      name="first-name" 
+                      type="text" 
+                      placeholder="Juan" 
+                      value={firstName}
+                      onChange={handleFirstNameChange}
+                      className={errors.firstName ? "border-red-500" : ""}
+                    />
+                    {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
+                    
+                    <Label htmlFor="last-name-alumni">Last Name</Label>
+                    <Input 
+                      id="last-name-alumni" 
+                      name="last-name" 
+                      type="text" 
+                      placeholder="Dela Cruz" 
+                      value={lastName}
+                      onChange={handleLastNameChange}
+                      className={errors.lastName ? "border-red-500" : ""}
+                    />
+                    {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
+                    
+                    <Label htmlFor="phone-number-alumni">Phone Number</Label>
                     <div className="flex items-center gap-2">
                       <Select
                         name="country-code"
@@ -330,41 +504,40 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                           ))}
                         </SelectContent>
                       </Select>
-
                       
                       <Input
-                        id="phone-number"
+                        id="phone-number-alumni"
                         name="phone-number"
                         type="text"
                         value={phoneNumber}
                         onChange={handlePhoneChange}
                         placeholder={`Enter ${selectedCountryCode.maxDigits}-digit number`}
                         maxLength={selectedCountryCode.maxDigits}
-                        required
+                        className={errors.phoneNumber ? "border-red-500" : ""}
                       />
                     </div>
-                    {phoneError && <p className="text-red-500 text-sm">{phoneError}</p>}
-
+                    {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber}</p>}
+                    
                     <div className="flex gap-3">
-                     <div className="flex-1">
-                        <Label htmlFor="age">Age</Label>
+                      <div className="flex-1">
+                        <Label htmlFor="age-alumni">Age</Label>
                         <Input
-                          id="age"
+                          id="age-alumni"
                           name="age"
                           type="text"
                           value={age}
                           onChange={handleAgeChange}
                           placeholder="Enter your age"
                           maxLength={3}
-                          required
+                          className={errors.age ? "border-red-500" : ""}
                         />
-                        {ageError && <p className="text-red-500 text-sm">{ageError}</p>}
+                        {errors.age && <p className="text-red-500 text-sm">{errors.age}</p>}
                       </div>
                       <div className="flex-1">
-                        <Label htmlFor="gender">Sex/Gender</Label>
-                        <Select name="gender" onValueChange={setGender} required>
-                          <SelectTrigger id="gender">
-                            <SelectValue placeholder="Select your gender" />
+                        <Label htmlFor="gender-alumni">Sex/Gender</Label>
+                        <Select name="gender" onValueChange={handleGenderChange} value={gender}>
+                          <SelectTrigger id="gender-alumni" className={errors.gender ? "border-red-500" : ""}>
+                            <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
                             {genderOptions.map((option) => (
@@ -374,9 +547,10 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                             ))}
                           </SelectContent>
                         </Select>
+                        {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
                       </div>
                     </div>
-
+                    
                     <Label htmlFor="department-graduated">Program Graduated</Label>
                     <div className="relative">
                       <Input
@@ -386,7 +560,7 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         value={department}
                         onChange={handleInputChange}
                         placeholder="Type or select your department"
-                        required
+                        className={errors.department ? "border-red-500" : ""}
                       />
                       {showDropdown && (
                         <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-md max-h-40 overflow-y-auto">
@@ -406,21 +580,49 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         </ul>
                       )}
                     </div>
+                    {errors.department && <p className="text-red-500 text-sm">{errors.department}</p>}
                   </div>
                 </TabsContent>
-
+                
                 <TabsContent value="Faculty">
                   <div className="flex flex-col gap-3">
-                    <Label htmlFor="first-name">First Name</Label>
-                    <Input id="first-name" name="first-name" type="text" placeholder="Juan" required />
-
-                    <Label htmlFor="last-name">Last Name</Label>
-                    <Input id="last-name" name="last-name" type="text" placeholder="Dela Cruz" required />
-
+                    <Label htmlFor="first-name-faculty">First Name</Label>
+                    <Input 
+                      id="first-name-faculty" 
+                      name="first-name" 
+                      type="text" 
+                      placeholder="Juan" 
+                      value={firstName}
+                      onChange={handleFirstNameChange}
+                      className={errors.firstName ? "border-red-500" : ""}
+                    />
+                    {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
+                    
+                    <Label htmlFor="last-name-faculty">Last Name</Label>
+                    <Input 
+                      id="last-name-faculty" 
+                      name="last-name" 
+                      type="text" 
+                      placeholder="Dela Cruz" 
+                      value={lastName}
+                      onChange={handleLastNameChange}
+                      className={errors.lastName ? "border-red-500" : ""}
+                    />
+                    {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
+                    
                     <Label htmlFor="faculty-id">Faculty ID Number</Label>
-                    <Input id="faculty-id" name="faculty-number" type="text" placeholder="2010-000..." required />
-
-                    <Label htmlFor="phone-number">Phone Number</Label>
+                    <Input 
+                      id="faculty-id" 
+                      name="faculty-id"
+                      type="text" 
+                      placeholder="2010-000..." 
+                      value={facultyId}
+                      onChange={handleFacultyIdChange}
+                      className={errors.facultyId ? "border-red-500" : ""}
+                    />
+                    {errors.facultyId && <p className="text-red-500 text-sm">{errors.facultyId}</p>}
+                    
+                    <Label htmlFor="phone-number-faculty">Phone Number</Label>
                     <div className="flex items-center gap-2">
                       <Select
                         name="country-code"
@@ -439,38 +641,38 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         </SelectContent>
                       </Select>
                       <Input
-                        id="phone-number"
+                        id="phone-number-faculty"
                         name="phone-number"
                         type="text"
                         value={phoneNumber}
                         onChange={handlePhoneChange}
                         placeholder={`Enter ${selectedCountryCode.maxDigits}-digit number`}
                         maxLength={selectedCountryCode.maxDigits}
-                        required
+                        className={errors.phoneNumber ? "border-red-500" : ""}
                       />
                     </div>
-                    {phoneError && <p className="text-red-500 text-sm">{phoneError}</p>}
-
+                    {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber}</p>}
+                    
                     <div className="flex gap-3">
-                     <div className="flex-1">
-                        <Label htmlFor="age">Age</Label>
+                      <div className="flex-1">
+                        <Label htmlFor="age-faculty">Age</Label>
                         <Input
-                          id="age"
+                          id="age-faculty"
                           name="age"
                           type="text"
                           value={age}
                           onChange={handleAgeChange}
                           placeholder="Enter your age"
                           maxLength={3}
-                          required
+                          className={errors.age ? "border-red-500" : ""}
                         />
-                        {ageError && <p className="text-red-500 text-sm">{ageError}</p>}
+                        {errors.age && <p className="text-red-500 text-sm">{errors.age}</p>}
                       </div>
                       <div className="flex-1">
-                        <Label htmlFor="gender">Sex/Gender</Label>
-                        <Select name="gender" onValueChange={setGender} required>
-                          <SelectTrigger id="gender">
-                            <SelectValue placeholder="Select your gender" />
+                        <Label htmlFor="gender-faculty">Sex/Gender</Label>
+                        <Select name="gender" onValueChange={handleGenderChange} value={gender}>
+                          <SelectTrigger id="gender-faculty" className={errors.gender ? "border-red-500" : ""}>
+                            <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
                             {genderOptions.map((option) => (
@@ -480,19 +682,20 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                             ))}
                           </SelectContent>
                         </Select>
+                        {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
                       </div>
                     </div>
-
-                    <Label htmlFor="department">Department</Label>
+                    
+                    <Label htmlFor="department-faculty">Department</Label>
                     <div className="relative">
                       <Input
-                        id="department"
+                        id="department-faculty"
                         name="department"
                         type="text"
                         value={department}
                         onChange={handleInputChange}
                         placeholder="Type or select your department"
-                        required
+                        className={errors.department ? "border-red-500" : ""}
                       />
                       {showDropdown && (
                         <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-md max-h-40 overflow-y-auto">
@@ -512,9 +715,13 @@ export default function SignUpForm2({ userType, setUserType, onSubmit, errorMsg 
                         </ul>
                       )}
                     </div>
+                    {errors.department && <p className="text-red-500 text-sm">{errors.department}</p>}
                   </div>
                 </TabsContent>
-
+                
+                {/* Display global error message if provided */}
+                {errorMsg && <p className="text-red-500 text-sm mt-2">{errorMsg}</p>}
+                
                 <Button type="submit" className="w-full mt-6 bg-yellow-500 hover:bg-yellow-800 text-black">Sign up</Button>
                 <div className="mt-3 text-center text-sm">
               Already have an account?{" "}
