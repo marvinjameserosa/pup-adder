@@ -75,18 +75,14 @@ export default function SignUpForm() {
     const passwordInput = formData.get("password") as string;
 
     try {
-      // Register the user
       const userCredential = await createUserWithEmailAndPassword(auth, emailInput, passwordInput);
       const user = userCredential.user;
       const userId = user.uid;
 
-      // Add email to user details
       const fullUserData = { ...userDetails, userId, email: user.email };
 
-      // Save user details in Firestore
       await setDoc(doc(db, "users", userId), fullUserData);
 
-      // Redirect after successful registration
       router.push("/discover");
     } catch (error: any) {
       setError(formatFirebaseError(error.code));
@@ -107,9 +103,9 @@ export default function SignUpForm() {
   return (
     <div>
       {!showSignUpForm1 ? (
-        <SignUpForm2 userType={userType} onSubmit={(event) => handleSignUpForm2(event, userType)} errorMsg={error} setUserType={setUserType} />
+        <SignUpForm1 onSubmit={handleSignUpForm1} errorMsg={error} />  
       ) : (
-        <SignUpForm1 onSubmit={handleSignUpForm1} errorMsg={error} />
+        <SignUpForm2 userType={userType} onSubmit={(event) => handleSignUpForm2(event, userType)} errorMsg={error} setUserType={setUserType}/>  
       )}
     </div>
   );
